@@ -1,7 +1,11 @@
 <template>
 
     <!-- CYTOSCAPE -->
-    <cytoscape ref="cy" :config="myConfig" v-on:mousedown="onMouseDown" v-on:cxttapstart="onStart">
+    <cytoscape
+            ref="cy"
+            :config="myConfig"
+            @tap="$emit('tapArea', $event)"
+            @cxttapstart="onStart">
         <cy-element
                 v-for="def in automata.getData()"
                 :key="`${def.data.id}`"
@@ -49,8 +53,8 @@
             }
         };
 
-        onMouseDown() {
-            console.log("Mouse down");
+        onMouseDown(e: any) {
+            console.log(e);
         }
 
         onStart() {

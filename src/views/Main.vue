@@ -19,7 +19,10 @@
                         <b-tab title="Automata1" active>
 
                             <!-- AUTOMATA PREVIEW -->
-                            <AutomataPreview :automata="automata"></AutomataPreview>
+                            <AutomataPreview
+                                :automata="automata"
+                                @tapArea="onTapArea"
+                            ></AutomataPreview>
 
                         </b-tab>
                         <b-tab title="MyAutomata">
@@ -47,11 +50,10 @@
 <script lang="ts">
     import { Vue, Component } from 'vue-property-decorator';
     import { BButton, BContainer, BRow, BCol, BTabs, BTab } from 'bootstrap-vue';
-    const uuidv1 = require('uuid/v1');
-
     import AutomataPreview from '@/components/AutomataPreview.vue';
     import Automata from "@/classes/Automata";
     import FiniteAutomata from "@/classes/FiniteAutomata";
+    import uuidv1 from "uuid/v1";
 
     @Component({
         components: {
@@ -70,6 +72,19 @@
             this.automata.addTransition("a", "A", "A");
             this.automata.addTransition("b", "A", "B");
             this.automata.addTransition("b", "B", "B");
+        }
+
+        /**
+         * Executes when the user clicks on the preview area
+         * @param e - event object
+         */
+        async onTapArea(e: any) {
+            console.log(e);
+
+            // If there is no target (no node / edge selected)
+            if (!e.target[0]) {
+                this.automata.addState(uuidv1(), e.position.x, e.position.y);
+            }
         }
 
         generate() {

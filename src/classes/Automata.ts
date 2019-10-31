@@ -12,7 +12,7 @@ export default abstract class Automata {
     /**
      * The Cytoscape data that stores nodes and edges
      */
-    protected data: object[] = [];
+    protected data: any[] = [];
 
     /**
      * Sets the input string stored in the automata
@@ -38,6 +38,7 @@ export default abstract class Automata {
      */
     addState(name: string, x: number, y: number) {
         this.data.push({
+            type: "node",
             data: {id: name},
             position: {x, y}
         });
@@ -52,6 +53,7 @@ export default abstract class Automata {
     addTransition(symbol: string, source: string, target: string) {
         this.data.push({
             data: {
+                type: "edge",
                 id: uuidv1(),
                 source, target,
                 label: symbol
