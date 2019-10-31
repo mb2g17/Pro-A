@@ -3,7 +3,7 @@
     <!-- CYTOSCAPE -->
     <cytoscape ref="cy" :config="myConfig" v-on:mousedown="onMouseDown" v-on:cxttapstart="onStart">
         <cy-element
-                v-for="def in elements"
+                v-for="def in automata.getData()"
                 :key="`${def.data.id}`"
                 :definition="def"
                 v-on:mousedown="onStateClick"
@@ -14,10 +14,11 @@
 
 <script lang="ts">
     import {Vue, Component, Prop} from "vue-property-decorator";
+    import Automata from "@/classes/Automata";
 
     @Component
     export default class AutomataPreview extends Vue {
-        @Prop() readonly elements!: object;
+        @Prop() readonly automata!: Automata;
 
         myConfig: object = {
             style: [

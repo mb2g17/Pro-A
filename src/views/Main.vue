@@ -19,7 +19,7 @@
                         <b-tab title="Automata1" active>
 
                             <!-- AUTOMATA PREVIEW -->
-                            <AutomataPreview :elements="elements"></AutomataPreview>
+                            <AutomataPreview :automata="automata"></AutomataPreview>
 
                         </b-tab>
                         <b-tab title="MyAutomata">
@@ -50,6 +50,8 @@
     const uuidv1 = require('uuid/v1');
 
     import AutomataPreview from '@/components/AutomataPreview.vue';
+    import Automata from "@/classes/Automata";
+    import FiniteAutomata from "@/classes/FiniteAutomata";
 
     @Component({
         components: {
@@ -59,17 +61,7 @@
     })
     export default class About extends Vue {
 
-        elements: object[] = [
-            { // node a
-                data: { id: 'a' },
-                position: {x: 50, y: 50}
-            }, { // node b
-                data: { id: 'b' },
-                position: {x: 150, y: 160}
-            }, { // edge ab
-                data: { id: 'ab', source: 'a', target: 'b', label: "HI"},
-            }
-        ];
+        automata: Automata = new FiniteAutomata();
 
         onMouseDown() {
             console.log("Mouse down");
@@ -81,6 +73,12 @@
 
         onStateClick() {
             console.log("On state click");
+        }
+
+        mounted() {
+            this.automata.addState("a", 50, 50);
+            this.automata.addState("b", 150, 150);
+            this.automata.addTransition("ab", "a", "b");
         }
 
         generate() {
