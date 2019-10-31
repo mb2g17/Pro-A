@@ -63,22 +63,13 @@
 
         automata: Automata = new FiniteAutomata();
 
-        onMouseDown() {
-            console.log("Mouse down");
-        }
-
-        onStart() {
-            console.log("Start");
-        }
-
-        onStateClick() {
-            console.log("On state click");
-        }
-
         mounted() {
-            this.automata.addState("a", 50, 50);
-            this.automata.addState("b", 150, 150);
-            this.automata.addTransition("ab", "a", "b");
+            this.automata.addState("A", 50, 50);
+            this.automata.addState("B", 150, 150);
+            this.automata.addTransition("a", "B", "A");
+            this.automata.addTransition("a", "A", "A");
+            this.automata.addTransition("b", "A", "B");
+            this.automata.addTransition("b", "B", "B");
         }
 
         generate() {
@@ -94,7 +85,7 @@
                 });
             }
 
-            this.elements = Object.assign({}, this.elements, newArray);
+            //this.automata.getData() = Object.assign({}, this.elements, newArray);
         }
     }
 

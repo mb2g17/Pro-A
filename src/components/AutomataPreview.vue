@@ -28,14 +28,18 @@
                         'background-color': '#666',
                         'label': 'data(id)'
                     }
-                }, {
+                },
+                {
                     selector: 'edge',
                     style: {
                         'width': 3,
                         'line-color': '#ccc',
+                        'label': 'data(label)',
+
+                        'curve-style': 'bezier',
                         'target-arrow-color': '#ccc',
                         'target-arrow-shape': 'triangle',
-                        'label': 'data(label)'
+                        'arrow-scale': 2,
                     }
                 }
             ],
@@ -44,9 +48,20 @@
                 rows: 1
             }
         };
+
+        onMouseDown() {
+            console.log("Mouse down");
+        }
+
+        onStart() {
+            console.log("Start");
+        }
+
+        onStateClick() {
+            console.log("On state click");
+        }
     }
 </script>
 
 <style scoped>
-
 </style>
