@@ -19,54 +19,52 @@
 </template>
 
 <script lang="ts">
-    import {Vue, Component, Prop} from "vue-property-decorator";
-    import Automata from "@/classes/Automata";
-    import edgehandles from "cytoscape-edgehandles";
+import {Vue, Component, Prop} from 'vue-property-decorator';
+import Automata from '@/classes/Automata';
+import edgehandles from 'cytoscape-edgehandles';
 
-    import config from "./config";
+import config from './config';
 
-    @Component
-    export default class AutomataPreview extends Vue {
-        @Prop() readonly automata!: Automata;
+@Component
+export default class AutomataPreview extends Vue {
+    @Prop() public readonly automata!: Automata;
 
-        preConfig(cytoscape: any) {
-            cytoscape.use(edgehandles);
-        }
+    public myConfig: object = config;
 
-        afterCreated(cy: any) {
-            let eh = cy.edgehandles({
-                handleInDrawMode: true,
-                nodeLoopOffset: 50, // offset for edgeType: 'node' loops
-                snap: true,
-                loopAllowed: function loopAllowed(node: any) {
-                    // for the specified node, return whether edges from itself to itself are allowed
-                    return true;
-                },
-            });
-
-            // On edge creation
-            cy.on("ehcomplete", (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
-                cy.remove(addedEles);
-                let symbol = prompt("Please enter transition symbol:", "a");
-                if (symbol !== null)
-                    this.automata.addTransition(symbol, sourceNode._private.data.id, targetNode._private.data.id);
-            });
-        }
-
-        myConfig: object = config;
-
-        onMouseDown(e: any) {
-            console.log(e);
-        }
-
-        onStart() {
-            console.log("Start");
-        }
-
-        onStateClick() {
-            console.log("On state click");
-        }
+    public preConfig(cytoscape: any) {
+        cytoscape.use(edgehandles);
     }
+
+    public afterCreated(cy: any) {
+        const eh = cy.edgehandles({
+            handleInDrawMode: true,
+            nodeLoopOffset: 50, // offset for edgeType: 'node' loops
+            snap: true,
+            loopAllowed: function loopAllowed(node: any) {
+                // for the specified node, return whether edges from itself to itself are allowed
+                return true;
+            },
+        });
+
+        // On edge creation
+        cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
+            cy.remove(addedEles);
+            const symbol = prompt('Please enter transition symbol:', 'a');
+            if (symbol !== null) {
+                this.automata.addTransition(symbol, sourceNode._private.data.id, targetNode._private.data.id);
+            }
+        });
+    }
+
+    public onMouseDown(e: any) {
+    }
+
+    public onStart() {
+    }
+
+    public onStateClick() {
+    }
+}
 </script>
 
 <style scoped>

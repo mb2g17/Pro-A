@@ -57,82 +57,84 @@
 </template>
 
 <script lang="ts">
-    import { Vue, Component } from 'vue-property-decorator';
-    import { BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea } from 'bootstrap-vue';
-    import AutomataPreview from '@/components/AutomataPreview.vue';
-    import Automata from "@/classes/Automata";
-    import FiniteAutomata from "@/classes/FiniteAutomata";
-    import uuidv1 from "uuid/v1";
+import { Vue, Component } from 'vue-property-decorator';
+import { BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea } from 'bootstrap-vue';
+import AutomataPreview from '@/components/AutomataPreview.vue';
+import Automata from '@/classes/Automata';
+import FiniteAutomata from '@/classes/FiniteAutomata';
+import uuidv1 from 'uuid/v1';
 
-    @Component({
-        components: {
-            AutomataPreview,
-            BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea
-        }
-    })
-    export default class About extends Vue {
+@Component({
+    components: {
+        AutomataPreview,
+        BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea,
+    },
+})
+export default class About extends Vue {
 
-        private automata: Automata = new FiniteAutomata();
-        private inputString: string = "";
+    private automata: Automata = new FiniteAutomata();
+    private inputString: string = '';
 
-        mounted() {
-            this.automata.addState("A", 50, 50, true, false);
-            this.automata.addState("B", 150, 150, false, true);
-            this.automata.addTransition("a", "B", "A");
-            this.automata.addTransition("a", "A", "A");
-            this.automata.addTransition("b", "A", "B");
-            this.automata.addTransition("b", "B", "B");
-        }
+    public mounted() {
+        /*this.automata.addState("A", 50, 50, true, false);
+        this.automata.addState("B", 150, 150, false, true);
+        this.automata.addTransition("a", "B", "A");
+        this.automata.addTransition("a", "A", "A");
+        this.automata.addTransition("b", "A", "B");
+        this.automata.addTransition("b", "B", "B");*/
+        this.automata.addState("A", 50, 50, true, false);
+        this.automata.addState("B", 150, 150, false, true);
+        this.automata.addTransition("a", "A", "C");
+    }
 
-        /**
-         * Executes when the user clicks on the preview area
-         * @param e - event object
-         */
-        async onTapArea(e: any) {
-            console.log(e);
+    /**
+     * Executes when the user clicks on the preview area
+     * @param e - event object
+     */
+    public async onTapArea(e: any) {
 
-            // If there is no target (no node / edge selected)
-            if (!e.target[0]) {
-                const nodeID = prompt("Please enter node label:", "A");
-                const initial = confirm("Initial state?");
-                const final = confirm("Final state?");
-                if (nodeID !== null)
-                    this.automata.addState(nodeID, e.position.x, e.position.y, initial, final);
-                else
-                    this.automata.addState(uuidv1(), e.position.x, e.position.y, initial, final);
+        // If there is no target (no node / edge selected)
+        if (!e.target[0]) {
+            const nodeID = prompt('Please enter node label:', 'A');
+            const initial = confirm('Initial state?');
+            const final = confirm('Final state?');
+            if (nodeID !== null) {
+                this.automata.addState(nodeID, e.position.x, e.position.y, initial, final);
+            } else {
+                this.automata.addState(uuidv1(), e.position.x, e.position.y, initial, final);
             }
-        }
-
-        /**
-         * When the user clicks on "Pass input" button
-         */
-        onPassInputClick() {
-            // Clears automata
-            this.automata.reset();
-
-            // Sets the input string
-            this.automata.setInput(this.inputString);
-            this.inputString = "";
-            this.automata.simulate();
-        }
-
-        generate() {
-            let newArray = [];
-
-            for (let i = 0; i < 100; i++) {
-                newArray.push({ // node c
-                    data: { id: ("a" + i) },
-                    position: {
-                        x: 200 + (50 * (i % 30)),
-                        y: 200 + (50 * (i / 30))
-                    }
-                });
-            }
-
-            //this.automata.getData() = Object.assign({}, this.elements, newArray);
         }
     }
 
+    /**
+     * When the user clicks on "Pass input" button
+     */
+    public onPassInputClick() {
+        // Clears automata
+        this.automata.reset();
+
+        // Sets the input string
+        this.automata.setInput(this.inputString);
+        this.inputString = '';
+        this.automata.simulate();
+    }
+
+    public generate() {
+        const newArray = [];
+
+        for (let i = 0; i < 100; i++) {
+            newArray.push({ // node c
+                data: { id: ('a' + i) },
+                position: {
+                    x: 200 + (50 * (i % 30)),
+                    y: 200 + (50 * (i / 30)),
+                },
+            });
+        }
+
+        // this.automata.getData() = Object.assign({}, this.elements, newArray);
+    }
+}
 </script>
 
 <style lang="scss">

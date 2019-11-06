@@ -9,9 +9,9 @@ export default class FiniteAutomata extends Automata {
     private currentStates: Set<string> = new Set();
 
     public get outcome(): Outcome {
-        // If we have no final states, set as undefined
+        // If we have no final states, fail
         if (this.currentStates.size === 0) {
-            return Outcome.UNDECIDED;
+            return Outcome.REJECT;
         }
 
         // Checks if any of our current states are final

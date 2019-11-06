@@ -24,6 +24,14 @@ export default abstract class Automata {
     }
 
     /**
+     * Gets the input string of this automata
+     * @returns the current input string
+     */
+    public getInput(): string {
+        return this.inputString;
+    }
+
+    /**
      * Clones and returns the data to put into Cytoscape
      * @returns the object to insert into cytoscape
      */
@@ -40,16 +48,19 @@ export default abstract class Automata {
      * @param final - if true, this will be a final state
      */
     public addState(name: string, x: number, y: number, initial: boolean, final: boolean) {
-        this.data.push({
-            type: 'node',
-            classes: [
-                initial ? 'initial-node' : '',
-                final ? 'final-node' : '',
-            ],
-            data: {id: name},
-            position: {x, y},
-            initial, final,
-        });
+        // If this state doesn't already exist
+        if (!this.getState(name)) {
+            this.data.push({
+                type: 'node',
+                classes: [
+                    initial ? 'initial-node' : '',
+                    final ? 'final-node' : '',
+                ],
+                data: {id: name},
+                position: {x, y},
+                initial, final,
+            });
+        }
     }
 
     /**
@@ -59,14 +70,53 @@ export default abstract class Automata {
      * @param target - name of the state to go to
      */
     public addTransition(symbol: string, source: string, target: string) {
-        this.data.push({
-            type: 'edge',
-            data: {
-                id: uuidv1(),
-                label: symbol,
-                source, target,
-            },
-        });
+        // If the source and target states exist
+        if (this.getState(source) && this.getState(target)) {
+            // If this transition doesn't already exist
+            if (!this.getTransition(symbol, source, target)) {
+                this.data.push({
+                    type: 'edge',
+                    data: {
+                        id: uuidv1(),
+                        label: symbol,
+                        source, target,
+                    },
+                });
+            }
+        }
+    }
+
+    /**
+     * Gets a state with an ID
+     * @param id - the ID of the state to get
+     * @returns state object if found, null if not found
+     */
+    public getState(id: string): object | null {
+        for (const dataObject of this.data) {
+            if (dataObject.type === 'node' && dataObject.data.id === id) {
+                return dataObject;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets a transition with symbol, source and target
+     * @param symbol - the symbol of the transition
+     * @param source - the source state
+     * @param target - the target state
+     * @returns the transition object if found, null if not found
+     */
+    public getTransition(symbol: string, source: string, target: string): object | null {
+        for (const dataObject of this.data) {
+            if (dataObject.type === 'edge' &&
+                dataObject.data.label === symbol &&
+                dataObject.data.source === source &&
+                dataObject.data.target === target) {
+                return dataObject;
+            }
+        }
+        return null;
     }
 
     /**

@@ -16,7 +16,7 @@ import './custom.scss';
 // @ts-ignore
 import Dialog from 'bootstrap-vue-dialog';
 Vue.use(Dialog, {
-    store, router
+    store, router,
 });
 
 Vue.config.productionTip = false;
