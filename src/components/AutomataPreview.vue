@@ -43,7 +43,9 @@
             // On edge creation
             cy.on("ehcomplete", (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
                 cy.remove(addedEles);
-                this.automata.addTransition("c", sourceNode._private.data.id, targetNode._private.data.id);
+                let symbol = prompt("Please enter transition symbol:", "a");
+                if (symbol !== null)
+                    this.automata.addTransition(symbol, sourceNode._private.data.id, targetNode._private.data.id);
             });
         }
 
