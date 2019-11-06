@@ -39,6 +39,15 @@
                 <!-- INPUTS -->
                 <b-col>
                     <p>Input, alphabet tree, past inputs</p>
+                    <p>Input string:</p>
+                    <b-form-textarea
+                            v-model="inputString"
+                            placeholder="Input string"
+                            rows="3"
+                            max-rows="6"
+                    ></b-form-textarea>
+                    <b-button variant="primary" @click="onPassInputClick">Pass input</b-button>
+                    <p>Decision: {{ this.automata.outcome.toLocaleString() }}</p>
                 </b-col>
 
             </b-row>
@@ -49,7 +58,7 @@
 
 <script lang="ts">
     import { Vue, Component } from 'vue-property-decorator';
-    import { BButton, BContainer, BRow, BCol, BTabs, BTab } from 'bootstrap-vue';
+    import { BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea } from 'bootstrap-vue';
     import AutomataPreview from '@/components/AutomataPreview.vue';
     import Automata from "@/classes/Automata";
     import FiniteAutomata from "@/classes/FiniteAutomata";
@@ -58,16 +67,17 @@
     @Component({
         components: {
             AutomataPreview,
-            BButton, BContainer, BRow, BCol, BTabs, BTab
+            BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea
         }
     })
     export default class About extends Vue {
 
-        automata: Automata = new FiniteAutomata();
+        private automata: Automata = new FiniteAutomata();
+        private inputString: string = "";
 
         mounted() {
-            this.automata.addState("A", 50, 50);
-            this.automata.addState("B", 150, 150);
+            this.automata.addState("A", 50, 50, true, false);
+            this.automata.addState("B", 150, 150, false, true);
             this.automata.addTransition("a", "B", "A");
             this.automata.addTransition("a", "A", "A");
             this.automata.addTransition("b", "A", "B");
@@ -83,8 +93,27 @@
 
             // If there is no target (no node / edge selected)
             if (!e.target[0]) {
-                this.automata.addState(uuidv1(), e.position.x, e.position.y);
+                const nodeID = prompt("Please enter node label:", "A");
+                const initial = confirm("Initial state?");
+                const final = confirm("Final state?");
+                if (nodeID !== null)
+                    this.automata.addState(nodeID, e.position.x, e.position.y, initial, final);
+                else
+                    this.automata.addState(uuidv1(), e.position.x, e.position.y, initial, final);
             }
+        }
+
+        /**
+         * When the user clicks on "Pass input" button
+         */
+        onPassInputClick() {
+            // Clears automata
+            this.automata.reset();
+
+            // Sets the input string
+            this.automata.setInput(this.inputString);
+            this.inputString = "";
+            this.automata.simulate();
         }
 
         generate() {

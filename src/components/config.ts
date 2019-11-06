@@ -1,9 +1,23 @@
 const myConfig: object = {
     style: [
-        {
+        { // State
             selector: 'node',
             style: {
                 'background-color': '#666',
+                'content': 'data(id)',
+            },
+        },
+        { // Initial state
+            selector: '.initial-node',
+            style: {
+                'background-color': '#00f',
+                'content': 'data(id)',
+            },
+        },
+        { // Final state
+            selector: '.final-node',
+            style: {
+                'border-width': 4,
                 'content': 'data(id)',
             },
         },

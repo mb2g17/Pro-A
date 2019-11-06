@@ -1,4 +1,5 @@
 import uuidv1 from 'uuid/v1';
+import { Outcome } from '@/classes/Outcome';
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -35,12 +36,19 @@ export default abstract class Automata {
      * @param name - the name of the automata
      * @param x - the X coordinate of the automata
      * @param y - the Y coordinate of the automata
+     * @param initial - if true, this will be an initial state
+     * @param final - if true, this will be a final state
      */
-    public addState(name: string, x: number, y: number) {
+    public addState(name: string, x: number, y: number, initial: boolean, final: boolean) {
         this.data.push({
             type: 'node',
+            classes: [
+                initial ? 'initial-node' : '',
+                final ? 'final-node' : '',
+            ],
             data: {id: name},
             position: {x, y},
+            initial, final,
         });
     }
 
@@ -52,13 +60,22 @@ export default abstract class Automata {
      */
     public addTransition(symbol: string, source: string, target: string) {
         this.data.push({
+            type: 'edge',
             data: {
-                type: 'edge',
                 id: uuidv1(),
-                source, target,
                 label: symbol,
+                source, target,
             },
         });
+    }
+
+    /**
+     * Simulates the automata with an input string in it
+     */
+    public simulate() {
+        while (this.inputString.length > 0) {
+            this.step();
+        }
     }
 
     /**
@@ -76,4 +93,9 @@ export default abstract class Automata {
      * @returns null for FA, stack for PDA, tape for TM
      */
     public abstract getDataStructure(): object | null;
+
+    /**
+     * The outcome of the automata: undecided, accept, reject
+     */
+    public abstract get outcome(): Outcome;
 }
