@@ -1,4 +1,4 @@
-import uuidv1 from "uuid/v1";
+import uuidv1 from 'uuid/v1';
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -7,7 +7,7 @@ export default abstract class Automata {
     /**
      * The input string stored in the automata
      */
-    protected inputString: string = "";
+    protected inputString: string = '';
 
     /**
      * The Cytoscape data that stores nodes and edges
@@ -18,7 +18,7 @@ export default abstract class Automata {
      * Sets the input string stored in the automata
      * @param inputString - the new input string to put into the automata
      */
-    setInput(inputString: string) {
+    public setInput(inputString: string) {
         this.inputString = inputString;
     }
 
@@ -26,7 +26,7 @@ export default abstract class Automata {
      * Clones and returns the data to put into Cytoscape
      * @returns the object to insert into cytoscape
      */
-    getData(): object[] {
+    public getData(): object[] {
         return this.data;
     }
 
@@ -36,11 +36,11 @@ export default abstract class Automata {
      * @param x - the X coordinate of the automata
      * @param y - the Y coordinate of the automata
      */
-    addState(name: string, x: number, y: number) {
+    public addState(name: string, x: number, y: number) {
         this.data.push({
-            type: "node",
+            type: 'node',
             data: {id: name},
-            position: {x, y}
+            position: {x, y},
         });
     }
 
@@ -50,30 +50,30 @@ export default abstract class Automata {
      * @param source - name of the state to go from
      * @param target - name of the state to go to
      */
-    addTransition(symbol: string, source: string, target: string) {
+    public addTransition(symbol: string, source: string, target: string) {
         this.data.push({
             data: {
-                type: "edge",
+                type: 'edge',
                 id: uuidv1(),
                 source, target,
-                label: symbol
-            }
+                label: symbol,
+            },
         });
     }
 
     /**
      * Resets the animation of this automata
      */
-    abstract reset(): void;
+    public abstract reset(): void;
 
     /**
      * Reads the next input symbol and travels to the next state
      */
-    abstract step(): void;
+    public abstract step(): void;
 
     /**
      * Returns the data structure the automata is using
      * @returns null for FA, stack for PDA, tape for TM
      */
-    abstract getDataStructure(): object | null;
+    public abstract getDataStructure(): object | null;
 }

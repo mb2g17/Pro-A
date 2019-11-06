@@ -4,6 +4,8 @@
     <cytoscape
             ref="cy"
             :config="myConfig"
+            :preConfig="preConfig"
+            :afterCreated="afterCreated"
             @tap="$emit('tapArea', $event)"
             @cxttapstart="onStart">
         <cy-element
@@ -19,39 +21,33 @@
 <script lang="ts">
     import {Vue, Component, Prop} from "vue-property-decorator";
     import Automata from "@/classes/Automata";
+    import edgehandles from "cytoscape-edgehandles";
+
+    import config from "./config";
 
     @Component
     export default class AutomataPreview extends Vue {
         @Prop() readonly automata!: Automata;
 
-        myConfig: object = {
-            style: [
-                {
-                    selector: 'node',
-                    style: {
-                        'background-color': '#666',
-                        'label': 'data(id)'
-                    }
-                },
-                {
-                    selector: 'edge',
-                    style: {
-                        'width': 3,
-                        'line-color': '#ccc',
-                        'label': 'data(label)',
+        preConfig(cytoscape: any) {
+            cytoscape.use(edgehandles);
+        }
 
-                        'curve-style': 'bezier',
-                        'target-arrow-color': '#ccc',
-                        'target-arrow-shape': 'triangle',
-                        'arrow-scale': 2,
-                    }
-                }
-            ],
-            layout: {
-                name: 'grid',
-                rows: 1
-            }
-        };
+        afterCreated(cy: any) {
+            let eh = cy.edgehandles({
+                handleInDrawMode: true,
+                nodeLoopOffset: 50, // offset for edgeType: 'node' loops
+                snap: true
+            });
+
+            // On edge creation
+            cy.on("ehcomplete", (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
+                cy.remove(addedEles);
+                this.automata.addTransition("c", sourceNode._private.data.id, targetNode._private.data.id);
+            });
+        }
+
+        myConfig: object = config;
 
         onMouseDown(e: any) {
             console.log(e);
