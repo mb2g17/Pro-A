@@ -37,7 +37,11 @@
             let eh = cy.edgehandles({
                 handleInDrawMode: true,
                 nodeLoopOffset: 50, // offset for edgeType: 'node' loops
-                snap: true
+                snap: true,
+                loopAllowed: function loopAllowed(node: any) {
+                    // for the specified node, return whether edges from itself to itself are allowed
+                    return true;
+                },
             });
 
             // On edge creation
