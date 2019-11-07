@@ -179,6 +179,22 @@ export default abstract class Automata {
     }
 
     /**
+     * Gets a set of initial states
+     * @returns a Set of initial state names
+     */
+    public getInitialStates(): Set<string> {
+        return this.initialStates;
+    }
+
+    /**
+     * Gets a set of final states
+     * @returns a Set of final state names
+     */
+    public getFinalStates(): Set<string> {
+        return this.finalStates;
+    }
+
+    /**
      * Resets the animation of this automata
      */
     public abstract reset(): void;

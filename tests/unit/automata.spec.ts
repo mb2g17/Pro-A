@@ -35,6 +35,30 @@ describe('Automata.ts', () => {
         }
     });
 
+    it('can get a set of initial states', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 10, 10, true, false);
+        automata.addState('C', 10, 10, false, true);
+        automata.addState('D', 10, 10, false, true);
+        const initialStates = automata.getInitialStates();
+        assert.isTrue(initialStates.has('A') &&
+                    initialStates.has('B') &&
+                    !initialStates.has('C') &&
+                    !initialStates.has('D'));
+    });
+
+    it('can get a set of final states', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 10, 10, true, false);
+        automata.addState('C', 10, 10, true, true);
+        automata.addState('D', 10, 10, true, true);
+        const initialStates = automata.getFinalStates();
+        assert.isTrue(!initialStates.has('A') &&
+            !initialStates.has('B') &&
+            initialStates.has('C') &&
+            initialStates.has('D'));
+    });
+
     it('adds a final state', () => {
         automata.addState('A', 10, 10, false, true);
         const state: any = automata.getState('A');
