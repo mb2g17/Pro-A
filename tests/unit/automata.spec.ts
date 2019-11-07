@@ -22,6 +22,11 @@ describe('Automata.ts', () => {
         assert.isNotNull(automata.getState('A'));
     });
 
+    it('recognises when there isn\'t a state', () => {
+        automata.addState('A', 10, 10, false, false);
+        assert.isNull(automata.getState('B'));
+    });
+
     it('adds an initial state', () => {
         automata.addState('A', 10, 10, true, false);
         const state: any = automata.getState('A');
@@ -41,7 +46,7 @@ describe('Automata.ts', () => {
     it('cannot add two of the same state', () => {
         automata.addState('A', 10, 10, false, false);
         automata.addState('A', 50, 50, false, false);
-        assert.equal(automata.getData().length, 1);
+        assert.equal(automata.getNumberOfStates(), 1);
     });
 
     // --------------------------------
@@ -59,12 +64,12 @@ describe('Automata.ts', () => {
         automata.addState('B', 50, 50, false, true);
         automata.addTransition('a', 'A', 'B');
         automata.addTransition('a', 'A', 'B');
-        assert.equal(automata.getData().length, 3);
+        assert.equal(automata.getNumberOfTransitions(), 1);
     });
 
     it('cannot add transitions to states that do not exist', () => {
         automata.addState('A', 10, 10, true, false);
         automata.addTransition('a', 'A', 'C');
-        assert.equal(automata.getData().length, 1);
+        assert.equal(automata.getNumberOfTransitions(), 0);
     });
 });

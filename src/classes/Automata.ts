@@ -1,5 +1,7 @@
 import uuidv1 from 'uuid/v1';
 import { Outcome } from '@/classes/Outcome';
+import uuid from "uuid";
+import Vue from "vue";
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -10,10 +12,20 @@ export default abstract class Automata {
      */
     protected inputString: string = '';
 
-    /**
-     * The Cytoscape data that stores nodes and edges
-     */
-    protected data: any[] = [];
+    /** Mapping from node names "A" to ID */
+    protected nodeID: any = {};
+
+    /** Mapping from edge name "a: A: B" to ID */
+    protected edgeID: any = {};
+
+    /** Set of initial state names */
+    protected initialStates: Set<string> = new Set();
+
+    /** Set of final state names */
+    protected finalStates: Set<string> = new Set();
+
+    /** Cytoscape data for all the graph objects */
+    protected data: any = {};
 
     /**
      * Sets the input string stored in the automata
@@ -35,7 +47,7 @@ export default abstract class Automata {
      * Clones and returns the data to put into Cytoscape
      * @returns the object to insert into cytoscape
      */
-    public getData(): object[] {
+    public getData(): object {
         return this.data;
     }
 
@@ -49,8 +61,21 @@ export default abstract class Automata {
      */
     public addState(name: string, x: number, y: number, initial: boolean, final: boolean) {
         // If this state doesn't already exist
-        if (!this.getState(name)) {
-            this.data.push({
+        if (!this.nodeID[name]) {
+            // If it's initial or final, add to sets
+            if (initial)
+                this.initialStates.add(name);
+            if (final)
+                this.finalStates.add(name);
+
+            // Creates ID
+            let ID = uuidv1();
+
+            // Sets node name -> id mapping
+            this.nodeID[name] = ID;
+
+            // Sets data
+            Vue.set(this.data, ID, {
                 type: 'node',
                 classes: [
                     initial ? 'initial-node' : '',
@@ -71,13 +96,26 @@ export default abstract class Automata {
      */
     public addTransition(symbol: string, source: string, target: string) {
         // If the source and target states exist
-        if (this.getState(source) && this.getState(target)) {
-            // If this transition doesn't already exist
-            if (!this.getTransition(symbol, source, target)) {
-                this.data.push({
+        if (this.nodeID[source] && this.nodeID[target]) {
+            // Creates the parent branches of edgeID
+            if (!this.edgeID[symbol])
+                this.edgeID[symbol] = {};
+            if (!this.edgeID[symbol][source])
+                this.edgeID[symbol][source] = {};
+
+            // If the transition doesn't already exist
+            if (!this.edgeID[symbol][source][target]) {
+                // Create ID
+                let ID = uuidv1();
+
+                // Create edge name -> id mapping
+                this.edgeID[symbol][source][target] = ID;
+
+                // Sets data
+                Vue.set(this.data, ID, {
                     type: 'edge',
                     data: {
-                        id: uuidv1(),
+                        id: ID,
                         label: symbol,
                         source, target,
                     },
@@ -88,16 +126,12 @@ export default abstract class Automata {
 
     /**
      * Gets a state with an ID
-     * @param id - the ID of the state to get
+     * @param name - the name of the state to get
      * @returns state object if found, null if not found
      */
-    public getState(id: string): object | null {
-        for (const dataObject of this.data) {
-            if (dataObject.type === 'node' && dataObject.data.id === id) {
-                return dataObject;
-            }
-        }
-        return null;
+    public getState(name: string): object | null {
+        let ID = this.nodeID[name];
+        return !!this.data[ID] ? this.data[ID] : null;
     }
 
     /**
@@ -108,24 +142,40 @@ export default abstract class Automata {
      * @returns the transition object if found, null if not found
      */
     public getTransition(symbol: string, source: string, target: string): object | null {
-        for (const dataObject of this.data) {
-            if (dataObject.type === 'edge' &&
-                dataObject.data.label === symbol &&
-                dataObject.data.source === source &&
-                dataObject.data.target === target) {
-                return dataObject;
-            }
-        }
+        // If edge branch exists, return transition object
+        if (this.edgeID[symbol])
+            if (this.edgeID[symbol][source])
+                if (this.edgeID[symbol][source][target]) {
+                    let edgeID = this.edgeID[symbol][source][target];
+                    return this.data[edgeID];
+                }
+        // It must not exist; return null
         return null;
+    }
+
+    /**
+     * Gets the number of states
+     * @returns the number of states
+     */
+    public getNumberOfStates(): number {
+        return Object.keys(this.nodeID).length;
+    }
+
+    /**
+     * Gets the number of transitions
+     * @returns the number of transitions
+     */
+    public getNumberOfTransitions(): number {
+        return Object.keys(this.edgeID).length;
     }
 
     /**
      * Simulates the automata with an input string in it
      */
     public simulate() {
-        while (this.inputString.length > 0) {
+        do {
             this.step();
-        }
+        } while (this.inputString.length > 0)
     }
 
     /**
@@ -147,5 +197,5 @@ export default abstract class Automata {
     /**
      * The outcome of the automata: undecided, accept, reject
      */
-    public abstract get outcome(): Outcome;
+    public abstract getOutcome(): Outcome;
 }

@@ -8,18 +8,20 @@ export default class FiniteAutomata extends Automata {
     /** The current states we're on */
     private currentStates: Set<string> = new Set();
 
-    public get outcome(): Outcome {
-        // If we have no final states, fail
+    public getOutcome(): Outcome {
+        // If we have no surviving states, fail
         if (this.currentStates.size === 0) {
             return Outcome.REJECT;
         }
 
         // Checks if any of our current states are final
-        for (const dataObject of this.data) {
-            // If this satisfies the conditions, we're finished
-            if (dataObject.type === 'node' && this.currentStates.has(dataObject.data.id) && dataObject.final) {
+        for (const currentState of this.currentStates) {
+            // Gets ID
+            const currentStateID = this.nodeID[currentState];
+
+            // If this is final, we're finished
+            if (this.data[currentStateID].final)
                 return Outcome.ACCEPT;
-            }
         }
 
         // We are not in a final state; reject
@@ -37,36 +39,36 @@ export default class FiniteAutomata extends Automata {
     }
 
     public step(): void {
+        // If there's no current states, add the initial ones
+        if (this.currentStates.size === 0) {
+            for (const initialState of this.initialStates) {
+                this.currentStates.add(initialState);
+            }
+        }
+
         // Gets first input symbol
         const inputSymbol: string = this.inputString[0];
 
         // If this exists
         if (inputSymbol) {
-            // If there's no current states, add the initial ones
-            if (this.currentStates.size === 0) {
-                for (const dataObject of this.data) {
-                    // If this satisfies the conditions, add to current states
-                    if (dataObject.type === 'node' && dataObject.initial) {
-                        this.currentStates.add(dataObject.data.id);
-                    }
-                }
-            }
-
             // Slices the rest of the input string
             this.inputString = this.inputString.slice(1, this.inputString.length);
 
-            // Remember the new set of current state
+            // Remember the new set of current states
             const newCurrentStates: Set<string> = new Set();
 
             // Gets a transition that 1) has our current state and 2) has this input symbol
-            for (const dataObject of this.data) {
-                // If this satisfies the conditions
-                if (dataObject.type === 'edge' &&
-                    this.currentStates.has(dataObject.data.source) &&
-                    dataObject.data.label === inputSymbol) {
-                    // Add to the new set of current states
-                    newCurrentStates.add(dataObject.data.target);
-                }
+            for (const currentState of this.currentStates) {
+                // If a transition for this state exists
+                if (this.edgeID[inputSymbol])
+                    if (this.edgeID[inputSymbol][currentState]) {
+                        // Gets all the target states
+                        const targetStates = Object.keys(this.edgeID[inputSymbol][currentState]);
+
+                        // Apply this transition
+                        for (const targetState of targetStates)
+                            newCurrentStates.add(targetState);
+                    }
             }
 
             // Updates this set of current states with the new one

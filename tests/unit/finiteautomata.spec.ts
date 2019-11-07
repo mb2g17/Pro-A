@@ -31,7 +31,7 @@ describe('FiniteAutomata.ts', () => {
         automata.addTransition('a', 'B', 'A');
         automata.setInput('aaa');
         automata.simulate();
-        assert.equal(automata.outcome, Outcome.ACCEPT);
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
 
     it('simulates a finite automata and rejects an input', () => {
@@ -41,7 +41,14 @@ describe('FiniteAutomata.ts', () => {
         automata.addTransition('a', 'B', 'A');
         automata.setInput('aa');
         automata.simulate();
-        assert.equal(automata.outcome, Outcome.REJECT);
+        assert.equal(automata.getOutcome(), Outcome.REJECT);
+    });
+
+    it('simulates a finite automata with an initial and final state', () => {
+        automata.addState('A', 10, 10, true, true);
+        automata.setInput('');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
 
     it('simulates a finite automata with multiple final states', () => {
@@ -57,12 +64,12 @@ describe('FiniteAutomata.ts', () => {
 
         automata.setInput('a');
         automata.simulate();
-        assert.equal(automata.outcome, Outcome.ACCEPT);
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
 
         automata.reset();
         automata.setInput('aa');
         automata.simulate();
-        assert.equal(automata.outcome, Outcome.ACCEPT);
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
 
     it('simulates non-determinism', () => {
@@ -73,7 +80,7 @@ describe('FiniteAutomata.ts', () => {
         automata.addTransition('a', 'A', 'C');
         automata.setInput('a');
         automata.simulate();
-        assert.equal(automata.outcome, Outcome.ACCEPT);
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
 
     it('cannot simulate with incorrect symbols', () => {
@@ -85,7 +92,7 @@ describe('FiniteAutomata.ts', () => {
         ['ab', 'abc', 'c'].forEach((input) => {
             automata.setInput(input);
             automata.simulate();
-            assert.equal(automata.outcome, Outcome.REJECT);
+            assert.equal(automata.getOutcome(), Outcome.REJECT);
             automata.reset();
         });
     });

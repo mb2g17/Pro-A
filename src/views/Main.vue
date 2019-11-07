@@ -47,7 +47,7 @@
                             max-rows="6"
                     ></b-form-textarea>
                     <b-button variant="primary" @click="onPassInputClick">Pass input</b-button>
-                    <p>Decision: {{ this.automata.outcome.toLocaleString() }}</p>
+                    <p>Decision: {{ outcome }}</p>
                 </b-col>
 
             </b-row>
@@ -63,6 +63,7 @@ import AutomataPreview from '@/components/AutomataPreview.vue';
 import Automata from '@/classes/Automata';
 import FiniteAutomata from '@/classes/FiniteAutomata';
 import uuidv1 from 'uuid/v1';
+import {Outcome} from "@/classes/Outcome";
 
 @Component({
     components: {
@@ -74,6 +75,7 @@ export default class About extends Vue {
 
     private automata: Automata = new FiniteAutomata();
     private inputString: string = '';
+    private outcome: string = "UNDECIDED";
 
     public mounted() {
         /*this.automata.addState("A", 50, 50, true, false);
@@ -118,6 +120,9 @@ export default class About extends Vue {
         this.automata.setInput(this.inputString);
         this.inputString = '';
         this.automata.simulate();
+
+        // Sets outcome
+        this.outcome = this.automata.getOutcome().toLocaleString();
     }
 
     public generate() {
