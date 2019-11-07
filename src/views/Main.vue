@@ -81,10 +81,11 @@ export default class About extends Vue {
         this.automata.addTransition("a", "B", "A");
         this.automata.addTransition("a", "A", "A");
         this.automata.addTransition("b", "A", "B");
-        this.automata.addTransition("b", "B", "B");*/
+        this.automata.addTransition("b", "B", "B");
+
         this.automata.addState("A", 50, 50, true, false);
         this.automata.addState("B", 150, 150, false, true);
-        this.automata.addTransition("a", "A", "C");
+        this.automata.addTransition("a", "A", "C");*/
     }
 
     /**
