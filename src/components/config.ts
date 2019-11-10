@@ -4,7 +4,7 @@ const myConfig: object = {
             selector: 'node',
             style: {
                 'background-color': '#666',
-                'content': 'data(id)',
+                'content': 'data(name)',
             },
         },
         { // Initial state

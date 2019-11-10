@@ -20,7 +20,7 @@ export default class FiniteAutomata extends Automata {
             const currentStateID = this.nodeID[currentState];
 
             // If this is final, we're finished
-            if (this.data[currentStateID].final)
+            if (this.data[currentStateID].data.final)
                 return Outcome.ACCEPT;
         }
 

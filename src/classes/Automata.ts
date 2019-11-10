@@ -76,14 +76,17 @@ export default abstract class Automata {
 
             // Sets data
             Vue.set(this.data, ID, {
-                type: 'node',
                 classes: [
                     initial ? 'initial-node' : '',
                     final ? 'final-node' : '',
                 ],
-                data: {id: name},
-                position: {x, y},
-                initial, final,
+                data: {
+                    id: ID,
+                    name,
+                    type: 'node',
+                    initial, final
+                },
+                position: {x, y}
             });
         }
     }
@@ -111,13 +114,20 @@ export default abstract class Automata {
                 // Create edge name -> id mapping
                 this.edgeID[symbol][source][target] = ID;
 
-                // Sets data
+                // Gets IDs of the states
+                const sourceID = this.nodeID[source];
+                const targetID = this.nodeID[target];
+
+                    // Sets data
                 Vue.set(this.data, ID, {
-                    type: 'edge',
                     data: {
                         id: ID,
                         label: symbol,
-                        source, target,
+                        source: sourceID,
+                        target: targetID,
+                        sourceName: source,
+                        targetName: target,
+                        type: 'edge'
                     },
                 });
             }
@@ -242,7 +252,7 @@ export default abstract class Automata {
         const id = this.nodeID[stateName];
 
         // Updates set and classes
-        if (this.data[id].initial) {
+        if (this.data[id].data.initial) {
             this.initialStates.delete(stateName);
 
             // Gets class index
@@ -255,7 +265,7 @@ export default abstract class Automata {
         }
 
         // Sets initial
-        Vue.set(this.data[id], "initial", initial);
+        Vue.set(this.data[id].data, "initial", initial);
     }
 
     /**
@@ -268,7 +278,7 @@ export default abstract class Automata {
         const id = this.nodeID[stateName];
 
         // Updates set
-        if (this.data[id].final){
+        if (this.data[id].data.final){
             this.finalStates.delete(stateName);
 
             // Gets class index
@@ -281,7 +291,7 @@ export default abstract class Automata {
         }
 
         // Sets final
-        Vue.set(this.data[id], "final", final);
+        Vue.set(this.data[id].data, "final", final);
     }
 
     /**

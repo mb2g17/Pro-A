@@ -60,7 +60,7 @@ export default class AutomataPreview extends Vue {
             cy.remove(addedEles);
             const symbol = prompt('Please enter transition symbol:', 'a');
             if (symbol !== null) {
-                this.automata.addTransition(symbol, sourceNode._private.data.id, targetNode._private.data.id);
+                this.automata.addTransition(symbol, sourceNode._private.data.name, targetNode._private.data.name);
             }
         });
 
@@ -75,7 +75,7 @@ export default class AutomataPreview extends Vue {
                     selector: 'node',
                     onClickFunction: (event: any) => {
                         // Gets state name and initial property
-                        const stateName = event.target._private.data.id;
+                        const stateName = event.target._private.data.name;
                         const initial = this.automata.getState(stateName).initial;
 
                         // Toggles initial state + class
@@ -90,7 +90,7 @@ export default class AutomataPreview extends Vue {
                     selector: 'node',
                     onClickFunction: (event: any) => {
                         // Gets state name and final property
-                        const stateName = event.target._private.data.id;
+                        const stateName = event.target._private.data.name;
                         const final = this.automata.getState(stateName).final;
 
                         // Toggles initial state
@@ -104,25 +104,30 @@ export default class AutomataPreview extends Vue {
                     tooltipText: 'remove',
                     selector: 'node, edge',
                     onClickFunction: (event: any) => {
-                        // If this is a state
-                        if (event.target._private.type === "node") {
-                            // Removes node from data
-                            const name = event.target._private.data.id;
-                            this.automata.removeState(name);
-                        }
-                        else {
-                            // Removes edge from data
-                            const [symbol, source, target] = [
-                                event.target._private.data.label,
-                                event.target._private.data.source,
-                                event.target._private.data.target
-                            ];
-                            this.automata.removeTransition(symbol, source, target);
-                        }
-
                         // Removes object from Cytoscape
                         let target = event.target || event.cyTarget;
-                        target.remove();
+                        const removedElements = target.remove();
+
+                        // Goes through all removed elements
+                        for (let i = 0; i < removedElements.length; i++) {
+                            const elem = removedElements[i];
+
+                            // If this is a state
+                            if (elem._private.data.type === "node") {
+                                // Removes node from data
+                                const name = elem._private.data.name;
+                                this.automata.removeState(name);
+                            }
+                            else {
+                                // Removes edge from data
+                                const [symbol, source, target] = [
+                                    elem._private.data.label,
+                                    elem._private.data.sourceName,
+                                    elem._private.data.targetName
+                                ];
+                                this.automata.removeTransition(symbol, source, target);
+                            }
+                        }
                     },
                     hasTrailingDivider: true
                 },

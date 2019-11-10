@@ -31,7 +31,7 @@ describe('Automata.ts', () => {
         automata.addState('A', 10, 10, true, false);
         const state: any = automata.getState('A');
         if (state !== null) {
-            assert.isTrue(state.initial);
+            assert.isTrue(state.data.initial);
         }
     });
 
@@ -63,7 +63,7 @@ describe('Automata.ts', () => {
         automata.addState('A', 10, 10, false, true);
         const state: any = automata.getState('A');
         if (state !== null) {
-            assert.isTrue(state.final);
+            assert.isTrue(state.data.final);
         }
     });
 
@@ -76,28 +76,28 @@ describe('Automata.ts', () => {
     it('sets a state to initial', () => {
         automata.addState('A', 10, 10, false, false);
         automata.setInitialState('A', true);
-        assert.isTrue(automata.getState('A').initial);
+        assert.isTrue(automata.getState('A').data.initial);
         assert.isTrue(automata.getState('A').classes.includes("initial-node"));
     });
 
     it('sets a state to final', () => {
         automata.addState('A', 10, 10, false, false);
         automata.setFinalState('A', true);
-        assert.isTrue(automata.getState('A').final);
+        assert.isTrue(automata.getState('A').data.final);
         assert.isTrue(automata.getState('A').classes.includes("final-node"));
     });
 
     it('unsets a state from initial', () => {
         automata.addState('A', 10, 10, true, true);
         automata.setInitialState('A', false);
-        assert.isFalse(automata.getState('A').initial);
+        assert.isFalse(automata.getState('A').data.initial);
         assert.isFalse(automata.getState('A').classes.includes("initial-node"));
     });
 
     it('unsets a state from final', () => {
         automata.addState('A', 10, 10, true, true);
         automata.setFinalState('A', false);
-        assert.isFalse(automata.getState('A').final);
+        assert.isFalse(automata.getState('A').data.final);
         assert.isFalse(automata.getState('A').classes.includes("final-node"));
     });
 
