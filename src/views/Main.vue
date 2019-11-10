@@ -97,7 +97,7 @@ export default class About extends Vue {
     public async onTapArea(e: any) {
 
         // If there is no target (no node / edge selected)
-        if (!e.target[0]) {
+        /*if (!e.target[0]) {
             const nodeID = prompt('Please enter node label:', 'A');
             const initial = confirm('Initial state?');
             const final = confirm('Final state?');
@@ -106,7 +106,7 @@ export default class About extends Vue {
             } else {
                 this.automata.addState(uuidv1(), e.position.x, e.position.y, initial, final);
             }
-        }
+        }*/
     }
 
     /**

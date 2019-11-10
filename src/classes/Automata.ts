@@ -247,6 +247,23 @@ export default abstract class Automata {
     }
 
     /**
+     * Gets a new, unique name for a state
+     */
+    public getNewStateName(): string {
+        // Gets set of states
+        const states = new Set(Object.keys(this.nodeID));
+
+        // Gets the first state name number
+        let stateNameNumber = states.size + 1;
+
+        // Keep generating state names and incrementing the number until we get unique name
+        while (states.has("s" + stateNameNumber))
+            stateNameNumber++;
+
+        return "s" + stateNameNumber;
+    }
+
+    /**
      * Resets the animation of this automata
      */
     public abstract reset(): void;

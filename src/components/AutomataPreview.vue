@@ -114,20 +114,12 @@ export default class AutomataPreview extends Vue {
                     content: 'Add node',
                     tooltipText: 'add node',
                     coreAsWell: true,
-                    onClickFunction: function (event: any) {
-                        let data = {
-                            group: 'nodes'
-                        };
+                    onClickFunction: (event: any) => {
+                        // Gets unique name
+                        const uniqueName = this.automata.getNewStateName();
 
-                        let pos = event.position || event.cyPosition;
-
-                        cy.add({
-                            data: data,
-                            position: {
-                                x: pos.x,
-                                y: pos.y
-                            }
-                        });
+                        // Creates new state
+                        this.automata.addState(uniqueName, event.position.x, event.position.y, false, false);
                     }
                 },
             ]
