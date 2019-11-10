@@ -101,6 +101,12 @@ describe('Automata.ts', () => {
         assert.isFalse(automata.getState('A').classes.includes("final-node"));
     });
 
+    it('removes a state', () => {
+        automata.addState('A', 10, 10, true, true);
+        automata.removeState('A');
+        assert.isNull(automata.getState('A'));
+    });
+
     // --------------------------------
     // --* TRANSITIONS
     // --------------------------------
@@ -123,5 +129,12 @@ describe('Automata.ts', () => {
         automata.addState('A', 10, 10, true, false);
         automata.addTransition('a', 'A', 'C');
         assert.equal(automata.getNumberOfTransitions(), 0);
+    });
+
+    it('removes a transition', () => {
+        automata.addState('A', 10, 10, true, true);
+        automata.addTransition('a', 'A', 'A');
+        automata.removeTransition('a', 'A', 'A');
+        assert.isNull(automata.getTransition('a', 'A', 'A'));
     });
 });

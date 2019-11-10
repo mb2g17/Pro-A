@@ -103,9 +103,26 @@ export default class AutomataPreview extends Vue {
                     content: 'Remove',
                     tooltipText: 'remove',
                     selector: 'node, edge',
-                    onClickFunction: function (event: any) {
+                    onClickFunction: (event: any) => {
+                        // If this is a state
+                        if (event.target._private.type === "node") {
+                            // Removes node from data
+                            const name = event.target._private.data.id;
+                            this.automata.removeState(name);
+                        }
+                        else {
+                            // Removes edge from data
+                            const [symbol, source, target] = [
+                                event.target._private.data.label,
+                                event.target._private.data.source,
+                                event.target._private.data.target
+                            ];
+                            this.automata.removeTransition(symbol, source, target);
+                        }
+
+                        // Removes object from Cytoscape
                         let target = event.target || event.cyTarget;
-                        target.remove()
+                        target.remove();
                     },
                     hasTrailingDivider: true
                 },

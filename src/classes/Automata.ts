@@ -154,6 +154,44 @@ export default abstract class Automata {
     }
 
     /**
+     * Removes a state
+     * @param stateName - the name of the state to delete
+     */
+    public removeState(stateName: string) {
+        // If this state exists
+        if (this.nodeID[stateName]) {
+            // Gets state ID
+            const id = this.nodeID[stateName];
+
+            // Delets nodeID entry
+            delete this.nodeID[stateName];
+
+            // Deletes data entry
+            delete this.data[id];
+        }
+    }
+
+    /**
+     * Removes a transition
+     * @param symbol - the symbol of the transition to remove
+     * @param source - the source state of the transition to remove
+     * @param target - the target state of the transition to remove
+     */
+    public removeTransition(symbol: string, source: string, target: string) {
+        // If this transition exists
+        if (this.edgeID[symbol][source][target]) {
+            // Gets edge ID
+            const id = this.edgeID[symbol][source][target];
+
+            // Delete edgeID entry
+            delete this.edgeID[symbol][source][target];
+
+            // Deletes data entry
+            delete this.data[id];
+        }
+    }
+
+    /**
      * Gets the number of states
      * @returns the number of states
      */
