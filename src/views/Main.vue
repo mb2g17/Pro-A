@@ -126,7 +126,13 @@ export default class About extends Vue {
     }
 
     public generate() {
-        const newArray = [];
+
+        const stateName = "A";
+        const initial = this.automata.getState(stateName).initial;
+        this.automata.setInitialState(stateName, !initial);
+        this.$forceUpdate();
+
+        /*const newArray = [];
 
         for (let i = 0; i < 100; i++) {
             newArray.push({ // node c
@@ -136,7 +142,7 @@ export default class About extends Vue {
                     y: 200 + (50 * (i / 30)),
                 },
             });
-        }
+        }*/
 
         // this.automata.getData() = Object.assign({}, this.elements, newArray);
     }

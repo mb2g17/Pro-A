@@ -73,6 +73,34 @@ describe('Automata.ts', () => {
         assert.equal(automata.getNumberOfStates(), 1);
     });
 
+    it('sets a state to initial', () => {
+        automata.addState('A', 10, 10, false, false);
+        automata.setInitialState('A', true);
+        assert.isTrue(automata.getState('A').initial);
+        assert.isTrue(automata.getState('A').classes.includes("initial-node"));
+    });
+
+    it('sets a state to final', () => {
+        automata.addState('A', 10, 10, false, false);
+        automata.setFinalState('A', true);
+        assert.isTrue(automata.getState('A').final);
+        assert.isTrue(automata.getState('A').classes.includes("final-node"));
+    });
+
+    it('unsets a state from initial', () => {
+        automata.addState('A', 10, 10, true, true);
+        automata.setInitialState('A', false);
+        assert.isFalse(automata.getState('A').initial);
+        assert.isFalse(automata.getState('A').classes.includes("initial-node"));
+    });
+
+    it('unsets a state from final', () => {
+        automata.addState('A', 10, 10, true, true);
+        automata.setFinalState('A', false);
+        assert.isFalse(automata.getState('A').final);
+        assert.isFalse(automata.getState('A').classes.includes("final-node"));
+    });
+
     // --------------------------------
     // --* TRANSITIONS
     // --------------------------------

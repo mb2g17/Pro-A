@@ -21,9 +21,15 @@
 <script lang="ts">
 import {Vue, Component, Prop} from 'vue-property-decorator';
 import Automata from '@/classes/Automata';
+import jquery from "jquery";
 import edgehandles from 'cytoscape-edgehandles';
+import contextMenus from 'cytoscape-context-menus';
 
+// Automata config
 import config from './config';
+
+// CSS for cytoscape-context-menus
+import 'cytoscape-context-menus/cytoscape-context-menus.css';
 
 @Component
 export default class AutomataPreview extends Vue {
@@ -32,10 +38,13 @@ export default class AutomataPreview extends Vue {
     public myConfig: object = config;
 
     public preConfig(cytoscape: any) {
+        //contextMenus(cytoscape, jquery);
+        cytoscape.use(contextMenus, jquery);
         cytoscape.use(edgehandles);
     }
 
     public afterCreated(cy: any) {
+        // -- EDGEHANDLES --
         const eh = cy.edgehandles({
             handleInDrawMode: true,
             nodeLoopOffset: 50, // offset for edgeType: 'node' loops
@@ -53,6 +62,75 @@ export default class AutomataPreview extends Vue {
             if (symbol !== null) {
                 this.automata.addTransition(symbol, sourceNode._private.data.id, targetNode._private.data.id);
             }
+        });
+
+        // -- CONTEXT MENU --
+        const cm = cy.contextMenus({
+            menuItems: [
+                // -- STATES --
+                {
+                    id: 'initial',
+                    content: 'Toggle initial state',
+                    tooltipText: 'initial',
+                    selector: 'node',
+                    onClickFunction: (event: any) => {
+                        // Gets state name and initial property
+                        const stateName = event.target._private.data.id;
+                        const initial = this.automata.getState(stateName).initial;
+
+                        // Toggles initial state + class
+                        this.automata.setInitialState(stateName, !initial);
+                        event.target.toggleClass('initial-node');
+                    }
+                },
+                {
+                    id: 'final',
+                    content: 'Toggle final state',
+                    tooltipText: 'final',
+                    selector: 'node',
+                    onClickFunction: (event: any) => {
+                        // Gets state name and final property
+                        const stateName = event.target._private.data.id;
+                        const final = this.automata.getState(stateName).final;
+
+                        // Toggles initial state
+                        this.automata.setFinalState(stateName, !final);
+                        event.target.toggleClass('final-node');
+                    }
+                },
+                {
+                    id: 'remove',
+                    content: 'Remove',
+                    tooltipText: 'remove',
+                    selector: 'node, edge',
+                    onClickFunction: function (event: any) {
+                        let target = event.target || event.cyTarget;
+                        target.remove()
+                    },
+                    hasTrailingDivider: true
+                },
+                {
+                    id: 'add-node',
+                    content: 'Add node',
+                    tooltipText: 'add node',
+                    coreAsWell: true,
+                    onClickFunction: function (event: any) {
+                        let data = {
+                            group: 'nodes'
+                        };
+
+                        let pos = event.position || event.cyPosition;
+
+                        cy.add({
+                            data: data,
+                            position: {
+                                x: pos.x,
+                                y: pos.y
+                            }
+                        });
+                    }
+                },
+            ]
         });
     }
 

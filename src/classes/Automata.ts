@@ -129,7 +129,7 @@ export default abstract class Automata {
      * @param name - the name of the state to get
      * @returns state object if found, null if not found
      */
-    public getState(name: string): object | null {
+    public getState(name: string): any | null {
         let ID = this.nodeID[name];
         return !!this.data[ID] ? this.data[ID] : null;
     }
@@ -192,6 +192,58 @@ export default abstract class Automata {
      */
     public getFinalStates(): Set<string> {
         return this.finalStates;
+    }
+
+    /**
+     * Sets a state's initial property
+     * @param stateName - the name of the state to change
+     * @param initial - if true, set this state to initial, if false, stop it from being initial
+     */
+    public setInitialState(stateName: string, initial: boolean) {
+        // Gets ID
+        const id = this.nodeID[stateName];
+
+        // Updates set and classes
+        if (this.data[id].initial) {
+            this.initialStates.delete(stateName);
+
+            // Gets class index
+            const classIndex = this.data[id].classes.indexOf("initial-node");
+            this.data[id].classes.splice(classIndex, 1);
+        }
+        else {
+            this.initialStates.add(stateName);
+            this.data[id].classes.push("initial-node");
+        }
+
+        // Sets initial
+        Vue.set(this.data[id], "initial", initial);
+    }
+
+    /**
+     * Sets a state's final property
+     * @param stateName - the name of the state to change
+     * @param final - if true, set this state to final, if false, stop it from being final
+     */
+    public setFinalState(stateName: string, final: boolean) {
+        // Gets ID
+        const id = this.nodeID[stateName];
+
+        // Updates set
+        if (this.data[id].final){
+            this.finalStates.delete(stateName);
+
+            // Gets class index
+            const classIndex = this.data[id].classes.indexOf("final-node");
+            this.data[id].classes.splice(classIndex, 1);
+        }
+        else{
+            this.finalStates.add(stateName);
+            this.data[id].classes.push("final-node");
+        }
+
+        // Sets final
+        Vue.set(this.data[id], "final", final);
     }
 
     /**
