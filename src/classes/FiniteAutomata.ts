@@ -8,6 +8,8 @@ export default class FiniteAutomata extends Automata {
     /** The current states we're on */
     private currentStates: Set<string> = new Set();
 
+    public addTransitionExtra(symbol: string, source: string, target: string, payload: any): void {}
+
     public getOutcome(): Outcome {
         // If we have no surviving states, fail
         if (this.currentStates.size === 0) {
@@ -28,7 +30,7 @@ export default class FiniteAutomata extends Automata {
         return Outcome.REJECT;
     }
 
-    public getDataStructure(): object | null {
+    public getDataStructure(): any | null {
         return null;
     }
 

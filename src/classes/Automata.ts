@@ -96,8 +96,9 @@ export default abstract class Automata {
      * @param symbol - the symbol of the transition
      * @param source - name of the state to go from
      * @param target - name of the state to go to
+     * @param payload - the information for this specific type of transition
      */
-    public addTransition(symbol: string, source: string, target: string) {
+    public addTransition(symbol: string, source: string, target: string, payload?: any) {
         // If the source and target states exist
         if (this.nodeID[source] && this.nodeID[target]) {
             // Creates the parent branches of edgeID
@@ -118,7 +119,7 @@ export default abstract class Automata {
                 const sourceID = this.nodeID[source];
                 const targetID = this.nodeID[target];
 
-                    // Sets data
+                // Sets data
                 Vue.set(this.data, ID, {
                     data: {
                         id: ID,
@@ -130,9 +131,21 @@ export default abstract class Automata {
                         type: 'edge'
                     },
                 });
+
+                // Saves payload stuff too
+                this.addTransitionExtra(symbol, source, target, payload);
             }
         }
     }
+
+    /**
+     * Type-specific behaviour for adding a transition
+     * @param symbol - the symbol of the transition
+     * @param source - name of the state to go from
+     * @param target - name of the state to go to
+     * @param payload - the information for this specific type of transition
+     */
+    public abstract addTransitionExtra(symbol: string, source: string, target: string, payload: any): void;
 
     /**
      * Gets a state with an ID
@@ -325,7 +338,7 @@ export default abstract class Automata {
      * Returns the data structure the automata is using
      * @returns null for FA, stack for PDA, tape for TM
      */
-    public abstract getDataStructure(): object | null;
+    public abstract getDataStructure(): any | null;
 
     /**
      * The outcome of the automata: undecided, accept, reject
