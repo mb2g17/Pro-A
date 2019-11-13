@@ -11,14 +11,14 @@ const myConfig: object = {
             selector: '.initial-node',
             style: {
                 'background-color': '#00f',
-                'content': 'data(id)',
+                'content': 'data(name)',
             },
         },
         { // Final state
             selector: '.final-node',
             style: {
                 'border-width': 4,
-                'content': 'data(id)',
+                'content': 'data(name)',
             },
         },
         {
