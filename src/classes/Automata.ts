@@ -131,22 +131,9 @@ export default abstract class Automata {
                         type: 'edge'
                     },
                 });
-
-                // Saves payload stuff too
-                this.addTransitionExtra(symbol, source, target, payload);
             }
         }
     }
-
-    /**
-     * Type-specific behaviour for adding a transition
-     * @param symbol - the symbol of the transition
-     * @param source - name of the state to go from
-     * @param target - name of the state to go to
-     * @param payload - the information for this specific type of transition
-     */
-    public abstract addTransitionExtra(symbol: string, source: string, target: string, payload: any): void;
-
     /**
      * Gets a state with an ID
      * @param name - the name of the state to get

@@ -28,7 +28,9 @@ export default class PushdownAutomata extends Automata {
         this._acceptByEmptyStack = value;
     }
 
-    addTransitionExtra(symbol: string, source: string, target: string, payload: any): void {
+    addTransition(symbol: string, source: string, target: string, payload: any): void {
+        super.addTransition(symbol, source, target, payload);
+
         /* Gets payload info
          * input: the input stack symbol. Single string.
          * output: stack symbols to put on the stack. Array of strings.
