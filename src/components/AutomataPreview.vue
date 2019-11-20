@@ -30,6 +30,7 @@ import config from './config';
 
 // CSS for cytoscape-context-menus
 import 'cytoscape-context-menus/cytoscape-context-menus.css';
+import PushdownAutomata from "@/classes/PushdownAutomata";
 
 @Component
 export default class AutomataPreview extends Vue {
@@ -59,9 +60,25 @@ export default class AutomataPreview extends Vue {
         cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
             cy.remove(addedEles);
             const symbol = prompt('Please enter transition symbol:', 'a');
-            if (symbol !== null) {
-                this.automata.addTransition(symbol, sourceNode._private.data.name, targetNode._private.data.name);
+            if (symbol === null)
+                return;
+
+            // If it's not finite, we need a payload
+            let payload = {};
+
+            // Pushdown automata
+            if (this.automata instanceof PushdownAutomata) {
+                const input = prompt('Please enter stack symbol (use __empty for empty stack symbol and null for epsilon):', 'A');
+                let output: string | string[] | null = prompt('Please enter output stack symbols, separated by commas (use null for epsilon):', 'A,B');
+                if (input && output) {
+                    output = output.split(',');
+                    payload = {
+                        input, output
+                    };
+                }
             }
+
+            this.automata.addTransition(symbol, sourceNode._private.data.name, targetNode._private.data.name, payload);
         });
 
         // -- CONTEXT MENU --

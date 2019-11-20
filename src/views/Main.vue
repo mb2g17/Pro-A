@@ -64,6 +64,7 @@ import Automata from '@/classes/Automata';
 import FiniteAutomata from '@/classes/FiniteAutomata';
 import uuidv1 from 'uuid/v1';
 import {Outcome} from "@/classes/Outcome";
+import PushdownAutomata from "@/classes/PushdownAutomata";
 
 @Component({
     components: {
@@ -73,7 +74,7 @@ import {Outcome} from "@/classes/Outcome";
 })
 export default class About extends Vue {
 
-    private automata: Automata = new FiniteAutomata();
+    private automata: Automata = new PushdownAutomata();
     private inputString: string = '';
     private outcome: string = "UNDECIDED";
 

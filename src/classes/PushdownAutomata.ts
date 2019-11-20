@@ -29,16 +29,26 @@ export default class PushdownAutomata extends Automata {
     }
 
     addTransitionExtra(symbol: string, source: string, target: string, payload: any): void {
-        // Gets payload info
-        const {input, output} = payload;
+        /* Gets payload info
+         * input: the input stack symbol. Single string.
+         * output: stack symbols to put on the stack. Array of strings.
+        */
+        let {input, output} = payload;
+
+        // Converts string nulls to actual nulls
+        if (input === "null")
+            input = null;
+        if (output[0] === "null")
+            output = [];
 
         // Gets transition ID
         const id = this.edgeID[symbol][source][target];
 
-        // Adds input and output stack symbols to data
+        // Adds input and output stack symbols to data, and sets the label
         this.data[id].data = {
             ...this.data[id].data,
-            input, output
+            input, output,
+            label: symbol + " ; " + input + " / " + output.toString()
         };
     }
 
