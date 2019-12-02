@@ -28,6 +28,14 @@ export default class PushdownAutomata extends Automata {
         this._acceptByEmptyStack = value;
     }
 
+    protected addInitialConfigsIfNoCurrentConfigs(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    protected applyTransition(srcConfig: [string, import("./TuringMachineTape").default, number], edgeID: number): [string, import("./TuringMachineTape").default, number] {
+        throw new Error("Method not implemented.");
+    }
+
     addTransition(symbol: string, source: string, target: string, payload: any): void {
         super.addTransition(symbol, source, target, payload);
 
@@ -119,10 +127,6 @@ export default class PushdownAutomata extends Automata {
             // Updates this set of current states with the new one
             this.currentStates = newCurrentStates;
         }
-    }
-
-    getDataStructure(): any | null {
-        return null; // TODO
     }
 
     getOutcome(): Outcome {

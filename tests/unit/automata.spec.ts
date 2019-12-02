@@ -137,4 +137,28 @@ describe('Automata.ts', () => {
         automata.removeTransition('a', 'A', 'A');
         assert.isNull(automata.getTransition('a', 'A', 'A'));
     });
+
+    // --------------------------------
+    // --* MISC
+    // --------------------------------
+    it('can identify target states given an input symbol and a source state', () => {
+        // Adds states
+        automata.addState("A", 10, 10, true, false);
+        automata.addState("B", 20, 10, true, false);
+        automata.addState("C", 30, 10, false, false);
+
+        // Asserts that the automata has no target states
+        assert.isNull(automata["getTargetStates"]("a", "A"));
+
+        // Adds transitions
+        automata.addTransition("a", "A", "B");
+        automata.addTransition("a", "A", "C");
+
+        // Gets target states
+        const targetStates = automata["getTargetStates"]("a", "A");
+
+        // Asserts that there are target states and that there are two of them
+        assert.isNotNull(targetStates);
+        assert.equal(targetStates!.length, 2);
+    });
 });

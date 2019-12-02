@@ -44,4 +44,31 @@ export default class TuringMachineTape {
     public read(index: number): string {
         return this.tape[index];
     }
+
+    /**
+     * The length of the tape, as defined by the written symbols
+     */
+    get length(): number {
+        return Object.keys(this.tape).length;
+    }
+
+    /**
+     * Checks if this tape is equal to another tape
+     * @param tape - the other tape to compare
+     */
+    public equals(tape: TuringMachineTape): boolean {
+        // Check if it's the same number of keys
+        if (this.length !== tape.length)
+            return false;
+
+        // Checks every value's equivalence
+        for (const key in Object.keys(this.tape)) {
+            const numberKey: number = parseInt(key);
+            if (this.read(numberKey) !== tape.read(numberKey))
+                return false;
+        }
+
+        // Assertions are OK; they're the same
+        return true;
+    }
 }

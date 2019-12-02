@@ -2,6 +2,8 @@ import uuidv1 from 'uuid/v1';
 import { Outcome } from '@/classes/Outcome';
 import uuid from "uuid";
 import Vue from "vue";
+import TuringMachineTape from "@/classes/TuringMachineTape";
+import {TuringMachineConfig} from "@/classes/TuringMachine";
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -134,6 +136,7 @@ export default abstract class Automata {
             }
         }
     }
+
     /**
      * Gets a state with an ID
      * @param name - the name of the state to get
@@ -258,8 +261,7 @@ export default abstract class Automata {
             // Gets class index
             const classIndex = this.data[id].classes.indexOf("initial-node");
             this.data[id].classes.splice(classIndex, 1);
-        }
-        else {
+        } else {
             this.initialStates.add(stateName);
             this.data[id].classes.push("initial-node");
         }
@@ -278,14 +280,13 @@ export default abstract class Automata {
         const id = this.nodeID[stateName];
 
         // Updates set
-        if (this.data[id].data.final){
+        if (this.data[id].data.final) {
             this.finalStates.delete(stateName);
 
             // Gets class index
             const classIndex = this.data[id].classes.indexOf("final-node");
             this.data[id].classes.splice(classIndex, 1);
-        }
-        else{
+        } else {
             this.finalStates.add(stateName);
             this.data[id].classes.push("final-node");
         }
@@ -312,6 +313,22 @@ export default abstract class Automata {
     }
 
     /**
+     * Gets the target states from an input symbol and source state
+     * @param inputSymbol - the input symbol of the transition
+     * @param sourceState - the source state of the transition
+     * @returns an array of target state IDs if the transition exists, null if it doesn't
+     */
+    protected getTargetStates(inputSymbol: string, sourceState: string): any[] | null {
+        // If a transition for this state exists
+        if (this.edgeID[inputSymbol])
+            if (this.edgeID[inputSymbol][sourceState]) {
+                // Gets all the target states
+                return Object.keys(this.edgeID[inputSymbol][sourceState]);
+            }
+        return null;
+    }
+
+    /**
      * Resets the animation of this automata
      */
     public abstract reset(): void;
@@ -322,13 +339,20 @@ export default abstract class Automata {
     public abstract step(): void;
 
     /**
-     * Returns the data structure the automata is using
-     * @returns null for FA, stack for PDA, tape for TM
-     */
-    public abstract getDataStructure(): any | null;
-
-    /**
      * The outcome of the automata: undecided, accept, reject
      */
     public abstract getOutcome(): Outcome;
+
+    /**
+     * Adds initial configs if there are no current configs
+     */
+    protected abstract addInitialConfigsIfNoCurrentConfigs(): void;
+
+    /**
+     * Applies a transition from a source TM config to a destination TM config
+     * @param srcConfig - the config of the TM
+     * @param edgeID - the ID of the transition to take
+     * @returns the new config of the TM
+     */
+    protected abstract applyTransition(srcConfig: TuringMachineConfig, edgeID: number): TuringMachineConfig;
 }

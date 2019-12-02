@@ -28,8 +28,12 @@ export default class FiniteAutomata extends Automata {
         return Outcome.REJECT;
     }
 
-    public getDataStructure(): any | null {
-        return null;
+    protected addInitialConfigsIfNoCurrentConfigs(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    protected applyTransition(srcConfig: [string, import("./TuringMachineTape").default, number], edgeID: number): [string, import("./TuringMachineTape").default, number] {
+        throw new Error("Method not implemented.");
     }
 
     public reset(): void {
