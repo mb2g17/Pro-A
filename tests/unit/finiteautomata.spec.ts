@@ -21,7 +21,11 @@ describe('FiniteAutomata.ts', () => {
         automata.addTransition('a', 'A', 'B');
         automata.setInput('aa');
         automata.step();
-        assert.equal(automata.getInput(), 'a');
+
+        // Checks that the config input is now 'a'
+        automata.getCurrentConfigs().forEach(config => {
+            assert.equal(config.getInput(), 'a');
+        });
     });
 
     it('simulates a finite automata and accepts an input', () => {
@@ -44,7 +48,7 @@ describe('FiniteAutomata.ts', () => {
         assert.equal(automata.getOutcome(), Outcome.REJECT);
     });
 
-    it('simulates a finite automata with an initial and final state', () => {
+    it('simulates a finite automata with only a state that is both initial and final', () => {
         automata.addState('A', 10, 10, true, true);
         automata.setInput('');
         automata.simulate();

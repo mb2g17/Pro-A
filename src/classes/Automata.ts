@@ -1,9 +1,7 @@
 import uuidv1 from 'uuid/v1';
-import { Outcome } from '@/classes/Outcome';
-import uuid from "uuid";
+import {Outcome} from '@/classes/Outcome';
 import Vue from "vue";
-import TuringMachineTape from "@/classes/TuringMachineTape";
-import {TuringMachineConfig} from "@/classes/TuringMachine";
+import AutomataConfig from "@/classes/AutomataConfig";
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -224,9 +222,15 @@ export default abstract class Automata {
      * Simulates the automata with an input string in it
      */
     public simulate() {
+        // Check to see if the initial config accepts
+        this.addInitialConfigsIfNoCurrentConfigs();
+        if (this.getOutcome() === Outcome.ACCEPT)
+            return;
+
+        // It doesn't; compute steps until we do or run out of configs
         do {
             this.step();
-        } while (this.inputString.length > 0)
+        } while (this.getOutcome() !== Outcome.ACCEPT && this.getCurrentConfigs().size > 0)
     }
 
     /**
@@ -329,14 +333,60 @@ export default abstract class Automata {
     }
 
     /**
+     * Reads the next input symbol and travels to the next state
+     */
+    public step(): void {
+        // If there's no current states, add the initial ones
+        this.addInitialConfigsIfNoCurrentConfigs();
+
+        // Remember the new set of current states
+        const newCurrentConfigs: Set<AutomataConfig> = new Set();
+
+        // Goes through each config
+        for (let config of this.getCurrentConfigs()) {
+            // Gets first input symbol
+            const inputSymbol: string = config.getInputSymbol();
+
+            // If input symbol exists
+            if (inputSymbol) {
+                // If transition exists, gets target states and applies transitions
+                const targetStates = this.getTargetStates(inputSymbol, config.state);
+                if (targetStates) {
+                    // Apply this transition for each target state
+                    for (const targetState of targetStates) {
+                        // Gets edge ID
+                        const edgeID = this.edgeID[inputSymbol][config.state][targetState];
+
+                        // Gets new config by applying transition
+                        const newConfig = this.applyTransition(config, edgeID);
+
+                        // If the transition was succesful, add
+                        if (newConfig)
+                            newCurrentConfigs.add(newConfig);
+                    }
+                }
+            }
+        }
+
+        // Updates this set of current states with the new one
+        this.setCurrentConfigs(newCurrentConfigs);
+    }
+
+    /**
+     * Returns a list of the current configurations of the automata
+     */
+    public abstract getCurrentConfigs(): Set<AutomataConfig>;
+
+    /**
+     * Sets the set of configs to a new one
+     * @param newConfigs - a new set of configs
+     */
+    protected abstract setCurrentConfigs(newConfigs: Set<AutomataConfig>): void;
+
+    /**
      * Resets the animation of this automata
      */
     public abstract reset(): void;
-
-    /**
-     * Reads the next input symbol and travels to the next state
-     */
-    public abstract step(): void;
 
     /**
      * The outcome of the automata: undecided, accept, reject
@@ -349,10 +399,10 @@ export default abstract class Automata {
     protected abstract addInitialConfigsIfNoCurrentConfigs(): void;
 
     /**
-     * Applies a transition from a source TM config to a destination TM config
-     * @param srcConfig - the config of the TM
+     * Applies a transition from a source config to a destination config
+     * @param srcConfig - the config to start from
      * @param edgeID - the ID of the transition to take
-     * @returns the new config of the TM
+     * @returns the new config if this transition was successful, null if not
      */
-    protected abstract applyTransition(srcConfig: TuringMachineConfig, edgeID: number): TuringMachineConfig;
+    protected abstract applyTransition(srcConfig: AutomataConfig, edgeID: number): AutomataConfig | null;
 }

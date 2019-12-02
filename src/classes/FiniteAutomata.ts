@@ -1,23 +1,29 @@
 import Automata from '@/classes/Automata';
 import { Outcome } from '@/classes/Outcome';
+import AutomataConfig from "@/classes/AutomataConfig";
+import TuringMachineTape from "@/classes/TuringMachineTape";
 
 /**
  * Implementation of a finite automata
  */
 export default class FiniteAutomata extends Automata {
-    /** The current states we're on */
-    private currentStates: Set<string> = new Set();
+    /** The current configs we're on */
+    private currentConfigs: Set<AutomataConfig> = new Set();
 
     public getOutcome(): Outcome {
-        // If we have no surviving states, fail
-        if (this.currentStates.size === 0) {
+        // If we have no surviving configs, fail
+        if (this.currentConfigs.size === 0) {
             return Outcome.REJECT;
         }
 
-        // Checks if any of our current states are final
-        for (const currentState of this.currentStates) {
-            // Gets ID
-            const currentStateID = this.nodeID[currentState];
+        // Checks if any of our current configs are on a final state
+        for (const config of this.currentConfigs) {
+            // If we haven't exhuasted the whole input yet, it hasn't accepted
+            if (config.getInputLength() > 0)
+                continue;
+
+            // Gets ID of state of this config
+            const currentStateID = this.nodeID[config.state];
 
             // If this is final, we're finished
             if (this.data[currentStateID].data.final)
@@ -29,54 +35,36 @@ export default class FiniteAutomata extends Automata {
     }
 
     protected addInitialConfigsIfNoCurrentConfigs(): void {
-        throw new Error("Method not implemented.");
+        if (this.currentConfigs.size === 0) {
+            for (const initialState of this.initialStates) {
+                this.currentConfigs.add(new AutomataConfig(initialState, this.inputString));
+            }
+        }
     }
 
-    protected applyTransition(srcConfig: [string, import("./TuringMachineTape").default, number], edgeID: number): [string, import("./TuringMachineTape").default, number] {
-        throw new Error("Method not implemented.");
+    protected applyTransition(srcConfig: AutomataConfig, edgeID: number): AutomataConfig {
+        // Gets target state ID and target state
+        const targetStateID = this.data[edgeID].data.target;
+        const targetState = this.data[targetStateID];
+
+        // Truncates input to get new input
+        const newInput = srcConfig.getTruncatedInput();
+
+        // Returns new config
+        return new AutomataConfig(targetState.data.name, newInput);
+    }
+
+    getCurrentConfigs(): Set<AutomataConfig> {
+        return this.currentConfigs;
+    }
+
+    protected setCurrentConfigs(newConfigs: Set<AutomataConfig>): void {
+        this.currentConfigs = newConfigs;
     }
 
     public reset(): void {
-        // Resets state and clears input string
-        this.currentStates = new Set();
+        // Resets configs and clears input string
+        this.currentConfigs = new Set();
         this.inputString = '';
-    }
-
-    public step(): void {
-        // If there's no current states, add the initial ones
-        if (this.currentStates.size === 0) {
-            for (const initialState of this.initialStates) {
-                this.currentStates.add(initialState);
-            }
-        }
-
-        // Gets first input symbol
-        const inputSymbol: string = this.inputString[0];
-
-        // If this exists
-        if (inputSymbol) {
-            // Slices the rest of the input string
-            this.inputString = this.inputString.slice(1, this.inputString.length);
-
-            // Remember the new set of current states
-            const newCurrentStates: Set<string> = new Set();
-
-            // Gets a transition that 1) has our current state and 2) has this input symbol
-            for (const currentState of this.currentStates) {
-                // If a transition for this state exists
-                if (this.edgeID[inputSymbol])
-                    if (this.edgeID[inputSymbol][currentState]) {
-                        // Gets all the target states
-                        const targetStates = Object.keys(this.edgeID[inputSymbol][currentState]);
-
-                        // Apply this transition
-                        for (const targetState of targetStates)
-                            newCurrentStates.add(targetState);
-                    }
-            }
-
-            // Updates this set of current states with the new one
-            this.currentStates = newCurrentStates;
-        }
     }
 }

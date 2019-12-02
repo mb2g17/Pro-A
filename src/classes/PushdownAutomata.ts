@@ -1,39 +1,58 @@
 import Automata from "@/classes/Automata";
 import {Outcome} from "@/classes/Outcome";
+import AutomataConfig from "@/classes/AutomataConfig";
+import PushdownAutomataConfig from "@/classes/PushdownAutomataConfig";
 
 /**
  * Implementation of a push-down automata
  * For stack symbols, use "__empty" for an empty stack symbol and null for epsilon (any stack symbol)
  */
 export default class PushdownAutomata extends Automata {
-    /** The current states we're on, #0 being the state name, #1 being the stack */
-    private currentStates: Set<[string, string[]]> = new Set();
+    /** The current configs we're on */
+    private currentConfigs: Set<PushdownAutomataConfig> = new Set();
 
     /** If true, the PDA will accept by empty stack */
-    private _acceptByEmptyStack: boolean = false;
+    public acceptByEmptyStack: boolean = false;
 
-    /**
-     * Returns if we accept by empty stack or not
-     * @returns true if we accept by empty stack, false if not
-     */
-    get acceptByEmptyStack(): boolean {
-        return this._acceptByEmptyStack;
+    public getCurrentConfigs(): Set<AutomataConfig> {
+        return this.currentConfigs;
     }
 
-    /**
-     * Sets the accept by empty stack property
-     * @param value - if true, this PDA will accept by empty stack
-     */
-    set acceptByEmptyStack(value: boolean) {
-        this._acceptByEmptyStack = value;
+    protected setCurrentConfigs(newConfigs: Set<PushdownAutomataConfig>): void {
+        this.currentConfigs = newConfigs;
     }
 
     protected addInitialConfigsIfNoCurrentConfigs(): void {
-        throw new Error("Method not implemented.");
+        if (this.currentConfigs.size === 0) {
+            for (const initialState of this.initialStates) {
+                this.currentConfigs.add(new PushdownAutomataConfig(initialState, this.inputString, []));
+            }
+        }
     }
 
-    protected applyTransition(srcConfig: [string, import("./TuringMachineTape").default, number], edgeID: number): [string, import("./TuringMachineTape").default, number] {
-        throw new Error("Method not implemented.");
+    protected applyTransition(srcConfig: PushdownAutomataConfig, edgeID: number): PushdownAutomataConfig | null {
+        // If one of these conditions is true, do the transition
+        const stackSymbol = this.data[edgeID].data.input === srcConfig.stack[0];
+        const emptyStack = this.data[edgeID].data.input === "__empty" && srcConfig.stack.length === 0;
+        const nullSymbol = this.data[edgeID].data.input === null;
+        if (stackSymbol || emptyStack || nullSymbol) {
+            // Pops element off stack, then push output stack symbols
+            let newStack = srcConfig.stack;
+            if (stackSymbol)
+                newStack = newStack.slice(1);
+            newStack = newStack.concat(this.data[edgeID].data.output);
+
+            // Gets target state ID and target state
+            const targetStateID = this.data[edgeID].data.target;
+            const targetState = this.data[targetStateID];
+
+            // Truncates input to get new input
+            const newInput = srcConfig.getTruncatedInput();
+
+            // Returns new config
+            return new PushdownAutomataConfig(targetState.data.name, newInput, newStack);
+        } else
+            return null;
     }
 
     addTransition(symbol: string, source: string, target: string, payload: any): void {
@@ -62,90 +81,27 @@ export default class PushdownAutomata extends Automata {
         };
     }
 
-    step(): void {
-        // If there's no current states, add the initial ones
-        if (this.currentStates.size === 0) {
-            for (const initialState of this.initialStates) {
-                this.currentStates.add([initialState, []]);
-            }
-        }
-
-        // Gets first input symbol
-        const inputSymbol: string = this.inputString[0];
-
-        // If this exists
-        if (inputSymbol) {
-            // Slices the rest of the input string
-            this.inputString = this.inputString.slice(1, this.inputString.length);
-
-            // Remember the new set of current states
-            const newCurrentStates: Set<[string, string[]]> = new Set();
-
-            // Gets a transition that 1) has our current state and 2) has this input symbol
-            for (let [currentState, currentStack] of this.currentStates) {
-
-                // Creates a new stack from current stack
-                let newCurrentStack = Array.from(currentStack);
-
-                // Gets top stack symbol
-                const topStackSymbol: string = newCurrentStack[newCurrentStack.length - 1];
-
-                // If a transition for this state exists
-                if (this.edgeID[inputSymbol])
-                    if (this.edgeID[inputSymbol][currentState]) {
-                        // Gets all the target states
-                        const targetStates = Object.keys(this.edgeID[inputSymbol][currentState]);
-
-                        // Goes through all target states
-                        for (const targetState of targetStates) {
-                            // Gets ID
-                            const id = this.edgeID[inputSymbol][currentState][targetState];
-
-                            // Gets input stack symbol
-                            const inputStackSymbol = this.data[id].data.input;
-
-                            // If the top stack symbol is the input symbol OR if the input symbol is null and there is no top stack symbol
-                            if (inputStackSymbol === topStackSymbol || (inputStackSymbol === "__empty" && !topStackSymbol) || inputStackSymbol === null) {
-                                // Get output stack symbols
-                                const outputStackSymbols = this.data[id].data.output;
-
-                                // Pop from stack, if we should pop at all
-                                if (inputStackSymbol !== null)
-                                    newCurrentStack.pop();
-
-                                // Put output symbols onto stack
-                                for (const stackSymbol of outputStackSymbols)
-                                    newCurrentStack.push(stackSymbol);
-
-                                // Apply transition
-                                newCurrentStates.add([targetState, newCurrentStack]);
-                            }
-                        }
-                    }
-            }
-
-            // Updates this set of current states with the new one
-            this.currentStates = newCurrentStates;
-        }
-    }
-
     getOutcome(): Outcome {
         // If we have no surviving states, fail
-        if (this.currentStates.size === 0) {
+        if (this.currentConfigs.size === 0) {
             return Outcome.REJECT;
         }
 
         // Checks if any of our current states are final
-        for (const [currentState, currentStack] of this.currentStates) {
+        for (const config of this.currentConfigs) {
+            // If we haven't exhuasted the whole input yet, it hasn't accepted
+            if (config.getInputLength() > 0)
+                continue;
+
             // Gets ID
-            const currentStateID = this.nodeID[currentState];
+            const currentStateID = this.nodeID[config.state];
 
             // If this is final, we're finished
             if (this.data[currentStateID].data.final)
                 return Outcome.ACCEPT;
 
             // If this is an empty stack AND we should accept that, we're finished
-            if (currentStack.length === 0 && this.acceptByEmptyStack)
+            if (config.stack.length === 0 && this.acceptByEmptyStack)
                 return Outcome.ACCEPT;
         }
 
@@ -155,7 +111,7 @@ export default class PushdownAutomata extends Automata {
 
     reset(): void {
         // Resets state and clears input string
-        this.currentStates = new Set();
+        this.currentConfigs = new Set();
         this.inputString = '';
     }
 }

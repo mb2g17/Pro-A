@@ -1,26 +1,21 @@
 import Automata from "@/classes/Automata";
 import {Outcome} from "@/classes/Outcome";
 import TuringMachineTape from "@/classes/TuringMachineTape";
-
-/** Configuration of the TM
- * #0 the state name
- * #1 the tape
- * #2 the tape index
- */
-export type TuringMachineConfig = [string, TuringMachineTape, number];
+import TuringMachineConfig from "@/classes/TuringMachineConfig";
 
 /**
  * Implementation of a Turing machine
  */
 export default class TuringMachine extends Automata {
     /** The current configurations we're on */
-    private _currentConfigs: Set<TuringMachineConfig> = new Set();
+    private currentConfigs: Set<TuringMachineConfig> = new Set();
 
-    /**
-     * Set of current states
-     */
-    get currentConfigs(): Set<TuringMachineConfig> {
-        return this._currentConfigs;
+    public getCurrentConfigs(): Set<TuringMachineConfig> {
+        return this.currentConfigs;
+    }
+
+    protected setCurrentConfigs(newConfigs: Set<TuringMachineConfig>): void {
+        this.currentConfigs = newConfigs;
     }
 
     addTransition(symbol: string, source: string, target: string, payload: any): void {
@@ -39,6 +34,7 @@ export default class TuringMachine extends Automata {
         this.data[id].data = {
             ...this.data[id].data,
             writeTapeSymbol, direction,
+            readTapeSymbol: symbol,
             label: symbol + " , " + writeTapeSymbol + " , " + direction
         };
     }
@@ -47,9 +43,9 @@ export default class TuringMachine extends Automata {
      * Adds initial configs if there are no current configs
      */
     protected addInitialConfigsIfNoCurrentConfigs() {
-        if (this._currentConfigs.size === 0) {
+        if (this.currentConfigs.size === 0) {
             for (const initialState of this.initialStates) {
-                this._currentConfigs.add([initialState, new TuringMachineTape(this.inputString), 0]);
+                this.currentConfigs.add(new TuringMachineConfig(initialState, new TuringMachineTape(this.inputString), 0));
             }
         }
     }
@@ -60,9 +56,13 @@ export default class TuringMachine extends Automata {
      * @param edgeID - the ID of the transition to take
      * @returns the new config of the TM
      */
-    protected applyTransition(srcConfig: TuringMachineConfig, edgeID: number): TuringMachineConfig {
+    protected applyTransition(srcConfig: TuringMachineConfig, edgeID: number): TuringMachineConfig | null {
+        // Checks if the selected tape symbol is the transition symbol
+        if (srcConfig.getInputSymbol() !== this.data[edgeID].data.readTapeSymbol)
+            return null;
+
         // Gets src state info
-        let [srcState, srcTape, srcTapeIndex] = srcConfig;
+        let [srcTape, srcTapeIndex] = [srcConfig.tape, srcConfig.index];
 
         // Creates new tape
         const newTape: TuringMachineTape = new TuringMachineTape(srcTape);
@@ -81,55 +81,19 @@ export default class TuringMachine extends Automata {
         const targetState = this.data[targetStateID];
 
         // Returns new state
-        return [targetState.data.name, newTape, srcTapeIndex];
-    }
-
-    step(): void {
-        // If there's no current states, add the initial ones
-        this.addInitialConfigsIfNoCurrentConfigs();
-
-        // Remember the new set of current states
-        const newCurrentConfigs: Set<TuringMachineConfig> = new Set();
-
-        // Goes through each state
-        for (let [currentState, currentTape, currentTapeIndex] of this._currentConfigs) {
-            // Gets first input symbol
-            const inputSymbol: string = currentTape.read(currentTapeIndex);
-
-            // If input symbol exists
-            if (inputSymbol) {
-                // If transition exists, gets target states and applies transitions
-                const targetStates = this.getTargetStates(inputSymbol, currentState);
-                if (targetStates) {
-                    // Apply this transition for each target state
-                    for (const targetState of targetStates) {
-                        // Gets edge ID
-                        const edgeID = this.edgeID[inputSymbol][currentState][targetState];
-
-                        // Gets new config by applying transition
-                        const newConfig = this.applyTransition([currentState, currentTape, currentTapeIndex], edgeID);
-
-                        // Add new config
-                        newCurrentConfigs.add(newConfig);
-                    }
-                }
-            }
-        }
-
-        // Updates this set of current states with the new one
-        this._currentConfigs = newCurrentConfigs;
+        return new TuringMachineConfig(targetState.data.name, newTape, srcTapeIndex);
     }
 
     getOutcome(): Outcome {
         // If we have no surviving configs, fail
-        if (this._currentConfigs.size === 0) {
+        if (this.currentConfigs.size === 0) {
             return Outcome.REJECT;
         }
 
         // Checks if any of our current configs are on a final state
-        for (const [currentState, currentTape, currentTapeIndex] of this._currentConfigs) {
+        for (const config of this.currentConfigs) {
             // Gets ID of current state
-            const currentStateID = this.nodeID[currentState];
+            const currentStateID = this.nodeID[config.state];
 
             // If this is final, we're finished
             if (this.data[currentStateID].data.final)
@@ -142,7 +106,7 @@ export default class TuringMachine extends Automata {
 
     reset(): void {
         // Resets state and clears input string
-        this._currentConfigs = new Set();
+        this.currentConfigs = new Set();
         this.inputString = '';
     }
 }
