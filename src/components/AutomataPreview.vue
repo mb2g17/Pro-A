@@ -72,7 +72,7 @@ export default class AutomataPreview extends Vue {
         // On edge creation
         cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
             cy.remove(addedEles);
-            const symbol = prompt('Please enter transition symbol:', 'a');
+            const symbol = prompt('Please enter transition symbol (if TM, use __empty for empty tape symbol):', 'a');
             if (symbol === null)
                 return;
 

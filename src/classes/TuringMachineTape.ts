@@ -37,12 +37,20 @@ export default class TuringMachineTape {
     }
 
     /**
+     * Erases a symbol from the tape
+     * @param index - the index of the tape to erase from
+     */
+    public delete(index: number) {
+        delete this.tape[index];
+    }
+
+    /**
      * Reads from the tape
      * @param index - the index of the tape to read from
-     * @returns the symbol on the tape at that position, and undefined if empty
+     * @returns the symbol on the tape at that position, and null if empty
      */
-    public read(index: number): string {
-        return this.tape[index];
+    public read(index: number): string | null {
+        return this.tape[index] ? this.tape[index] : null;
     }
 
     /**

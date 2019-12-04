@@ -101,4 +101,96 @@ describe('TuringMachine.ts', () => {
         assert.isTrue(destConfig!.tape.equals(new TuringMachineTape("bab")));
         assert.equal(destConfig!.index, 1);
     });
+
+    it('can run the TM for the language a^n b^n c^n', () => {
+        // Adds states
+        automata.addState("q0", 10, 10, true, false);
+        automata.addState("q1", 20, 10, false, false);
+        automata.addState("q2", 20, 10, false, false);
+        automata.addState("q3", 20, 10, false, false);
+        automata.addState("q4", 20, 10, false, false);
+        automata.addState("qf", 20, 10, false, true);
+
+        // Adds transition
+        automata.addTransition("a", "q0", "q1", {
+            writeTapeSymbol: 'X',
+            direction: 'R'
+        });
+        automata.addTransition("a", "q1", "q1", {
+            writeTapeSymbol: 'a',
+            direction: 'R'
+        });
+        automata.addTransition("Y", "q1", "q1", {
+            writeTapeSymbol: 'Y',
+            direction: 'R'
+        });
+        automata.addTransition("b", "q1", "q2", {
+            writeTapeSymbol: 'Y',
+            direction: 'R'
+        });
+        automata.addTransition("b", "q2", "q2", {
+            writeTapeSymbol: 'b',
+            direction: 'R'
+        });
+        automata.addTransition("Z", "q2", "q2", {
+            writeTapeSymbol: 'Z',
+            direction: 'R'
+        });
+        automata.addTransition("c", "q2", "q3", {
+            writeTapeSymbol: 'Z',
+            direction: 'L'
+        });
+        automata.addTransition("Z", "q3", "q3", {
+            writeTapeSymbol: 'Z',
+            direction: 'L'
+        });
+        automata.addTransition("b", "q3", "q3", {
+            writeTapeSymbol: 'b',
+            direction: 'L'
+        });
+        automata.addTransition("Y", "q3", "q3", {
+            writeTapeSymbol: 'Y',
+            direction: 'L'
+        });
+        automata.addTransition("a", "q3", "q3", {
+            writeTapeSymbol: 'a',
+            direction: 'L'
+        });
+        automata.addTransition("X", "q3", "q0", {
+            writeTapeSymbol: 'X',
+            direction: 'R'
+        });
+        automata.addTransition("Y", "q0", "q4", {
+            writeTapeSymbol: 'Y',
+            direction: 'R'
+        });
+        automata.addTransition("Y", "q4", "q4", {
+            writeTapeSymbol: 'Y',
+            direction: 'R'
+        });
+        automata.addTransition("Z", "q4", "q4", {
+            writeTapeSymbol: 'Z',
+            direction: 'R'
+        });
+        automata.addTransition("__empty", "q4", "qf", {
+            writeTapeSymbol: '__empty',
+            direction: 'L'
+        });
+
+        // Asserts a few accepting cases
+        for (const input of ["abc", "aabbcc", "aaabbbccc", "aaaaaaaaabbbbbbbbbccccccccc"]) {
+            automata.reset();
+            automata.setInput(input);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+        }
+
+        // Asserts a few failing cases
+        for (const input of ["aabc", "abbc", "abcc", "d", "a", "aaaaabbbbccccc"]) {
+            automata.reset();
+            automata.setInput(input);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), Outcome.REJECT);
+        }
+    });
 });

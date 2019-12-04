@@ -74,8 +74,11 @@ export default class TuringMachine extends Automata {
         // Creates new tape
         const newTape: TuringMachineTape = new TuringMachineTape(srcTape);
 
-        // Write new symbol
-        newTape.write(srcTapeIndex, this.data[edgeID].data.writeTapeSymbol);
+        // If write symbol is empty, erase, else write new symbol
+        if (this.data[edgeID].data.writeTapeSymbol === "__empty")
+            newTape.delete(srcTapeIndex);
+        else
+            newTape.write(srcTapeIndex, this.data[edgeID].data.writeTapeSymbol);
 
         // Make tape index go left or right
         if (this.data[edgeID].data.direction == "L")
