@@ -15,24 +15,22 @@
                     <b-button variant="primary" @click="generate">Test button</b-button>
 
                     <!-- TABS -->
-                    <b-tabs content-class="mt-3">
-                        <b-tab title="Automata1" active>
+                    <b-tabs content-class="mt-3" v-model="automataTab">
+                        <b-tab v-for="automata in automatas" title="Automata tab" active>
 
                             <!-- AUTOMATA PREVIEW -->
                             <AutomataPreview
                                 :automata="automata"
-                                @tapArea="onTapArea"
+                                @tapArea="onTapArea($event, automata)"
                             ></AutomataPreview>
 
                         </b-tab>
-                        <b-tab title="MyAutomata">
-                            <p>MyAutomata</p>
-                        </b-tab>
-                        <b-tab title="TuringCalculator">
-                            <p>TuringCalculator</p>
-                        </b-tab>
-                    </b-tabs>
 
+                        <!-- New Automata Button (Using tabs-end slot) -->
+                        <template v-slot:tabs-end>
+                            <b-nav-item @click.prevent="newAutomata" href="#"><b>+</b></b-nav-item>
+                        </template>
+                    </b-tabs>
 
                 </b-col>
 
@@ -74,9 +72,11 @@ import PushdownAutomata from "@/classes/PushdownAutomata";
 })
 export default class About extends Vue {
 
-    private automata: Automata = new PushdownAutomata();
+    private automatas: Automata[] = [];
     private inputString: string = '';
     private outcome: string = "UNDECIDED";
+
+    private automataTab: number = 0;
 
     public mounted() {
         /*this.automata.addState("A", 50, 50, true, false);
@@ -95,8 +95,8 @@ export default class About extends Vue {
      * Executes when the user clicks on the preview area
      * @param e - event object
      */
-    public async onTapArea(e: any) {
-
+    public async onTapArea(e: any, automata: any) {
+        console.log(automata);
         // If there is no target (no node / edge selected)
         /*if (!e.target[0]) {
             const nodeID = prompt('Please enter node label:', 'A');
@@ -115,22 +115,22 @@ export default class About extends Vue {
      */
     public onPassInputClick() {
         // Clears automata
-        this.automata.reset();
+        this.automatas[this.automataTab].reset();
 
         // Sets the input string
-        this.automata.setInput(this.inputString);
+        this.automatas[this.automataTab].setInput(this.inputString);
         this.inputString = '';
-        this.automata.simulate();
+        this.automatas[this.automataTab].simulate();
 
         // Sets outcome
-        this.outcome = this.automata.getOutcome().toLocaleString();
+        this.outcome = this.automatas[this.automataTab].getOutcome().toLocaleString();
     }
 
     public generate() {
 
         const stateName = "A";
-        const initial = this.automata.getState(stateName).initial;
-        this.automata.setInitialState(stateName, !initial);
+        const initial = this.automatas[this.automataTab].getState(stateName).initial;
+        this.automatas[this.automataTab].setInitialState(stateName, !initial);
         this.$forceUpdate();
 
         /*const newArray = [];
@@ -146,6 +146,10 @@ export default class About extends Vue {
         }*/
 
         // this.automata.getData() = Object.assign({}, this.elements, newArray);
+    }
+
+    private newAutomata() {
+        this.automatas.push(new FiniteAutomata());
     }
 }
 </script>

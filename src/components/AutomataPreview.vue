@@ -39,9 +39,14 @@ export default class AutomataPreview extends Vue {
     public myConfig: object = config;
 
     public preConfig(cytoscape: any) {
-        //contextMenus(cytoscape, jquery);
-        cytoscape.use(contextMenus, jquery);
-        cytoscape.use(edgehandles);
+        try {
+            contextMenus(cytoscape, jquery);
+            edgehandles(cytoscape, jquery);
+        } catch (e) {
+            console.log(e.fullStackTrace);
+        }
+        //cytoscape.use(contextMenus, jquery);
+        //cytoscape.use(edgehandles);
     }
 
     public afterCreated(cy: any) {
