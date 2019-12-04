@@ -6,6 +6,7 @@
 
                 <!-- AUTOMATA OPERATIONS -->
                 <b-col>
+                    <h1 v-if="automatas[automataTab] !== undefined">{{ automatas[automataTab].getModelName() }}</h1>
                     <p>Folds and stuff</p>
                 </b-col>
 
@@ -70,6 +71,7 @@ import FiniteAutomata from '@/classes/FiniteAutomata';
 import uuidv1 from 'uuid/v1';
 import {Outcome} from "@/classes/Outcome";
 import PushdownAutomata from "@/classes/PushdownAutomata";
+import TuringMachine from "@/classes/TuringMachine";
 
 @Component({
     components: {
@@ -83,6 +85,9 @@ export default class About extends Vue {
     private inputString: string = '';
     private outcome: string = "UNDECIDED";
 
+    /**
+     * Stores the tab the user is currently selected
+     */
     private automataTab: number = 0;
 
     public mounted() {
@@ -176,7 +181,14 @@ export default class About extends Vue {
      * Creates a new automata tab
      */
     private newTab() {
-        this.automatas.push(new FiniteAutomata());
+        const choice = prompt("What kind of automata? (f for finite, p for pushdown, t for turing)", "f");
+
+        if (choice === "f")
+            this.automatas.push(new FiniteAutomata());
+        else if (choice === "p")
+            this.automatas.push(new PushdownAutomata());
+        else
+            this.automatas.push(new TuringMachine());
     }
 }
 </script>

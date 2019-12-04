@@ -10,6 +10,10 @@ export default class FiniteAutomata extends Automata {
     /** The current configs we're on */
     private currentConfigs: Set<AutomataConfig> = new Set();
 
+    public getModelName(): string {
+        return "Finite Automata";
+    }
+
     public getOutcome(): Outcome {
         // If we have no surviving configs, fail
         if (this.currentConfigs.size === 0) {

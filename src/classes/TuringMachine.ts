@@ -10,6 +10,10 @@ export default class TuringMachine extends Automata {
     /** The current configurations we're on */
     private currentConfigs: Set<TuringMachineConfig> = new Set();
 
+    public getModelName(): string {
+        return "Turing Machine";
+    }
+
     public getCurrentConfigs(): Set<TuringMachineConfig> {
         return this.currentConfigs;
     }

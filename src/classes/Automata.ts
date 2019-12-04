@@ -394,6 +394,11 @@ export default abstract class Automata {
     public abstract getOutcome(): Outcome;
 
     /**
+     * Returns the name of this model
+     */
+    public abstract getModelName(): string;
+
+    /**
      * Adds initial configs if there are no current configs
      */
     protected abstract addInitialConfigsIfNoCurrentConfigs(): void;

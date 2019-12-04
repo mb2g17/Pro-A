@@ -14,6 +14,10 @@ export default class PushdownAutomata extends Automata {
     /** If true, the PDA will accept by empty stack */
     public acceptByEmptyStack: boolean = false;
 
+    public getModelName(): string {
+        return "Pushdown Automata";
+    }
+
     public getCurrentConfigs(): Set<AutomataConfig> {
         return this.currentConfigs;
     }
