@@ -124,6 +124,7 @@ export default abstract class Automata {
                     data: {
                         id: ID,
                         label: symbol,
+                        symbol: symbol,
                         source: sourceID,
                         target: targetID,
                         sourceName: source,

@@ -2,6 +2,7 @@ import Automata from "@/classes/Automata";
 import {Outcome} from "@/classes/Outcome";
 import TuringMachineTape from "@/classes/TuringMachineTape";
 import TuringMachineConfig from "@/classes/TuringMachineConfig";
+import Vue from "vue";
 
 /**
  * Implementation of a Turing machine
@@ -35,12 +36,14 @@ export default class TuringMachine extends Automata {
         const id = this.edgeID[symbol][source][target];
 
         // Adds input and output stack symbols to data, and sets the label
-        this.data[id].data = {
-            ...this.data[id].data,
-            writeTapeSymbol, direction,
-            readTapeSymbol: symbol,
-            label: symbol + " , " + writeTapeSymbol + " , " + direction
-        };
+        Vue.set(this.data, id, {
+            data: {
+                ...this.data[id].data,
+                writeTapeSymbol, direction,
+                readTapeSymbol: symbol,
+                label: symbol + " ; " + writeTapeSymbol + " , " + direction
+            },
+        });
     }
 
     /**

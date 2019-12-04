@@ -31,6 +31,7 @@ import config from './config';
 // CSS for cytoscape-context-menus
 import 'cytoscape-context-menus/cytoscape-context-menus.css';
 import PushdownAutomata from "@/classes/PushdownAutomata";
+import TuringMachine from "@/classes/TuringMachine";
 
 @Component
 export default class AutomataPreview extends Vue {
@@ -86,6 +87,17 @@ export default class AutomataPreview extends Vue {
                     output = output.split(',');
                     payload = {
                         input, output
+                    };
+                }
+            }
+
+            // Turing machine
+            if (this.automata instanceof TuringMachine) {
+                const writeTapeSymbol = prompt('Please enter symbol to write on the tape', 'a');
+                let direction = prompt('Please enter direction (L or R):', 'R');
+                if (writeTapeSymbol && direction) {
+                    payload = {
+                        writeTapeSymbol, direction
                     };
                 }
             }
@@ -150,7 +162,7 @@ export default class AutomataPreview extends Vue {
                             else {
                                 // Removes edge from data
                                 const [symbol, source, target] = [
-                                    elem._private.data.label,
+                                    elem._private.data.symbol,
                                     elem._private.data.sourceName,
                                     elem._private.data.targetName
                                 ];
