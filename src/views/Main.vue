@@ -16,19 +16,26 @@
 
                     <!-- TABS -->
                     <b-tabs content-class="mt-3" v-model="automataTab">
-                        <b-tab v-for="automata in automatas" title="Automata tab" active>
+                        <b-tab v-for="(automata, index) in automatas" active>
 
                             <!-- AUTOMATA PREVIEW -->
                             <AutomataPreview
                                 :automata="automata"
+                                :ref="`automata` + index"
                                 @tapArea="onTapArea($event, automata)"
                             ></AutomataPreview>
+
+                            <!-- Tab title -->
+                            <template v-slot:title>
+                                Automata
+                                <b-button variant="danger" @click="closeTab(index)">X</b-button>
+                            </template>
 
                         </b-tab>
 
                         <!-- New Automata Button (Using tabs-end slot) -->
                         <template v-slot:tabs-end>
-                            <b-nav-item @click.prevent="newAutomata" href="#"><b>+</b></b-nav-item>
+                            <b-nav-item @click.prevent="newTab" href="#"><b>+</b></b-nav-item>
                         </template>
                     </b-tabs>
 
@@ -128,9 +135,9 @@ export default class About extends Vue {
 
     public generate() {
 
-        const stateName = "A";
+        /*const stateName = "A";
         const initial = this.automatas[this.automataTab].getState(stateName).initial;
-        this.automatas[this.automataTab].setInitialState(stateName, !initial);
+        this.automatas[this.automataTab].setInitialState(stateName, !initial);*/
         this.$forceUpdate();
 
         /*const newArray = [];
@@ -148,7 +155,27 @@ export default class About extends Vue {
         // this.automata.getData() = Object.assign({}, this.elements, newArray);
     }
 
-    private newAutomata() {
+    /**
+     * Closes the tab the user is on
+     */
+    private closeTab(index: number) {
+        // Removes the cytoscape elements
+        for (const dataObjKey of Object.keys(this.automatas[index].getData())) {
+            console.log(`Removing ${dataObjKey}`);
+            (this.$refs["automata" + index] as any)[0].cy.remove(`#${dataObjKey}`);
+        }
+
+        // Destroys the Automata reference
+        this.automatas.splice(index, 1);
+
+        // Updates Vue
+        this.$forceUpdate();
+    }
+
+    /**
+     * Creates a new automata tab
+     */
+    private newTab() {
         this.automatas.push(new FiniteAutomata());
     }
 }

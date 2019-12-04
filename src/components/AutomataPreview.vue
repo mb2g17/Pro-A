@@ -38,6 +38,11 @@ export default class AutomataPreview extends Vue {
 
     public myConfig: object = config;
 
+    /**
+     * The cytoscape instance in this preview component
+     */
+    public cy: any;
+
     public preConfig(cytoscape: any) {
         try {
             contextMenus(cytoscape, jquery);
@@ -50,6 +55,8 @@ export default class AutomataPreview extends Vue {
     }
 
     public afterCreated(cy: any) {
+        this.cy = cy; // Stores cytoscape instance
+
         // -- EDGEHANDLES --
         const eh = cy.edgehandles({
             handleInDrawMode: true,
