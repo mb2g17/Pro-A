@@ -56,7 +56,8 @@
                     <b-button variant="primary" @click="onStepClick">Step</b-button>
                     <p>Decision: {{ outcome }}</p>
 
-                    <p>Configs: {{ configs }}</p>
+                    <!-- Config -->
+                    <ConfigTable :configs="automatas[automataTab] ? automatas[automataTab].getCurrentConfigs() : undefined"></ConfigTable>
                 </b-col>
 
             </b-row>
@@ -75,9 +76,11 @@ import uuidv1 from 'uuid/v1';
 import {Outcome} from "@/classes/Outcome";
 import PushdownAutomata from "@/classes/PushdownAutomata";
 import TuringMachine from "@/classes/TuringMachine";
+import ConfigTable from '@/components/ConfigTable.vue';
 
 @Component({
     components: {
+        ConfigTable,
         AutomataPreview,
         BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea,
     },
@@ -148,8 +151,8 @@ export default class About extends Vue {
     public onStepClick() {
         // If it exists
         if (this.automatas[this.automataTab]) {
-            // If there is no input
-            if (this.automatas[this.automataTab].getInput() === "") {
+            // If there are no more configs, set new input
+            if (this.automatas[this.automataTab].getCurrentConfigs().size === 0) {
                 this.automatas[this.automataTab].setInput(this.inputString);
             }
             // Steps the automata
