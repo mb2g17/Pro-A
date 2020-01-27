@@ -1,0 +1,2 @@
+- add test cases for multiple initial states
+- add test cases for multiple final states

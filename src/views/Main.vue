@@ -53,7 +53,10 @@
                             max-rows="6"
                     ></b-form-textarea>
                     <b-button variant="primary" @click="onPassInputClick">Pass input</b-button>
+                    <b-button variant="primary" @click="onStepClick">Step</b-button>
                     <p>Decision: {{ outcome }}</p>
+
+                    <p>Configs: {{ configs }}</p>
                 </b-col>
 
             </b-row>
@@ -84,6 +87,7 @@ export default class About extends Vue {
     private automatas: Automata[] = [];
     private inputString: string = '';
     private outcome: string = "UNDECIDED";
+    private configs: string = "";
 
     /**
      * Stores the tab the user is currently selected
@@ -136,6 +140,36 @@ export default class About extends Vue {
 
         // Sets outcome
         this.outcome = this.automatas[this.automataTab].getOutcome().toLocaleString();
+    }
+
+    /**
+     * When the user clicks on "Step" button
+     */
+    public onStepClick() {
+        // If it exists
+        if (this.automatas[this.automataTab]) {
+            // If there is no input
+            if (this.automatas[this.automataTab].getInput() === "") {
+                this.automatas[this.automataTab].setInput(this.inputString);
+            }
+            // Steps the automata
+            this.automatas[this.automataTab].step();
+            this.$forceUpdate();
+
+            // Gets the set of configs
+            const configs = this.automatas[this.automataTab].getCurrentConfigs();
+
+            // Converts to string
+            this.configs = "";
+            for (const config of configs) {
+                this.configs += (JSON.stringify(config) + ", ");
+            }
+
+            // Gets outcome
+            this.outcome = this.automatas[this.automataTab].getOutcome().toLocaleString();
+        } else {
+            alert("No automata exists!");
+        }
     }
 
     public generate() {

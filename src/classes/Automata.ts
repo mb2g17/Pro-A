@@ -231,7 +231,7 @@ export default abstract class Automata {
         // It doesn't; compute steps until we do or run out of configs
         do {
             this.step();
-        } while (this.getOutcome() !== Outcome.ACCEPT && this.getCurrentConfigs().size > 0)
+        } while (this.getOutcome() !== Outcome.ACCEPT && this.getCurrentConfigs().size > 0);
     }
 
     /**
@@ -337,6 +337,7 @@ export default abstract class Automata {
      * Reads the next input symbol and travels to the next state
      */
     public step(): void {
+        console.log("STEP");
         // If there's no current states, add the initial ones
         this.addInitialConfigsIfNoCurrentConfigs();
 

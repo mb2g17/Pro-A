@@ -2,6 +2,7 @@ import Automata from '@/classes/Automata';
 import { Outcome } from '@/classes/Outcome';
 import AutomataConfig from "@/classes/AutomataConfig";
 import TuringMachineTape from "@/classes/TuringMachineTape";
+import Vue from 'vue';
 
 /**
  * Implementation of a finite automata
@@ -63,7 +64,8 @@ export default class FiniteAutomata extends Automata {
     }
 
     protected setCurrentConfigs(newConfigs: Set<AutomataConfig>): void {
-        this.currentConfigs = newConfigs;
+        Vue.set(this, 'currentConfigs', newConfigs);
+        //this.currentConfigs = newConfigs;
     }
 
     public reset(): void {
