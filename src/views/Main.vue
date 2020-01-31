@@ -19,7 +19,7 @@
                 </template>
 
                 <!-- Body -->
-                <TabBody :automata="automata"></TabBody>
+                <TabBody :automata="automata" :index="index"></TabBody>
 
             </b-tab>
 

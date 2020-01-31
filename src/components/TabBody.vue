@@ -4,14 +4,48 @@
     <b-container fluid>
         <b-row>
 
-            <!-- AUTOMATA OPERATIONS -->
+            <!-- FOLDING, AUTOMATA OPERATIONS, EXPLORATION AND SEARCH -->
             <b-col>
                 <h1>{{ automata.getModelName() }}</h1>
-                <p>Folds and stuff</p>
+                <div id="operations">
+                    <b-button variant="warning">State fold</b-button>
+                    <b-button variant="primary">Union</b-button>
+                    <b-button variant="primary">Concatenation</b-button>
+                    <b-button variant="primary">Kleene Star</b-button>
+                </div>
+
+                <div id="multilevel-exploration">
+                    <b-form-checkbox
+                            id="multilevel-exploration-checkbox"
+                            v-model="isMultilevelExplorationEnabled"
+                            :value="true"
+                            :unchecked-value="false"
+                    >
+                        Multi-level exploration
+                    </b-form-checkbox>
+                    <b-form-input :enabled="isMultilevelExplorationEnabled" type="number" placeholder="Abstraction level"></b-form-input>
+                </div>
+
+                <div id="state-search">
+                    <b-form-input type="number" placeholder="State search"></b-form-input>
+                </div>
             </b-col>
 
             <!-- CYTOSCAPE -->
             <b-col cols="6">
+
+                <!-- Zoom and styles -->
+                <div id="zoom-and-styles">
+                    <div id="zoom">
+                        <b-button variant="warning">
+                            <font-awesome-icon :icon="['fas', 'search-plus']" @click="" />
+                        </b-button>
+                        <b-button variant="warning">
+                            <font-awesome-icon :icon="['fas', 'search-minus']" @click="" />
+                        </b-button>
+                    </div>
+                    <b-button variant="success">Styles</b-button>
+                </div>
 
                 <!-- AUTOMATA PREVIEW -->
                 <AutomataPreview
@@ -47,7 +81,7 @@
 
 <script lang="ts">
     import {Vue, Component, Prop} from 'vue-property-decorator';
-    import { BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea } from 'bootstrap-vue';
+    import { BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea, BFormCheckbox } from 'bootstrap-vue';
     import AutomataPreview from '@/components/AutomataPreview.vue';
     import ConfigTable from '@/components/ConfigTable.vue';
     import Automata from "../classes/Automata";
@@ -58,17 +92,21 @@
             ConfigTable, AutomataPreview,
 
             // Bootstrap components
-            BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea,
+            BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea, BFormCheckbox,
         },
     })
     export default class TabBody extends Vue {
         @Prop() public readonly automata!: Automata;
+        @Prop() public readonly index!: number;
 
         /** The input string inputted by the user */
         private inputString: string = '';
 
         /** The outcome of an animation */
         private outcome: string = "UNDECIDED";
+
+        /** If true, user wants to perform multi-level exploration */
+        private isMultilevelExplorationEnabled: boolean = false;
 
         /**
          * Executes when the user clicks on the preview area
@@ -128,6 +166,25 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    #zoom-and-styles {
+        display:flex;
+        justify-content: space-between;
 
+        padding: 5px 10px;
+    }
+    #zoom > * {
+        margin-right: 10px;
+    }
+    #operations {
+        display:flex;
+        flex-direction: column;
+        > * {
+            height: 50px;
+            text-align:left;
+            margin-bottom: 10px;
+            padding-left: 30px;
+            font-weight: bold;
+        }
+    }
 </style>
