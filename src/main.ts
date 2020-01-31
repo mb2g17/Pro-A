@@ -19,6 +19,10 @@ Vue.use(Dialog, {
     store, router,
 });
 
+// Imports Font Awesome
+import FontAwesomeIcon from './fontawesome';
+Vue.component('font-awesome-icon', FontAwesomeIcon);
+
 Vue.config.productionTip = false;
 
 new Vue({

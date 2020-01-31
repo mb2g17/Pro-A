@@ -1,67 +1,33 @@
 <template>
-    <div class="about">
+    <div class="main">
 
-        <b-container fluid>
-            <b-row>
+        <!-- TABS -->
+        <b-tabs id="tabs" content-class="mt-3" v-model="automataTab">
 
-                <!-- AUTOMATA OPERATIONS -->
-                <b-col>
-                    <h1 v-if="automatas[automataTab] !== undefined">{{ automatas[automataTab].getModelName() }}</h1>
-                    <p>Folds and stuff</p>
-                </b-col>
+            <!-- Logo at the start of the tabs -->
+            <template v-slot:tabs-start>
+                <img id="logo" src="../assets/logo.png" />
+            </template>
 
-                <!-- CYTOSCAPE -->
-                <b-col cols="6">
+            <b-tab v-for="(automata, index) in automatas" active>
 
-                    <b-button variant="primary" @click="generate">Test button</b-button>
+                <!-- Tab title -->
+                <template v-slot:title>
+                    Automata
+                    <!--<b-button variant="danger" @click="closeTab(index)">X</b-button>-->
+                    <font-awesome-icon :icon="['fas', 'times-circle']" @click="closeTab(index)" />
+                </template>
 
-                    <!-- TABS -->
-                    <b-tabs content-class="mt-3" v-model="automataTab">
-                        <b-tab v-for="(automata, index) in automatas" active>
+                <!-- Body -->
+                <TabBody :automata="automata"></TabBody>
 
-                            <!-- AUTOMATA PREVIEW -->
-                            <AutomataPreview
-                                :automata="automata"
-                                :ref="`automata` + index"
-                                @tapArea="onTapArea($event, automata)"
-                            ></AutomataPreview>
+            </b-tab>
 
-                            <!-- Tab title -->
-                            <template v-slot:title>
-                                Automata
-                                <b-button variant="danger" @click="closeTab(index)">X</b-button>
-                            </template>
-
-                        </b-tab>
-
-                        <!-- New Automata Button (Using tabs-end slot) -->
-                        <template v-slot:tabs-end>
-                            <b-nav-item @click.prevent="newTab" href="#"><b>+</b></b-nav-item>
-                        </template>
-                    </b-tabs>
-
-                </b-col>
-
-                <!-- INPUTS -->
-                <b-col>
-                    <p>Input, alphabet tree, past inputs</p>
-                    <p>Input string:</p>
-                    <b-form-textarea
-                            v-model="inputString"
-                            placeholder="Input string"
-                            rows="3"
-                            max-rows="6"
-                    ></b-form-textarea>
-                    <b-button variant="primary" @click="onPassInputClick">Pass input</b-button>
-                    <b-button variant="primary" @click="onStepClick">Step</b-button>
-                    <p>Decision: {{ outcome }}</p>
-
-                    <!-- Config -->
-                    <ConfigTable :configs="automatas[automataTab] ? automatas[automataTab].getCurrentConfigs() : undefined"></ConfigTable>
-                </b-col>
-
-            </b-row>
-        </b-container>
+            <!-- New Automata Button (Using tabs-end slot) -->
+            <template v-slot:tabs-end>
+                <b-nav-item @click.prevent="newTab" href="#"><b>+</b></b-nav-item>
+            </template>
+        </b-tabs>
 
     </div>
 </template>
@@ -77,20 +43,21 @@ import {Outcome} from "@/classes/Outcome";
 import PushdownAutomata from "@/classes/PushdownAutomata";
 import TuringMachine from "@/classes/TuringMachine";
 import ConfigTable from '@/components/ConfigTable.vue';
+import TabBody from "@/components/TabBody.vue";
 
 @Component({
     components: {
         ConfigTable,
         AutomataPreview,
         BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea,
+        TabBody
     },
 })
-export default class About extends Vue {
-
+export default class Main extends Vue {
+    /**
+     * The list of automatas that are in the program
+     */
     private automatas: Automata[] = [];
-    private inputString: string = '';
-    private outcome: string = "UNDECIDED";
-    private configs: string = "";
 
     /**
      * Stores the tab the user is currently selected
@@ -108,93 +75,6 @@ export default class About extends Vue {
         this.automata.addState("A", 50, 50, true, false);
         this.automata.addState("B", 150, 150, false, true);
         this.automata.addTransition("a", "A", "C");*/
-    }
-
-    /**
-     * Executes when the user clicks on the preview area
-     * @param e - event object
-     */
-    public async onTapArea(e: any, automata: any) {
-        console.log(automata);
-        // If there is no target (no node / edge selected)
-        /*if (!e.target[0]) {
-            const nodeID = prompt('Please enter node label:', 'A');
-            const initial = confirm('Initial state?');
-            const final = confirm('Final state?');
-            if (nodeID !== null) {
-                this.automata.addState(nodeID, e.position.x, e.position.y, initial, final);
-            } else {
-                this.automata.addState(uuidv1(), e.position.x, e.position.y, initial, final);
-            }
-        }*/
-    }
-
-    /**
-     * When the user clicks on "Pass input" button
-     */
-    public onPassInputClick() {
-        // Clears automata
-        this.automatas[this.automataTab].reset();
-
-        // Sets the input string
-        this.automatas[this.automataTab].setInput(this.inputString);
-        this.inputString = '';
-        this.automatas[this.automataTab].simulate();
-
-        // Sets outcome
-        this.outcome = this.automatas[this.automataTab].getOutcome().toLocaleString();
-    }
-
-    /**
-     * When the user clicks on "Step" button
-     */
-    public onStepClick() {
-        // If it exists
-        if (this.automatas[this.automataTab]) {
-            // If there are no more configs, set new input
-            if (this.automatas[this.automataTab].getCurrentConfigs().size === 0) {
-                this.automatas[this.automataTab].setInput(this.inputString);
-            }
-            // Steps the automata
-            this.automatas[this.automataTab].step();
-            this.$forceUpdate();
-
-            // Gets the set of configs
-            const configs = this.automatas[this.automataTab].getCurrentConfigs();
-
-            // Converts to string
-            this.configs = "";
-            for (const config of configs) {
-                this.configs += (JSON.stringify(config) + ", ");
-            }
-
-            // Gets outcome
-            this.outcome = this.automatas[this.automataTab].getOutcome().toLocaleString();
-        } else {
-            alert("No automata exists!");
-        }
-    }
-
-    public generate() {
-
-        /*const stateName = "A";
-        const initial = this.automatas[this.automataTab].getState(stateName).initial;
-        this.automatas[this.automataTab].setInitialState(stateName, !initial);*/
-        this.$forceUpdate();
-
-        /*const newArray = [];
-
-        for (let i = 0; i < 100; i++) {
-            newArray.push({ // node c
-                data: { id: ('a' + i) },
-                position: {
-                    x: 200 + (50 * (i % 30)),
-                    y: 200 + (50 * (i / 30)),
-                },
-            });
-        }*/
-
-        // this.automata.getData() = Object.assign({}, this.elements, newArray);
     }
 
     /**
@@ -234,5 +114,12 @@ export default class About extends Vue {
     #cytoscape-div {
         background-color: lightskyblue;
         text-align: left;
+    }
+    #logo {
+        width: 100px;
+        margin: 10px 20px 0 20px;
+    }
+    #tabs {
+        margin-top: 10px;
     }
 </style>
