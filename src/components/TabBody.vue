@@ -41,11 +41,11 @@
                 <!-- Zoom and styles -->
                 <div id="zoom-and-styles">
                     <div id="zoom">
-                        <b-button variant="warning">
-                            <font-awesome-icon :icon="['fas', 'search-plus']" @click="" />
+                        <b-button variant="warning" @click="zoom('in')">
+                            <font-awesome-icon :icon="['fas', 'search-plus']" />
                         </b-button>
-                        <b-button variant="warning">
-                            <font-awesome-icon :icon="['fas', 'search-minus']" @click="" />
+                        <b-button variant="warning" @click="zoom('out')">
+                            <font-awesome-icon :icon="['fas', 'search-minus']" />
                         </b-button>
                     </div>
                     <b-button variant="success">Styles</b-button>
@@ -170,6 +170,28 @@
             } else {
                 alert("No automata exists!");
             }
+        }
+
+        /**
+         * Zooms the canvas in a direction
+         * @param direction either the string 'in' or 'out' for zooming in and out; everything else will be ignored
+         */
+        public zoom(direction: string) {
+            // Gets automata preview reference
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // Gets new zoom level
+            let zoomLevel = automataPreview.cy.zoom();
+            if (direction === "in")
+                zoomLevel += 0.15;
+            else if (direction === "out")
+                zoomLevel -= 0.15;
+
+            // Sets new zoom level from the centre of the viewport
+            automataPreview.cy.zoom({
+                level: zoomLevel,
+                renderedPosition: {x: automataPreview.cy.width() / 2, y: automataPreview.cy.height() / 2}
+            });
         }
     }
 </script>

@@ -81,6 +81,10 @@ const myConfig: object = {
         name: 'grid',
         rows: 1,
     },
+
+    wheelSensitivity: 0.15,
+    minZoom: 0.1,
+    maxZoom: 10
 };
 
 export default myConfig;
