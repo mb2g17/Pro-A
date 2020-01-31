@@ -1,8 +1,8 @@
 <template>
     <div id="configTable">
 
-        <p>Config table</p>
-        <p v-if="configs === undefined">Undefined my boi</p>
+        <h4>Configuration table</h4>
+        <p v-if="configs === undefined || configs.size === 0">No configurations!</p>
         <b-table v-else :items="tableItems"></b-table>
 
     </div>

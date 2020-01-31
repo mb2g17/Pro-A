@@ -6,7 +6,10 @@
 
             <!-- FOLDING, AUTOMATA OPERATIONS, EXPLORATION AND SEARCH -->
             <b-col>
-                <h1>{{ automata.getModelName() }}</h1>
+                <!-- Automata type display -->
+                <h2>{{ automata.getModelName() }}</h2>
+
+                <!-- Operations -->
                 <div id="operations">
                     <b-button variant="warning">State fold</b-button>
                     <b-button variant="primary">Union</b-button>
@@ -14,21 +17,22 @@
                     <b-button variant="primary">Kleene Star</b-button>
                 </div>
 
+                <!-- Multi-level exploration -->
                 <div id="multilevel-exploration">
                     <b-form-checkbox
-                            id="multilevel-exploration-checkbox"
+                            class="mt-2"
                             v-model="isMultilevelExplorationEnabled"
                             :value="true"
                             :unchecked-value="false"
                     >
                         Multi-level exploration
                     </b-form-checkbox>
-                    <b-form-input :enabled="isMultilevelExplorationEnabled" type="number" placeholder="Abstraction level"></b-form-input>
+                    <b-form-input :disabled="!isMultilevelExplorationEnabled" type="number"
+                                  placeholder="Abstraction level"/>
                 </div>
 
-                <div id="state-search">
-                    <b-form-input type="number" placeholder="State search"></b-form-input>
-                </div>
+                <!-- Search -->
+                <b-form-input type="text" placeholder="State search" class="mt-3"/>
             </b-col>
 
             <!-- CYTOSCAPE -->
@@ -52,26 +56,30 @@
                         :automata="automata"
                         :ref="`automata` + index"
                         @tapArea="onTapArea($event, automata)"
-                ></AutomataPreview>
+                />
 
             </b-col>
 
             <!-- INPUTS -->
             <b-col>
-                <p>Input, alphabet tree, past inputs</p>
-                <p>Input string:</p>
                 <b-form-textarea
+                        class="mb-3"
                         v-model="inputString"
                         placeholder="Input string"
                         rows="3"
                         max-rows="6"
-                ></b-form-textarea>
-                <b-button variant="primary" @click="onPassInputClick">Pass input</b-button>
-                <b-button variant="primary" @click="onStepClick">Step</b-button>
-                <p>Decision: {{ outcome }}</p>
+                />
+                <div class="d-flex justify-content-center mb-2">
+                    <b-button variant="primary" @click="onPassInputClick" class="mr-2">Compute immediately</b-button>
+                    <b-button variant="primary" @click="onStepClick">Step</b-button>
+                </div>
+                <b-button variant="danger" class="mb-3" @click="onStepClick">Cancel</b-button>
+
+                <!-- Decision -->
+                <h2 id="decision">{{ outcome }}</h2>
 
                 <!-- Config -->
-                <ConfigTable :configs="automata.getCurrentConfigs()"></ConfigTable>
+                <ConfigTable :configs="automata.getCurrentConfigs()" />
             </b-col>
 
         </b-row>
@@ -186,5 +194,9 @@
             padding-left: 30px;
             font-weight: bold;
         }
+    }
+    #decision {
+        margin: 30px 0;
+        font-weight: bold;
     }
 </style>
