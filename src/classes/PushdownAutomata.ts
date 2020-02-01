@@ -26,8 +26,13 @@ export default class PushdownAutomata extends Automata {
         this.currentConfigs = newConfigs;
     }
 
-    protected addInitialConfigsIfNoCurrentConfigs(): void {
-        if (this.currentConfigs.size === 0) {
+    protected configInit(): void {
+        // If there is an outcome
+        if (this.getOutcome() !== Outcome.UNDECIDED) {
+            // Clear all the old configs
+            this.currentConfigs.clear();
+
+            // Add initial configs
             for (const initialState of this.initialStates) {
                 this.currentConfigs.add(new PushdownAutomataConfig(initialState, this.inputString, []));
             }
@@ -109,8 +114,8 @@ export default class PushdownAutomata extends Automata {
                 return Outcome.ACCEPT;
         }
 
-        // We are not in a final state; reject
-        return Outcome.REJECT;
+        // There are still configs, but they haven't accepted yet
+        return Outcome.UNDECIDED;
     }
 
     reset(): void {

@@ -3,6 +3,7 @@ import {Outcome} from "@/classes/Outcome";
 import TuringMachineTape from "@/classes/TuringMachineTape";
 import TuringMachineConfig from "@/classes/TuringMachineConfig";
 import Vue from "vue";
+import PushdownAutomataConfig from "@/classes/PushdownAutomataConfig";
 
 /**
  * Implementation of a Turing machine
@@ -49,8 +50,13 @@ export default class TuringMachine extends Automata {
     /**
      * Adds initial configs if there are no current configs
      */
-    protected addInitialConfigsIfNoCurrentConfigs() {
-        if (this.currentConfigs.size === 0) {
+    protected configInit() {
+        // If there is an outcome
+        if (this.getOutcome() !== Outcome.UNDECIDED) {
+            // Clear all the old configs
+            this.currentConfigs.clear();
+
+            // Add initial configs
             for (const initialState of this.initialStates) {
                 this.currentConfigs.add(new TuringMachineConfig(initialState, new TuringMachineTape(this.inputString), 0));
             }
@@ -110,8 +116,8 @@ export default class TuringMachine extends Automata {
                 return Outcome.ACCEPT;
         }
 
-        // We are not in a final state; reject
-        return Outcome.REJECT;
+        // There are still configs, but they haven't accepted yet
+        return Outcome.UNDECIDED;
     }
 
     reset(): void {

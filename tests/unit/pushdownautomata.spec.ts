@@ -61,7 +61,7 @@ describe('PushdownAutomata.ts', () => {
             output: ['A']
         });
         automata.setInput('a');
-        automata.step();
+        automata.simulate();
         assert.equal(automata.getOutcome(), Outcome.REJECT);
     });
 

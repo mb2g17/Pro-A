@@ -224,7 +224,7 @@ export default abstract class Automata {
      */
     public simulate() {
         // Check to see if the initial config accepts
-        this.addInitialConfigsIfNoCurrentConfigs();
+        this.configInit();
         if (this.getOutcome() === Outcome.ACCEPT)
             return;
 
@@ -337,9 +337,8 @@ export default abstract class Automata {
      * Reads the next input symbol and travels to the next state
      */
     public step(): void {
-        console.log("STEP");
         // If there's no current states, add the initial ones
-        this.addInitialConfigsIfNoCurrentConfigs();
+        this.configInit();
 
         // Remember the new set of current states
         const newCurrentConfigs: Set<AutomataConfig> = new Set();
@@ -401,9 +400,9 @@ export default abstract class Automata {
     public abstract getModelName(): string;
 
     /**
-     * Adds initial configs if there are no current configs
+     * Sets up initial configurations if needed
      */
-    protected abstract addInitialConfigsIfNoCurrentConfigs(): void;
+    protected abstract configInit(): void;
 
     /**
      * Applies a transition from a source config to a destination config

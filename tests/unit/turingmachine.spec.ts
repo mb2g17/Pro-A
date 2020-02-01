@@ -53,10 +53,8 @@ describe('TuringMachine.ts', () => {
             writeTapeSymbol: 'a',
             direction: 'R'
         });
-        automata.setInput('abb');
-        automata.step();
-        automata.step();
-        automata.step();
+        automata.setInput('aa');
+        automata.simulate();
         assert.equal(automata.getOutcome(), Outcome.REJECT);
     });
 
@@ -70,7 +68,7 @@ describe('TuringMachine.ts', () => {
         assert.equal(automata.getCurrentConfigs().size, 0);
 
         // Adds current states from initial states
-        automata["addInitialConfigsIfNoCurrentConfigs"]();
+        automata["configInit"]();
 
         // Asserts that the automata has the same number of current states as initial states
         assert.equal(automata.getCurrentConfigs().size, 2);

@@ -4,7 +4,7 @@ import FiniteAutomata from '@/classes/FiniteAutomata';
 import {Outcome} from '@/classes/Outcome';
 
 /**
- * Tests the abstract class FiniteAutomata.ts
+ * Tests the class FiniteAutomata.ts
  */
 describe('FiniteAutomata.ts', () => {
 
@@ -99,5 +99,16 @@ describe('FiniteAutomata.ts', () => {
             assert.equal(automata.getOutcome(), Outcome.REJECT);
             automata.reset();
         });
+    });
+
+    it('has an outcome of UNDEFINED when simulation is not finished', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 60, 60, false, true);
+        automata.addTransition('a', 'A', 'B');
+        automata.addTransition('a', 'B', 'C');
+        automata.setInput('aaaaaaaaaaa');
+        automata.step();
+        assert.equal(automata.getOutcome(), Outcome.UNDECIDED);
     });
 });

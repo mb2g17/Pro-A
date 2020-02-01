@@ -31,8 +31,7 @@
                 for (const config of this.configs) {
                     items.push({
                         "state": config.state,
-                        "next_input_symbol": config.getInputLength() > 0 ? config.getInputSymbol() : "None",
-                        "truncated_input": config.getInputLength() > 0 ? config.getTruncatedInput() : "Empty"
+                        "remaining_input": config.getInputLength() > 0 ? config.getInput() : "Empty",
                     });
                     console.log("Get input:");
                     console.log(config.getInput());

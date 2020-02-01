@@ -35,12 +35,17 @@ export default class FiniteAutomata extends Automata {
                 return Outcome.ACCEPT;
         }
 
-        // We are not in a final state; reject
-        return Outcome.REJECT;
+        // We still have configs, but none of them accept yet
+        return Outcome.UNDECIDED;
     }
 
-    protected addInitialConfigsIfNoCurrentConfigs(): void {
-        if (this.currentConfigs.size === 0) {
+    protected configInit(): void {
+        // If there is an outcome
+        if (this.getOutcome() !== Outcome.UNDECIDED) {
+            // Clear all the old configs
+            this.currentConfigs.clear();
+
+            // Add initial configs
             for (const initialState of this.initialStates) {
                 this.currentConfigs.add(new AutomataConfig(initialState, this.inputString));
             }

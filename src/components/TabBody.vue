@@ -155,21 +155,15 @@
          * When the user clicks on "Step" button
          */
         public onStepClick() {
-            // If it exists
-            if (this.automata) {
-                // If there are no more configs, set new input
-                if (this.automata.getCurrentConfigs().size === 0) {
-                    this.automata.setInput(this.inputString);
-                }
-                // Steps the automata
-                this.automata.step();
-                this.$forceUpdate();
+            // Set new input
+            this.automata.setInput(this.inputString);
 
-                // Gets outcome
-                this.outcome = this.automata.getOutcome().toLocaleString();
-            } else {
-                alert("No automata exists!");
-            }
+            // Steps the automata
+            this.automata.step();
+            this.$forceUpdate();
+
+            // Gets outcome
+            this.outcome = this.automata.getOutcome().toLocaleString();
         }
 
         /**
