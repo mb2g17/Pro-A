@@ -3,7 +3,7 @@
 
         <h4>Configuration table</h4>
         <p v-if="configs === undefined || configs.size === 0">No configurations!</p>
-        <b-table v-else :items="tableItems"></b-table>
+        <b-table v-else :items="tableItems"/>
 
     </div>
 </template>
@@ -12,6 +12,8 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import { BTable } from 'bootstrap-vue';
     import AutomataConfig from '@/classes/AutomataConfig';
+    import PushdownAutomataConfig from "@/classes/PushdownAutomataConfig";
+    import TuringMachineConfig from "@/classes/TuringMachineConfig";
 
     @Component
     export default class ConfigTable extends Vue {
@@ -29,12 +31,29 @@
 
                 // For each config, add table item
                 for (const config of this.configs) {
-                    items.push({
-                        "state": config.state,
-                        "remaining_input": config.getInputLength() > 0 ? config.getInput() : "Empty",
-                    });
-                    console.log("Get input:");
-                    console.log(config.getInput());
+
+                    // If this is a pushdown automata
+                    if (config instanceof PushdownAutomataConfig) {
+                        const pConfig: PushdownAutomataConfig = (config as PushdownAutomataConfig);
+                        items.push({
+                            "state": config.state,
+                            "remaining_input": config.getInputLength() > 0 ? config.getInput() : "Empty",
+                            "stack": pConfig.stackAsString()
+                        });
+                    }
+
+                    // If this is a turing machine
+                    else if (config instanceof TuringMachineConfig) {
+
+                    }
+
+                    // If this is a finite automata
+                    else {
+                        items.push({
+                            "state": config.state,
+                            "remaining_input": config.getInputLength() > 0 ? config.getInput() : "Empty",
+                        });
+                    }
                 }
 
                 // Return array of items

@@ -23,4 +23,10 @@ export default class PushdownAutomataConfig extends AutomataConfig {
     get stack(): (string | null)[] {
         return this._stack;
     }
+
+    stackAsString(): string {
+        return this.stack
+            .filter((s) => s !== null) // Removes nulls
+            .join(" ; "); // Join them all into a string
+    }
 }
