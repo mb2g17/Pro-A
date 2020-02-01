@@ -44,7 +44,11 @@
 
                     // If this is a turing machine
                     else if (config instanceof TuringMachineConfig) {
-
+                        const tConfig: TuringMachineConfig = (config as TuringMachineConfig);
+                        items.push({
+                            "state": config.state,
+                            "tape": tConfig.tapeToString(5),
+                        });
                     }
 
                     // If this is a finite automata

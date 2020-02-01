@@ -45,4 +45,23 @@ export default class TuringMachineConfig extends AutomataConfig {
     get index(): number {
         return this._index;
     }
+
+    /**
+     * Converts tape to string
+     * @param size - the size of the window to convert the tape
+     */
+    tapeToString(size: number): string {
+        let rv: string = "... ";
+
+        for (let i = this.index - size; i < this.index + size; i++) {
+            let s = this.tape.read(i);
+            if (s === null)
+                s = "□";
+            if (i === this.index)
+                s = `[${s}]`;
+            rv += (s + ",");
+        }
+
+        return rv + " ...";
+    }
 }
