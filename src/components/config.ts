@@ -7,6 +7,13 @@ const myConfig: object = {
                 'content': 'data(name)',
             },
         },
+        { // Selected state
+            selector: ':selected',
+            style: {
+                'background-color': '#933',
+                'color': '#F00'
+            }
+        },
         { // Initial state
             selector: '.initial-node',
             style: {
@@ -21,7 +28,7 @@ const myConfig: object = {
                 'content': 'data(name)',
             },
         },
-        {
+        { // Edge handle
             selector: '.eh-handle',
             style: {
                 'background-color': 'red',
@@ -34,27 +41,27 @@ const myConfig: object = {
                 'label': '',
             },
         },
-        {
+        { // Hovering over a state, edge handle
             selector: '.eh-hover',
             style: {
                 'background-color': 'red',
             },
         },
-        {
+        { // Making a transition, source state
             selector: '.eh-source',
             style: {
                 'border-width': 2,
                 'border-color': 'red',
             },
         },
-        {
+        { // Making a transition, target state
             selector: '.eh-target',
             style: {
                 'border-width': 2,
                 'border-color': 'red',
             },
         },
-        {
+        { // Making a transition, arrow
             selector: '.eh-preview, .eh-ghost-edge',
             style: {
                 'background-color': 'red',
@@ -63,7 +70,7 @@ const myConfig: object = {
                 'source-arrow-color': 'red',
             },
         },
-        {
+        { // Transition
             selector: 'edge',
             style: {
                 'width': 3,
@@ -76,6 +83,18 @@ const myConfig: object = {
                 'arrow-scale': 2,
             },
         },
+        { // Parent (state fold node)
+            selector: '.parent',
+            style: {
+                'background-color': '#50b8f8',
+            }
+        },
+        { // Parent (state fold node)
+            selector: '.parent:selected',
+            style: {
+                'background-color': '#5099f8',
+            }
+        }
     ],
     layout: {
         name: 'grid',
@@ -84,7 +103,7 @@ const myConfig: object = {
 
     wheelSensitivity: 0.15,
     minZoom: 0.1,
-    maxZoom: 10
+    maxZoom: 10,
 };
 
 export default myConfig;

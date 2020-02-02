@@ -11,7 +11,7 @@
 
                 <!-- Operations -->
                 <div id="operations">
-                    <b-button variant="warning">State fold</b-button>
+                    <b-button variant="warning" @click="onStateFoldClick">State fold</b-button>
                     <b-button variant="primary">Union</b-button>
                     <b-button variant="primary">Concatenation</b-button>
                     <b-button variant="primary">Kleene Star</b-button>
@@ -93,6 +93,7 @@
     import AutomataPreview from '@/components/AutomataPreview.vue';
     import ConfigTable from '@/components/ConfigTable.vue';
     import Automata from "../classes/Automata";
+    import uuidv1 from "uuid/v1";
 
     @Component({
         components: {
@@ -186,6 +187,27 @@
                 level: zoomLevel,
                 renderedPosition: {x: automataPreview.cy.width() / 2, y: automataPreview.cy.height() / 2}
             });
+        }
+
+        /**
+         * When the user clicks the "State fold" button
+         */
+        public onStateFoldClick() {
+            // Gets automata preview
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // Creates parent node
+            let parentID = uuidv1();
+            const parentNode = automataPreview.cy.add([
+                { group: 'nodes', data: { id: parentID }, position: { x: 100, y: 100 } }
+            ]);
+            parentNode.addClass("parent");
+
+            for (const node of automataPreview.selectedNodes) {
+                automataPreview.cy.getElementById(node).move({
+                    parent: parentID
+                });
+            }
         }
     }
 </script>

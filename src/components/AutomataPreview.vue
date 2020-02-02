@@ -24,6 +24,7 @@ import Automata from '@/classes/Automata';
 import jquery from "jquery";
 import edgehandles from 'cytoscape-edgehandles';
 import contextMenus from 'cytoscape-context-menus';
+import expandCollapse from 'cytoscape-expand-collapse';
 
 // Automata config
 import config from './config';
@@ -35,19 +36,23 @@ import TuringMachine from "@/classes/TuringMachine";
 
 @Component
 export default class AutomataPreview extends Vue {
+    /** The automata to preview */
     @Prop() public readonly automata!: Automata;
 
+    /** Config object (exported data stored as property) */
     public myConfig: object = config;
 
-    /**
-     * The cytoscape instance in this preview component
-     */
+    /** The cytoscape instance in this preview component */
     public cy: any;
+
+    /** Set of selected nodes */
+    public selectedNodes: Set<any> = new Set();
 
     public preConfig(cytoscape: any) {
         try {
             contextMenus(cytoscape, jquery);
             edgehandles(cytoscape, jquery);
+            expandCollapse(cytoscape);
         } catch (e) {
             console.log(e.fullStackTrace);
         }
@@ -58,8 +63,34 @@ export default class AutomataPreview extends Vue {
     public afterCreated(cy: any) {
         this.cy = cy; // Stores cytoscape instance
 
-        // -- EDGEHANDLES --
-        const eh = cy.edgehandles({
+        // Sets up extensions
+        this.initEdgeHandles();
+        this.initContextMenu();
+        this.initExpandCollapse();
+
+        // When the user selects a node
+        cy.on('select', (event: any) => {
+            console.log(event);
+            const id = event.target.id();
+            this.selectedNodes.add(id);
+
+            console.log(`Selecting ${id}`);
+        });
+
+        // When the user deselects a node
+        cy.on('unselect', (event: any) => {
+            const id = event.target.id();
+            this.selectedNodes.delete(id);
+
+            console.log(`Unselecting ${id}`);
+        });
+    }
+
+    /**
+     * Sets up edge handles extension
+     */
+    private initEdgeHandles() {
+        const eh = this.cy.edgehandles({
             handleInDrawMode: true,
             nodeLoopOffset: 50, // offset for edgeType: 'node' loops
             snap: true,
@@ -70,8 +101,8 @@ export default class AutomataPreview extends Vue {
         });
 
         // On edge creation
-        cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
-            cy.remove(addedEles);
+        this.cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
+            this.cy.remove(addedEles);
             const symbol = prompt('Please enter transition symbol (if TM, use __empty for empty tape symbol):', 'a');
             if (symbol === null)
                 return;
@@ -104,9 +135,13 @@ export default class AutomataPreview extends Vue {
 
             this.automata.addTransition(symbol, sourceNode._private.data.name, targetNode._private.data.name, payload);
         });
+    }
 
-        // -- CONTEXT MENU --
-        const cm = cy.contextMenus({
+    /**
+     * Sets up context menu extension
+     */
+    private initContextMenu() {
+        const cm = this.cy.contextMenus({
             menuItems: [
                 // -- STATES --
                 {
@@ -186,6 +221,20 @@ export default class AutomataPreview extends Vue {
                     }
                 },
             ]
+        });
+    }
+
+    /**
+     * Sets up expand collapse extension
+     */
+    private initExpandCollapse() {
+        const ec = this.cy.expandCollapse({
+            layoutBy: {
+                name: 'grid'
+            },
+            fisheye: false,
+            animate: false,
+            undoable: false
         });
     }
 
