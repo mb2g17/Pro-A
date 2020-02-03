@@ -55,7 +55,6 @@
                 <AutomataPreview
                         :automata="automata"
                         :ref="`automata` + index"
-                        @tapArea="onTapArea($event, automata)"
                 />
 
             </b-col>
@@ -116,25 +115,6 @@
 
         /** If true, user wants to perform multi-level exploration */
         private isMultilevelExplorationEnabled: boolean = false;
-
-        /**
-         * Executes when the user clicks on the preview area
-         * @param e - event object
-         */
-        public async onTapArea(e: any, automata: any) {
-            console.log(automata);
-            // If there is no target (no node / edge selected)
-            /*if (!e.target[0]) {
-                const nodeID = prompt('Please enter node label:', 'A');
-                const initial = confirm('Initial state?');
-                const final = confirm('Final state?');
-                if (nodeID !== null) {
-                    this.automata.addState(nodeID, e.position.x, e.position.y, initial, final);
-                } else {
-                    this.automata.addState(uuidv1(), e.position.x, e.position.y, initial, final);
-                }
-            }*/
-        }
 
         /**
          * When the user clicks on "Pass input" button
@@ -199,15 +179,49 @@
             // Creates parent node
             let parentID = uuidv1();
             const parentNode = automataPreview.cy.add([
-                { group: 'nodes', data: { id: parentID }, position: { x: 100, y: 100 } }
+                {
+                    group: 'nodes',
+                    data: { id: parentID, name: "" },
+                    position: { x: 100, y: 100 },
+                    classes: ['parent']
+                },
             ]);
-            parentNode.addClass("parent");
+            /*const parentNode = {
+                group: 'nodes',
+                data: {
+                    id: parentID,
+                    final: false,
+                    initial: false,
+                    name: "parent",
+                    type: "node"
+                },
+                position: { x: 100, y: 100 },
+                classes: ['parent']
+            };*/
 
+            // Sets parent of all selected nodes
             for (const node of automataPreview.selectedNodes) {
                 automataPreview.cy.getElementById(node).move({
                     parent: parentID
                 });
             }
+
+            // Sets parent of all nodes
+            /*const nodes = automataPreview.cy.nodes().map((n: any) => n._private.data.id);
+            for (const node of nodes) {
+                automataPreview.cy.getElementById(node).move({
+                    parent: parentID
+                });
+            }*/
+
+            console.log("Cy data:");
+            console.log(automataPreview.cy.data());
+            console.log(automataPreview.cy.nodes("#" + parentID));
+
+            // Add this node to automata class
+            let newData: any = this.automata.getData();
+            newData[parentID] = automataPreview.cy.nodes("#" + parentID)[0]._private;
+            this.automata.setData(newData);
         }
     }
 </script>

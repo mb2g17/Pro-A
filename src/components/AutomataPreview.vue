@@ -5,14 +5,11 @@
             ref="cy"
             :config="myConfig"
             :preConfig="preConfig"
-            :afterCreated="afterCreated"
-            @tap="$emit('tapArea', $event)"
-            @cxttapstart="onStart">
+            :afterCreated="afterCreated">
         <cy-element
                 v-for="def in automata.getData()"
                 :key="`${def.data.id}`"
                 :definition="def"
-                v-on:mousedown="onStateClick"
         />
     </cytoscape>
 
@@ -52,7 +49,7 @@ export default class AutomataPreview extends Vue {
         try {
             contextMenus(cytoscape, jquery);
             edgehandles(cytoscape, jquery);
-            expandCollapse(cytoscape);
+            expandCollapse(cytoscape, jquery);
         } catch (e) {
             console.log(e.fullStackTrace);
         }
@@ -70,19 +67,50 @@ export default class AutomataPreview extends Vue {
 
         // When the user selects a node
         cy.on('select', (event: any) => {
-            console.log(event);
             const id = event.target.id();
             this.selectedNodes.add(id);
-
-            console.log(`Selecting ${id}`);
         });
 
         // When the user deselects a node
         cy.on('unselect', (event: any) => {
             const id = event.target.id();
             this.selectedNodes.delete(id);
+        });
 
-            console.log(`Unselecting ${id}`);
+        // When the user taps on the screen
+        cy.on('tap', (event: any) => {
+            console.log(event);
+
+            // If we clicked on a parent
+            if (event.target[0]) {
+                if (event.target[0]._private.classes.has("parent")) {
+                    // Gets x and y of parent
+                    const [parentX, parentY] = [event.target[0]._private.position.x, event.target[0]._private.position.y];
+                    const [parentWidth, parentHeight] = [event.target[0]._private.autoWidth, event.target[0]._private.autoHeight];
+
+                    // Gets x and y of click
+                    const [tapX, tapY] = [event.position.x, event.position.y];
+
+                    // Check if user tapped on cue (collapse version)
+                    const [left, top] =  [parentX - (parentWidth / 2), parentY - (parentHeight / 2)];
+                    if (Math.abs(tapX - left) < 6 && Math.abs(tapY - top) < 6) {
+                        console.log("Tapped on cue! Collapse");
+
+                        let api = this.cy.expandCollapse('get');
+                        api.collapse(event.target);
+                    }
+
+                    // Check if user tapped on cue (expand version)
+                    else if (tapX < parentX && tapY < parentY && event.target[0]._private.classes.has("cy-expand-collapse-collapsed-node")) {
+                        console.log("Tapped on cue! Expand");
+
+                        let api = this.cy.expandCollapse('get');
+                        api.expand(event.target);
+                    }
+                }
+            }
+
+            // Gets x and y of parent
         });
     }
 
@@ -144,6 +172,26 @@ export default class AutomataPreview extends Vue {
         const cm = this.cy.contextMenus({
             menuItems: [
                 // -- STATES --
+                {
+                    id: 'collapse',
+                    content: 'Collapse state',
+                    tooltipText: 'collapse',
+                    selector: 'node',
+                    onClickFunction: (event: any) => {
+                        let api = this.cy.expandCollapse('get');
+                        api.collapseAll();
+                    }
+                },
+                {
+                    id: 'Expand',
+                    content: 'Expand state',
+                    tooltipText: 'expand',
+                    selector: 'node',
+                    onClickFunction: (event: any) => {
+                        let api = this.cy.expandCollapse('get');
+                        api.expandAll();
+                    }
+                },
                 {
                     id: 'initial',
                     content: 'Toggle initial state',
@@ -229,22 +277,28 @@ export default class AutomataPreview extends Vue {
      */
     private initExpandCollapse() {
         const ec = this.cy.expandCollapse({
-            layoutBy: {
-                name: 'grid'
-            },
+            layoutBy: null,
             fisheye: false,
             animate: false,
-            undoable: false
+            undoable: false,
+            ready: () => console.log("Expand collapse is ready"),
+
+            cueEnabled: true,
+            expandCollapseCueSensitivity: 0.001
         });
-    }
 
-    public onMouseDown(e: any) {
-    }
-
-    public onStart() {
-    }
-
-    public onStateClick() {
+        this.cy.nodes().on("expandcollapse.beforecollapse", (event: any) => {
+            console.log("beforecollapse");
+        });
+        this.cy.nodes().on("expandcollapse.aftercollapse", (event: any) => {
+            console.log("aftercollapse");
+        });
+        this.cy.nodes().on("expandcollapse.beforeexpand", (event: any) => {
+            console.log("beforeexpand");
+        });
+        this.cy.nodes().on("expandcollapse.afterexpand", (event: any) => {
+            console.log("afterexpand");
+        });
     }
 }
 </script>

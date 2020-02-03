@@ -51,6 +51,10 @@ export default abstract class Automata {
         return this.data;
     }
 
+    public setData(newData: any) {
+        Vue.set(this, "data", newData);
+    }
+
     /**
      * Adds a state to the automata
      * @param name - the name of the automata
@@ -89,6 +93,10 @@ export default abstract class Automata {
                 position: {x, y}
             });
         }
+    }
+
+    public addStateData(node: any) {
+        Vue.set(this.data, node.data.id, node);
     }
 
     /**
