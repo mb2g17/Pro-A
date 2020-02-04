@@ -87,6 +87,8 @@ const myConfig: object = {
             selector: '.parent',
             style: {
                 'background-color': '#50b8f8',
+                'border-width': 1,
+                'border-color': 'black'
             }
         },
         { // Parent (state fold node)

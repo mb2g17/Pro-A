@@ -7,9 +7,10 @@ import store from './store';
 import VueCytoscape from 'vue-cytoscape';
 Vue.use(VueCytoscape);
 
-// Imports Bootstrap-Vue
-import BootstrapVue from 'bootstrap-vue';
+// Imports Bootstrap-Vue and toast plugin for toasts
+import BootstrapVue, { ToastPlugin } from 'bootstrap-vue';
 Vue.use(BootstrapVue);
+Vue.use(ToastPlugin);
 import './custom.scss';
 
 // Imports Bootstrap-Vue-Dialog

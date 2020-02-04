@@ -172,7 +172,7 @@ export default class AutomataPreview extends Vue {
         const cm = this.cy.contextMenus({
             menuItems: [
                 // -- STATES --
-                {
+                /*{
                     id: 'collapse',
                     content: 'Collapse state',
                     tooltipText: 'collapse',
@@ -190,6 +190,60 @@ export default class AutomataPreview extends Vue {
                     onClickFunction: (event: any) => {
                         let api = this.cy.expandCollapse('get');
                         api.expandAll();
+                    }
+                },*/
+                {
+                    id: 'add-to-fold',
+                    content: 'Add selected state(s) to this fold',
+                    tooltipText: 'add-to-fold',
+                    selector: '.parent',
+                    hasTrailingDivider: true,
+                    onClickFunction: (event: any) => {
+                        // If there are no selected nodes, send a toast
+                        if (this.selectedNodes.size === 0) {
+                            this.$bvToast.toast("No nodes selected to add to state fold!", {
+                                title: 'Warning',
+                                variant: "warning",
+                                autoHideDelay: 5000
+                            });
+                            return;
+                        }
+
+                        // Gets parent ID
+                        const parentID = event.target[0]._private.data.id;
+
+                        // Goes through every selected node
+                        for (const node of this.selectedNodes) {
+                            // Sets parent of this node to new parent
+                            this.cy.getElementById(node).move({
+                                parent: parentID
+                            });
+                        }
+                    }
+                },
+                {
+                    id: 'remove-from-fold',
+                    content: 'Remove selected state(s) from folds',
+                    tooltipText: 'remove-from-fold',
+                    selector: 'node',
+                    hasTrailingDivider: true,
+                    onClickFunction: (event: any) => {
+                        // If there are no selected nodes, send a toast
+                        if (this.selectedNodes.size === 0) {
+                            this.$bvToast.toast("No nodes selected to remove from state folds!", {
+                                title: 'Warning',
+                                variant: "warning",
+                                autoHideDelay: 5000
+                            });
+                            return;
+                        }
+                        // Goes through every selected node
+                        for (const node of this.selectedNodes) {
+                            // Removes parent from this node
+                            this.cy.getElementById(node).move({
+                                parent: null
+                            });
+                        }
                     }
                 },
                 {
@@ -224,7 +278,7 @@ export default class AutomataPreview extends Vue {
                 },
                 {
                     id: 'remove',
-                    content: 'Remove',
+                    content: 'Remove node/edge',
                     tooltipText: 'remove',
                     selector: 'node, edge',
                     onClickFunction: (event: any) => {
