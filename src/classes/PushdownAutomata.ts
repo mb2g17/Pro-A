@@ -39,7 +39,7 @@ export default class PushdownAutomata extends Automata {
         }
     }
 
-    protected applyTransition(srcConfig: PushdownAutomataConfig, edgeID: number): PushdownAutomataConfig | null {
+    protected applyTransition(srcConfig: PushdownAutomataConfig, edgeID: number, epsilonMove: boolean): PushdownAutomataConfig | null {
         // If one of these conditions is true, do the transition
         const stackSymbol = this.data[edgeID].data.input === srcConfig.stack[0];
         const emptyStack = this.data[edgeID].data.input === "__empty" && srcConfig.stack.length === 0;
@@ -55,8 +55,10 @@ export default class PushdownAutomata extends Automata {
             const targetStateID = this.data[edgeID].data.target;
             const targetState = this.data[targetStateID];
 
-            // Truncates input to get new input
-            const newInput = srcConfig.getTruncatedInput();
+            // Truncates input to get new input (if it's not an epsilon move)
+            let newInput = srcConfig.getInput();
+            if (!epsilonMove)
+                newInput = srcConfig.getTruncatedInput();
 
             // Returns new config
             return new PushdownAutomataConfig(targetState.data.name, newInput, newStack);

@@ -47,9 +47,9 @@ export default class AutomataConfig {
     }
 
     /**
-     * Gets input using the two methods that already exist
+     * Gets whole input
      */
     public getInput(): string {
-        return this.getInputSymbol() + this.getTruncatedInput();
+        return String(this._input);
     }
 }

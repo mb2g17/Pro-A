@@ -353,26 +353,49 @@ export default abstract class Automata {
 
         // Goes through each config
         for (let config of this.getCurrentConfigs()) {
+            // Gets epsilon move target states
+            let epsilonTargetStates = this.getTargetStates("__epsilon", config.state);
+
+            // If there are none, change to empty array
+            if (!epsilonTargetStates)
+                epsilonTargetStates = [];
+
+            // Apply this transition for each epsilon target state
+            for (const targetState of epsilonTargetStates) {
+                // Gets edge ID
+                const edgeID = this.edgeID["__epsilon"][config.state][targetState];
+
+                // Gets new config by applying transition
+                const newConfig = this.applyTransition(config, edgeID, true);
+
+                // If the transition was succesful, add
+                if (newConfig)
+                    newCurrentConfigs.add(newConfig);
+            }
+
             // Gets first input symbol
             const inputSymbol: string = config.getInputSymbol();
 
             // If input symbol exists
             if (inputSymbol) {
-                // If transition exists, gets target states and applies transitions
-                const targetStates = this.getTargetStates(inputSymbol, config.state);
-                if (targetStates) {
-                    // Apply this transition for each target state
-                    for (const targetState of targetStates) {
-                        // Gets edge ID
-                        const edgeID = this.edgeID[inputSymbol][config.state][targetState];
+                // Gets target states, from normal moves
+                let normalTargetStates = this.getTargetStates(inputSymbol, config.state);
 
-                        // Gets new config by applying transition
-                        const newConfig = this.applyTransition(config, edgeID);
+                // If they are null, replace with empty array
+                if (!normalTargetStates)
+                    normalTargetStates = [];
 
-                        // If the transition was succesful, add
-                        if (newConfig)
-                            newCurrentConfigs.add(newConfig);
-                    }
+                // Apply this transition for each normal target state
+                for (const targetState of normalTargetStates) {
+                    // Gets edge ID
+                    const edgeID = this.edgeID[inputSymbol][config.state][targetState];
+
+                    // Gets new config by applying transition
+                    const newConfig = this.applyTransition(config, edgeID, false);
+
+                    // If the transition was succesful, add
+                    if (newConfig)
+                        newCurrentConfigs.add(newConfig);
                 }
             }
         }
@@ -416,7 +439,8 @@ export default abstract class Automata {
      * Applies a transition from a source config to a destination config
      * @param srcConfig - the config to start from
      * @param edgeID - the ID of the transition to take
+     * @param epsilonMove - true if it's an epsilon move, false if not
      * @returns the new config if this transition was successful, null if not
      */
-    protected abstract applyTransition(srcConfig: AutomataConfig, edgeID: number): AutomataConfig | null;
+    protected abstract applyTransition(srcConfig: AutomataConfig, edgeID: number, epsilonMove: boolean): AutomataConfig | null;
 }

@@ -67,11 +67,12 @@ export default class TuringMachine extends Automata {
      * Applies a transition from a source TM config to a destination TM config
      * @param srcConfig - the config of the TM
      * @param edgeID - the ID of the transition to take
+     * @param epsilonMove - true if epsilon move, false if not
      * @returns the new config of the TM
      */
-    protected applyTransition(srcConfig: TuringMachineConfig, edgeID: number): TuringMachineConfig | null {
-        // Checks if the selected tape symbol is the transition symbol
-        if (srcConfig.getInputSymbol() !== this.data[edgeID].data.readTapeSymbol)
+    protected applyTransition(srcConfig: TuringMachineConfig, edgeID: number, epsilonMove: boolean): TuringMachineConfig | null {
+        // Checks if the selected tape symbol is the transition symbol (or if it's an epsilon move)
+        if (srcConfig.getInputSymbol() !== this.data[edgeID].data.readTapeSymbol && !epsilonMove)
             return null;
 
         // Gets src state info
@@ -80,7 +81,7 @@ export default class TuringMachine extends Automata {
         // Creates new tape
         const newTape: TuringMachineTape = new TuringMachineTape(srcTape);
 
-        // If write symbol is empty, erase, else write new symbol
+        // If write symbol is "empty", erase, otherwise write new symbol
         if (this.data[edgeID].data.writeTapeSymbol === "__empty")
             newTape.delete(srcTapeIndex);
         else

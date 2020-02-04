@@ -52,13 +52,15 @@ export default class FiniteAutomata extends Automata {
         }
     }
 
-    protected applyTransition(srcConfig: AutomataConfig, edgeID: number): AutomataConfig {
+    protected applyTransition(srcConfig: AutomataConfig, edgeID: number, epsilonMove: boolean): AutomataConfig {
         // Gets target state ID and target state
         const targetStateID = this.data[edgeID].data.target;
         const targetState = this.data[targetStateID];
 
-        // Truncates input to get new input
-        const newInput = srcConfig.getTruncatedInput();
+        // Truncates input to get new input (if it's not an epsilon move)
+        let newInput = srcConfig.getInput();
+        if (!epsilonMove)
+            newInput = srcConfig.getTruncatedInput();
 
         // Returns new config
         return new AutomataConfig(targetState.data.name, newInput);

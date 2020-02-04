@@ -58,6 +58,43 @@ describe('TuringMachine.ts', () => {
         assert.equal(automata.getOutcome(), Outcome.REJECT);
     });
 
+    it('can run a TM with epsilon moves in it', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 50, 50, false, false);
+        automata.addState('D', 50, 50, false, false);
+        automata.addState('E', 50, 50, false, true);
+        automata.addTransition('a', 'A', 'B', {
+            writeTapeSymbol: 'a',
+            direction: 'R'
+        });
+        automata.addTransition('b', 'A', 'B', {
+            writeTapeSymbol: 'b',
+            direction: 'R'
+        });
+        automata.addTransition('__epsilon', 'B', 'C', {
+            writeTapeSymbol: 'a',
+            direction: 'L'
+        });
+        automata.addTransition('a', 'C', 'D', {
+            writeTapeSymbol: 'A',
+            direction: 'R'
+        });
+        automata.addTransition('a', 'D', 'E', {
+            writeTapeSymbol: 'A',
+            direction: 'R'
+        });
+
+        automata.setInput('a');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+        automata.reset();
+
+        automata.setInput('b');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.REJECT);
+    });
+
     it('can add an initial state if there are no current states', () => {
         // Adds states
         automata.addState("A", 10, 10, true, false);
@@ -89,7 +126,7 @@ describe('TuringMachine.ts', () => {
         const srcConfig: TuringMachineConfig = new TuringMachineConfig("A", new TuringMachineTape("aab"), 0);
 
         // Applies the transition and gets the destination configuration
-        const destConfig: TuringMachineConfig | null = automata["applyTransition"](srcConfig, automata["edgeID"]['a']["A"]["B"]);
+        const destConfig: TuringMachineConfig | null = automata["applyTransition"](srcConfig, automata["edgeID"]['a']["A"]["B"], false);
 
         // Assert that the transition actually worked
         assert.isNotNull(destConfig);

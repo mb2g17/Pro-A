@@ -65,6 +65,49 @@ describe('PushdownAutomata.ts', () => {
         assert.equal(automata.getOutcome(), Outcome.REJECT);
     });
 
+    it('can run a PDA with epsilon moves in it', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 50, 50, false, false);
+        automata.addState('D', 50, 50, false, false);
+        automata.addState('E', 50, 50, false, false);
+        automata.addState('F', 50, 50, false, true);
+        automata.addState('G', 50, 50, false, false);
+
+        automata.addTransition('__epsilon', 'A', 'B', {
+            input: null,
+            output: []
+        });
+        automata.addTransition('__epsilon', 'A', 'C', {
+            input: null,
+            output: []
+        });
+        automata.addTransition('a', 'B', 'D', {
+            input: null,
+            output: ['A']
+        });
+        automata.addTransition('a', 'D', 'F', {
+            input: 'A',
+            output: []
+        });
+        automata.addTransition('b', 'C', 'E', {
+            input: null,
+            output: ['B']
+        });
+        automata.addTransition('b', 'E', 'G', {
+            input: 'B',
+            output: []
+        });
+
+        automata.setInput('aa');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+
+        automata.setInput('bb');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.REJECT);
+    });
+
     it('can do transitions that do not require a top stack symbol', () => {
         automata.addState('A', 10, 10, true, false);
         automata.addState('B', 50, 50, false, true);

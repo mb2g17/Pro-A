@@ -87,6 +87,56 @@ describe('FiniteAutomata.ts', () => {
         assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
 
+    it('simulates an epsilon move', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, true);
+        automata.addTransition('__epsilon', 'A', 'B');
+        automata.setInput('');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+    });
+
+    it('simulates two epsilon moves', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 50, 50, false, true);
+        automata.addTransition('__epsilon', 'A', 'B');
+        automata.addTransition('__epsilon', 'B', 'C');
+        automata.setInput('');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+    });
+
+    it('simulates automata with epsilon moves in it', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 50, 50, false, false);
+        automata.addState('D', 50, 50, false, true);
+        automata.addState('E', 50, 50, false, false);
+        automata.addTransition('__epsilon', 'A', 'B');
+        automata.addTransition('__epsilon', 'A', 'C');
+        automata.addTransition('a', 'B', 'D');
+        automata.addTransition('b', 'C', 'E');
+
+        automata.setInput('a');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+
+        automata.setInput('b');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.REJECT);
+    });
+
+    /*it('can handle an epsilon loop', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addTransition('__epsilon', 'A', 'B');
+        automata.addTransition('__epsilon', 'B', 'A');
+        automata.setInput('');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.REJECT);
+    });*/
+
     it('cannot simulate with incorrect symbols', () => {
         automata.addState('A', 10, 10, true, false);
         automata.addState('B', 50, 50, false, true);
