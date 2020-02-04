@@ -186,37 +186,20 @@
                     classes: ['parent']
                 },
             ]);
-            /*const parentNode = {
-                group: 'nodes',
-                data: {
-                    id: parentID,
-                    final: false,
-                    initial: false,
-                    name: "parent",
-                    type: "node"
-                },
-                position: { x: 100, y: 100 },
-                classes: ['parent']
-            };*/
 
             // Sets parent of all selected nodes
+            let grandParent: any = null;
             for (const node of automataPreview.selectedNodes) {
+                grandParent = automataPreview.cy.getElementById(node)[0]._private.data.parent;
                 automataPreview.cy.getElementById(node).move({
                     parent: parentID
                 });
             }
 
-            // Sets parent of all nodes
-            /*const nodes = automataPreview.cy.nodes().map((n: any) => n._private.data.id);
-            for (const node of nodes) {
-                automataPreview.cy.getElementById(node).move({
-                    parent: parentID
-                });
-            }*/
-
-            console.log("Cy data:");
-            console.log(automataPreview.cy.data());
-            console.log(automataPreview.cy.nodes("#" + parentID));
+            // Sets grandparent (parent of parent)
+            automataPreview.cy.getElementById(parentID).move({
+                parent: grandParent
+            });
 
             // Add this node to automata class
             let newData: any = this.automata.getData();

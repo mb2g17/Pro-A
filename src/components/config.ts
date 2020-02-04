@@ -94,6 +94,13 @@ const myConfig: object = {
             style: {
                 'background-color': '#5099f8',
             }
+        },
+        { // Parent (collapsed)
+            selector: '.cy-expand-collapse-collapsed-node',
+            style: {
+                'border-width': 1,
+                'border-color': 'black'
+            }
         }
     ],
     layout: {
