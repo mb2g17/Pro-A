@@ -126,6 +126,11 @@ export default class AutomataPreview extends Vue {
                 // for the specified node, return whether edges from itself to itself are allowed
                 return true;
             },
+            show: (sourceNode: any) => {
+                // If we're hovering on a parent, hide the edge handle
+                if (sourceNode[0]._private.classes.has("parent"))
+                    eh.hide();
+            }
         });
 
         // On edge creation
