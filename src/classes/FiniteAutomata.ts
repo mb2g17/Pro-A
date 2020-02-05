@@ -77,7 +77,7 @@ export default class FiniteAutomata extends Automata {
 
     public reset(): void {
         // Resets configs and clears input string
-        this.currentConfigs = new Set();
-        this.inputString = '';
+        Vue.set(this, "currentConfigs", new Set());
+        Vue.set(this, "inputString", '');
     }
 }

@@ -72,10 +72,10 @@
                     <b-button variant="primary" @click="onPassInputClick" class="mr-2">Compute immediately</b-button>
                     <b-button variant="primary" @click="onStepClick">Step</b-button>
                 </div>
-                <b-button variant="danger" class="mb-3" @click="onStepClick">Cancel</b-button>
+                <b-button variant="danger" class="mb-3" @click="onCancelClick">Cancel</b-button>
 
                 <!-- Decision -->
-                <h2 id="decision">{{ outcome }}</h2>
+                <h2 id="decision" v-if="isSimulating">{{ outcome }}</h2>
 
                 <!-- Config -->
                 <ConfigTable :configs="automata.getCurrentConfigs()" />
@@ -116,10 +116,16 @@
         /** If true, user wants to perform multi-level exploration */
         private isMultilevelExplorationEnabled: boolean = false;
 
+        /** If true, we are simulating. If false, we aren't */
+        private isSimulating: boolean = false;
+
         /**
          * When the user clicks on "Pass input" button
          */
         public onPassInputClick() {
+            // We are now simulating
+            this.isSimulating = true;
+
             // Clears automata
             this.automata.reset();
 
@@ -136,6 +142,9 @@
          * When the user clicks on "Step" button
          */
         public onStepClick() {
+            // We are now simulating
+            this.isSimulating = true;
+
             // Set new input
             this.automata.setInput(this.inputString);
 
@@ -145,6 +154,14 @@
 
             // Gets outcome
             this.outcome = this.automata.getOutcome().toLocaleString();
+        }
+
+        /**
+         * When the user clicks on "Cancel" button
+         */
+        public onCancelClick() {
+            this.isSimulating = false; // We are no longer simulating
+            this.automata.reset(); // Reset automata configurations and input
         }
 
         /**

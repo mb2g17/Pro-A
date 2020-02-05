@@ -79,8 +79,6 @@ export default class AutomataPreview extends Vue {
 
         // When the user taps on the screen
         cy.on('tap', (event: any) => {
-            console.log(event);
-
             // If we clicked on a parent
             if (event.target[0]) {
                 if (event.target[0]._private.classes.has("parent")) {
@@ -94,16 +92,12 @@ export default class AutomataPreview extends Vue {
                     // Check if user tapped on cue (collapse version)
                     const [left, top] =  [parentX - (parentWidth / 2), parentY - (parentHeight / 2)];
                     if (Math.abs(tapX - left) < 6 && Math.abs(tapY - top) < 6) {
-                        console.log("Tapped on cue! Collapse");
-
                         let api = this.cy.expandCollapse('get');
                         api.collapse(event.target);
                     }
 
                     // Check if user tapped on cue (expand version)
                     else if (tapX < parentX && tapY < parentY && event.target[0]._private.classes.has("cy-expand-collapse-collapsed-node")) {
-                        console.log("Tapped on cue! Expand");
-
                         let api = this.cy.expandCollapse('get');
                         api.expand(event.target);
                     }
