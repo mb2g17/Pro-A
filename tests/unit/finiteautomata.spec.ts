@@ -2,6 +2,7 @@ import {assert} from 'chai';
 import Automata from '@/classes/Automata';
 import FiniteAutomata from '@/classes/FiniteAutomata';
 import {Outcome} from '@/classes/Outcome';
+import AutomataOperations from "@/classes/AutomataOperations";
 
 /**
  * Tests the class FiniteAutomata.ts
@@ -160,5 +161,38 @@ describe('FiniteAutomata.ts', () => {
         automata.setInput('aaaaaaaaaaa');
         automata.step();
         assert.equal(automata.getOutcome(), Outcome.UNDECIDED);
+    });
+
+    it('can union two smaller automata together', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 50, 50, true, false);
+        automata.addState('s3', 60, 60, true, false);
+        automata.addState('s4', 60, 60, false, true);
+        automata.addState('s5', 60, 60, false, true);
+
+        automata.addTransition('b', 's2', 's4');
+        automata.addTransition('c', 's3', 's5');
+
+        AutomataOperations.union(automata, new Set([
+            automata.getState("s2").data.id,
+            automata.getState("s4").data.id
+        ]), new Set([
+            automata.getState("s3").data.id,
+            automata.getState("s5").data.id
+        ]));
+
+        automata.setInitialState('s6', false);
+        automata.addTransition('a', 's1', 's6');
+
+        [
+            ['ab', Outcome.ACCEPT],
+            ['ac', Outcome.ACCEPT],
+            ['b', Outcome.REJECT],
+            ['c', Outcome.REJECT]
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1]);
+        });
     });
 });
