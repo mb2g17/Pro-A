@@ -145,12 +145,21 @@ export default abstract class Automata {
     }
 
     /**
-     * Gets a state with an ID
+     * Gets a state by its name
      * @param name - the name of the state to get
      * @returns state object if found, null if not found
      */
     public getState(name: string): any | null {
         let ID = this.nodeID[name];
+        return this.getStateById(ID);
+    }
+
+    /**
+     * Gets a state by its ID
+     * @param ID - the ID of the state to get
+     * @returns state object if found, null if not found
+     */
+    public getStateById(ID: string): any | null {
         return !!this.data[ID] ? this.data[ID] : null;
     }
 

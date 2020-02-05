@@ -12,9 +12,9 @@
                 <!-- Operations -->
                 <div id="operations">
                     <b-button variant="warning" @click="onStateFoldClick">State fold</b-button>
-                    <b-button variant="primary">Union</b-button>
-                    <b-button variant="primary">Concatenation</b-button>
-                    <b-button variant="primary">Kleene Star</b-button>
+                    <b-button :variant="operationState.selectStage === 0 ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
+                    <b-button :variant="operationState.selectStage === 0 ? 'primary' : 'success'">Concatenation</b-button>
+                    <b-button :variant="operationState.selectStage === 0 ? 'primary' : 'success'">Kleene Star</b-button>
                 </div>
 
                 <!-- Multi-level exploration -->
@@ -93,6 +93,7 @@
     import ConfigTable from '@/components/ConfigTable.vue';
     import Automata from "../classes/Automata";
     import uuidv1 from "uuid/v1";
+    import AutomataOperations from "@/classes/AutomataOperations";
 
     @Component({
         components: {
@@ -118,6 +119,16 @@
 
         /** If true, we are simulating. If false, we aren't */
         private isSimulating: boolean = false;
+
+        /** Stages of selecting nodes; used for automata operations */
+        private selectStage: number = 0;
+
+        /** The state of an automata operation */
+        private operationState: any = {
+            selectStage: 0,
+            operationName: '',
+            selectedStates: new Set()
+        };
 
         /**
          * When the user clicks on "Pass input" button
@@ -222,6 +233,49 @@
             let newData: any = this.automata.getData();
             newData[parentID] = automataPreview.cy.nodes("#" + parentID)[0]._private;
             this.automata.setData(newData);
+        }
+
+        /**
+         * When the user clicks the "Union" button
+         */
+        public onUnionClick() {
+            // Gets automata preview
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // If we're on the first group
+            if (this.operationState.selectStage === 0) {
+                this.operationState.selectStage = 1;
+
+                // Stores operation type
+                this.operationState.operationName = "union";
+
+                // Remember selected nodes
+                this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
+
+                // Tell user to input another group
+                this.$bvToast.toast("Select a second automata group and press the button again to perform this operation!", {
+                    title: 'Select a second automata group',
+                    variant: "success",
+                    autoHideDelay: 5000
+                });
+            }
+
+            // If we're on the second group
+            else if (this.operationState.selectStage === 1) {
+                this.operationState.selectStage = 0;
+
+                // Performs union
+                AutomataOperations.union(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
+
+                this.$forceUpdate();
+
+                // Tell user that union is finished
+                this.$bvToast.toast("Automata operation successfully computed!", {
+                    title: 'Success!',
+                    variant: "success",
+                    autoHideDelay: 5000
+                });
+            }
         }
     }
 </script>
