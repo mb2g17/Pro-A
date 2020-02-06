@@ -346,7 +346,55 @@
          * When the user clicks the "Kleene star" button
          */
         public onKleeneStarClick() {
-            alert("kleene star");
+            // Gets automata preview
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // Acts based on automata stage
+            switch (this.operationState.selectStage) {
+                case 0:
+                    // Stores operation type and increments stage
+                    this.operationState.operationName = "kleene-star";
+                    this.operationState.selectStage++;
+
+                    // Tells user to select final states of the first sub-automata
+                    this.$bvToast.toast("Select the final states of the sub-automata and press Kleene Star", {
+                        title: 'Kleene Star',
+                        variant: "success",
+                        autoHideDelay: 5000
+                    });
+                    break;
+
+                case 1:
+                    // Remembers the final states of 1st sub-automata
+                    this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
+
+                    // Increments operation stage
+                    this.operationState.selectStage++;
+
+                    // Tells user to select initial states of the second sub-automata
+                    this.$bvToast.toast("Select the initial states of the sub-automata and press Kleene Star", {
+                        title: 'Kleene Star',
+                        variant: "success",
+                        autoHideDelay: 5000
+                    });
+                    break;
+
+                case 2:
+                    // Concatenate
+                    AutomataOperations.kleeneStar(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
+                    this.$forceUpdate();
+
+                    // Tells user to select initial states of the second sub-automata
+                    this.$bvToast.toast("Kleene Star successfully computed!", {
+                        title: 'Kleene Star',
+                        variant: "success",
+                        autoHideDelay: 5000
+                    });
+
+                    // Clears state
+                    this.clearOperationState();
+                    break;
+            }
         }
     }
 </script>

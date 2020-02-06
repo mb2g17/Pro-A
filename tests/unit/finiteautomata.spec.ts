@@ -235,4 +235,55 @@ describe('FiniteAutomata.ts', () => {
             assert.equal(automata.getOutcome(), testCase[1]);
         });
     });
+
+    it('can kleene star an automata', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 50, 50, false, false);
+        automata.addState('s3', 60, 60, false, true);
+        automata.addState('s4', 60, 60, true, false);
+        automata.addState('s5', 60, 60, false, false);
+        automata.addState('s6', 60, 60, false, true);
+
+        automata.addTransition('a', 's1', 's2');
+        automata.addTransition('b', 's2', 's3');
+        automata.addTransition('c', 's4', 's5');
+        automata.addTransition('d', 's5', 's6');
+
+        // Tests automata before
+        [
+            ['a', Outcome.REJECT],
+            ['d', Outcome.REJECT],
+            ['ab', Outcome.ACCEPT],
+            ['cd', Outcome.ACCEPT],
+            ['abcd', Outcome.REJECT],
+            ['cdcdab', Outcome.REJECT],
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1]);
+        });
+
+        AutomataOperations.kleeneStar(automata, new Set([
+            automata.getState("s3").data.id,
+            automata.getState("s6").data.id,
+        ]), new Set([
+            automata.getState("s1").data.id,
+            automata.getState("s4").data.id,
+        ]));
+
+        // Tests automata after
+        [
+            ['a', Outcome.REJECT],
+            ['d', Outcome.REJECT],
+            ['ab', Outcome.ACCEPT],
+            ['cd', Outcome.ACCEPT],
+            ['abcd', Outcome.ACCEPT],
+            ['cdcdab', Outcome.ACCEPT],
+            ['abcdabcdcdababcdabcd', Outcome.ACCEPT],
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1]);
+        });
+    });
 });
