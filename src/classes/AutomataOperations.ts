@@ -39,4 +39,38 @@ export default class AutomataOperations {
                 cy.$(`#${initialState}`).removeClass("initial-node");
         }
     }
+
+    /**
+     * Performs concatenation
+     * @param automata - the automata object to edit
+     * @param group1 - the group of final states of sub-automata 1
+     * @param group2 - the group of initial states of sub-automata 2
+     * @param cy - the cytoscape instance (optional)
+     */
+    public static concatenation(automata: Automata, group1: Set<string>, group2: Set<string>, cy?: any) {
+        // For each final state
+        for (const finalState of group1) {
+            // Gets final state name
+            const finalStateName = automata.getStateById(finalState).data.name;
+
+            // Make this not a final state anymore
+            automata.setFinalState(finalStateName, false);
+            if (cy)
+                cy.$(`#${finalState}`).removeClass("final-node");
+
+            // For each initial state
+            for (const initialState of group2) {
+                // Gets initial state name
+                const initialStateName = automata.getStateById(initialState).data.name;
+
+                // Create an epsilon move for this
+                automata.addTransition("__epsilon", finalStateName, initialStateName);
+
+                // Make this not an initial state anymore
+                automata.setInitialState(initialStateName, false);
+                if (cy)
+                    cy.$(`#${initialState}`).removeClass("initial-node");
+            }
+        }
+    }
 }

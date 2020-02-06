@@ -12,9 +12,10 @@
                 <!-- Operations -->
                 <div id="operations">
                     <b-button variant="warning" @click="onStateFoldClick">State fold</b-button>
-                    <b-button :variant="operationState.selectStage === 0 ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
-                    <b-button :variant="operationState.selectStage === 0 ? 'primary' : 'success'">Concatenation</b-button>
-                    <b-button :variant="operationState.selectStage === 0 ? 'primary' : 'success'">Kleene Star</b-button>
+                    <b-button :variant="operationState.operationName !== 'union' ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
+                    <b-button :variant="operationState.operationName !== 'concatenation' ? 'primary' : 'success'" @click="onConcatenationClick">Concatenation</b-button>
+                    <b-button :variant="operationState.operationName !== 'kleene-star' ? 'primary' : 'success'" @click="onKleeneStarClick">Kleene Star</b-button>
+                    <b-button v-if="operationState.operationName" variant="danger" @click="clearOperationState">Cancel</b-button>
                 </div>
 
                 <!-- Multi-level exploration -->
@@ -120,15 +121,44 @@
         /** If true, we are simulating. If false, we aren't */
         private isSimulating: boolean = false;
 
-        /** Stages of selecting nodes; used for automata operations */
-        private selectStage: number = 0;
-
         /** The state of an automata operation */
         private operationState: any = {
-            selectStage: 0,
-            operationName: '',
-            selectedStates: new Set()
+            operationName: '', // The name of the operation we're doing
+            selectStage: 0, // Stages of selecting nodes; used for automata operations
+            selectedStates: new Set() // The selected states for this stage
         };
+
+        /**
+         * Zooms the canvas in a direction
+         * @param direction either the string 'in' or 'out' for zooming in and out; everything else will be ignored
+         */
+        public zoom(direction: string) {
+            // Gets automata preview reference
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // Gets new zoom level
+            let zoomLevel = automataPreview.cy.zoom();
+            if (direction === "in")
+                zoomLevel += 0.15;
+            else if (direction === "out")
+                zoomLevel -= 0.15;
+
+            // Sets new zoom level from the centre of the viewport
+            automataPreview.cy.zoom({
+                level: zoomLevel,
+                renderedPosition: {x: automataPreview.cy.width() / 2, y: automataPreview.cy.height() / 2}
+            });
+        }
+
+        /**
+         * Clears the automata operation state
+         */
+        public clearOperationState() {
+            this.$set(this, "operationState", {});
+            this.$set(this.operationState, "operationName", '');
+            this.$set(this.operationState, "selectStage", 0);
+            this.$set(this.operationState, "selectedStates", new Set());
+        }
 
         /**
          * When the user clicks on "Pass input" button
@@ -173,28 +203,6 @@
         public onCancelClick() {
             this.isSimulating = false; // We are no longer simulating
             this.automata.reset(); // Reset automata configurations and input
-        }
-
-        /**
-         * Zooms the canvas in a direction
-         * @param direction either the string 'in' or 'out' for zooming in and out; everything else will be ignored
-         */
-        public zoom(direction: string) {
-            // Gets automata preview reference
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
-
-            // Gets new zoom level
-            let zoomLevel = automataPreview.cy.zoom();
-            if (direction === "in")
-                zoomLevel += 0.15;
-            else if (direction === "out")
-                zoomLevel -= 0.15;
-
-            // Sets new zoom level from the centre of the viewport
-            automataPreview.cy.zoom({
-                level: zoomLevel,
-                renderedPosition: {x: automataPreview.cy.width() / 2, y: automataPreview.cy.height() / 2}
-            });
         }
 
         /**
@@ -253,7 +261,7 @@
                 this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
 
                 // Tell user to input another group
-                this.$bvToast.toast("Select a second automata group and press the button again to perform this operation!", {
+                this.$bvToast.toast("Select a second automata group and press the button again to perform union!", {
                     title: 'Select a second automata group',
                     variant: "success",
                     autoHideDelay: 5000
@@ -267,15 +275,78 @@
                 // Performs union
                 AutomataOperations.union(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
 
-                this.$forceUpdate();
-
                 // Tell user that union is finished
-                this.$bvToast.toast("Automata operation successfully computed!", {
+                this.$bvToast.toast("Union successfully computed!", {
                     title: 'Success!',
                     variant: "success",
                     autoHideDelay: 5000
                 });
+
+                // Updates operation state to be empty
+                this.clearOperationState();
             }
+        }
+
+        /**
+         * When the user clicks the "Concatenation" button
+         */
+        public onConcatenationClick() {
+            // Gets automata preview
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // Acts based on automata stage
+            switch (this.operationState.selectStage) {
+                case 0:
+                    // Stores operation type and increments stage
+                    this.operationState.operationName = "concatenation";
+                    this.operationState.selectStage++;
+
+                    // Tells user to select final states of the first sub-automata
+                    this.$bvToast.toast("Select the final states of the first sub-automata and press Concatenation", {
+                        title: 'Concatenation',
+                        variant: "success",
+                        autoHideDelay: 5000
+                    });
+                    break;
+
+                case 1:
+                    // Remembers the final states of 1st sub-automata
+                    this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
+
+                    // Increments operation stage
+                    this.operationState.selectStage++;
+
+                    // Tells user to select initial states of the second sub-automata
+                    this.$bvToast.toast("Select the initial states of the second sub-automata and press Concatenation", {
+                        title: 'Concatenation',
+                        variant: "success",
+                        autoHideDelay: 5000
+                    });
+                    break;
+
+                case 2:
+                    // Concatenate
+                    AutomataOperations.concatenation(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
+                    this.$forceUpdate();
+
+                    // Tells user to select initial states of the second sub-automata
+                    this.$bvToast.toast("Concatenation successfully computed!", {
+                        title: 'Concatenation',
+                        variant: "success",
+                        autoHideDelay: 5000
+                    });
+
+                    // Clears state
+                    this.clearOperationState();
+                    break;
+            }
+        }
+
+        /**
+         * When the user clicks the "Kleene star" button
+         */
+        public onKleeneStarClick() {
+            alert("kleene star");
         }
     }
 </script>

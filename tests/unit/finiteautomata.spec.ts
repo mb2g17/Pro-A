@@ -195,4 +195,44 @@ describe('FiniteAutomata.ts', () => {
             assert.equal(automata.getOutcome(), testCase[1]);
         });
     });
+
+    it('can concatenate two smaller automata together', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 50, 50, false, true);
+        automata.addState('s3', 60, 60, true, false);
+        automata.addState('s4', 60, 60, false, true);
+
+        automata.addTransition('a', 's1', 's2');
+        automata.addTransition('b', 's3', 's4');
+
+        // Tests automata before
+        [
+            ['a', Outcome.ACCEPT],
+            ['b', Outcome.ACCEPT],
+            ['ab', Outcome.REJECT]
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1]);
+        });
+
+        AutomataOperations.concatenation(automata, new Set([
+            automata.getState("s2").data.id
+        ]), new Set([
+            automata.getState("s3").data.id
+        ]));
+
+        // Tests automata after
+        [
+            ['a', Outcome.REJECT],
+            ['b', Outcome.REJECT],
+            ['ab', Outcome.ACCEPT],
+            ['ba', Outcome.REJECT],
+            ['abb', Outcome.REJECT],
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1]);
+        });
+    });
 });
