@@ -16,7 +16,7 @@
                 </b-button-group>
             </b-form-group>
 
-            <b-form-group :label="`Automata name: ${name}`">
+            <b-form-group :label="`Automata name: ${name ? name : 'Automata'}`">
                 <b-form-input v-model="name" placeholder="Automata"></b-form-input>
             </b-form-group>
         </b-form>
@@ -105,7 +105,7 @@
             // Emits event
             this.$emit('add', {
                 type: this.type,
-                name: this.name
+                name: this.name ? this.name : "Automata"
             });
 
             // Hides modal
