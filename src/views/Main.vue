@@ -85,8 +85,12 @@ export default class Main extends Vue {
     private closeTab(index: number) {
         // Removes the cytoscape elements
         for (const dataObjKey of Object.keys(this.automatas[index].getData())) {
-            console.log(`Removing ${dataObjKey}`);
-            (this.$refs["automata" + index] as any)[0].cy.remove(`#${dataObjKey}`);
+            // Gets cytoscape element
+            const elem = (this.$refs["automata" + index] as any);
+
+            // If it exists
+            if (elem)
+                elem[0].cy.remove(`#${dataObjKey}`);
         }
 
         // Destroys the Automata reference
