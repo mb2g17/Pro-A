@@ -2,4 +2,4 @@
 - make automata operations support PDA and TM
 - add validation to automata operations
 
-- give the ability to rename your automata tag
+- reorder tabs

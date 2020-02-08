@@ -15,6 +15,7 @@
                 <template v-slot:title>
                     {{ automata.getName() }}
                     <!--<b-button variant="danger" @click="closeTab(index)">X</b-button>-->
+                    <font-awesome-icon class="mr-1" :icon="['fas', 'pen-square']" @click="renameTab(index)" />
                     <font-awesome-icon :icon="['fas', 'times-circle']" @click="closeTab(index)" />
                 </template>
 
@@ -78,6 +79,20 @@ export default class Main extends Vue {
      * Stores the tab the user is currently selected
      */
     private automataTab: number = 0;
+
+    /**
+     * When the user wants to rename a tab
+     */
+    private async renameTab(index: number) {
+        let response = await this.$dialog.prompt({
+            text: `Type new automata name here`,
+            title: `Renaming '${this.automatas[index].getName()}'`
+        });
+
+        // If it wasn't cancelled, rename
+        if (response)
+            this.automatas[index].setName(response);
+    }
 
     /**
      * Closes the tab the user is on

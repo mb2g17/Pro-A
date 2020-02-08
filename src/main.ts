@@ -14,7 +14,6 @@ Vue.use(ToastPlugin);
 import './custom.scss';
 
 // Imports Bootstrap-Vue-Dialog
-// @ts-ignore
 import Dialog from 'bootstrap-vue-dialog';
 Vue.use(Dialog, {
     store, router,
