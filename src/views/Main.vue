@@ -13,7 +13,7 @@
 
                 <!-- Tab title -->
                 <template v-slot:title>
-                    Automata
+                    {{ automata.getName() }}
                     <!--<b-button variant="danger" @click="closeTab(index)">X</b-button>-->
                     <font-awesome-icon :icon="['fas', 'times-circle']" @click="closeTab(index)" />
                 </template>
@@ -25,16 +25,29 @@
 
             <!-- New Automata Button (Using tabs-end slot) -->
             <template v-slot:tabs-end>
-                <b-nav-item @click.prevent="newTab" href="#"><b>+</b></b-nav-item>
+                <b-nav-item @click.prevent="$refs['newTabModal'].toggle()" href="#"><b>+</b></b-nav-item>
             </template>
         </b-tabs>
+
+        <NewTabModal ref="newTabModal" @add="createAutomata($event.type, $event.name)" />
 
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea } from 'bootstrap-vue';
+import {
+    BButton,
+    BContainer,
+    BRow,
+    BCol,
+    BTabs,
+    BTab,
+    BFormTextarea,
+    BModal,
+    BButtonGroup,
+    BFormInput, BForm
+} from 'bootstrap-vue';
 import AutomataPreview from '@/components/AutomataPreview.vue';
 import Automata from '@/classes/Automata';
 import FiniteAutomata from '@/classes/FiniteAutomata';
@@ -44,12 +57,14 @@ import PushdownAutomata from "@/classes/PushdownAutomata";
 import TuringMachine from "@/classes/TuringMachine";
 import ConfigTable from '@/components/ConfigTable.vue';
 import TabBody from "@/components/TabBody.vue";
+import NewTabModal from '@/components/NewTabModal.vue';
 
 @Component({
     components: {
         ConfigTable,
         AutomataPreview,
-        BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea,
+        NewTabModal,
+        BButton, BContainer, BRow, BCol, BTabs, BTab, BModal, BButtonGroup,
         TabBody
     },
 })
@@ -63,19 +78,6 @@ export default class Main extends Vue {
      * Stores the tab the user is currently selected
      */
     private automataTab: number = 0;
-
-    public mounted() {
-        /*this.automata.addState("A", 50, 50, true, false);
-        this.automata.addState("B", 150, 150, false, true);
-        this.automata.addTransition("a", "B", "A");
-        this.automata.addTransition("a", "A", "A");
-        this.automata.addTransition("b", "A", "B");
-        this.automata.addTransition("b", "B", "B");
-
-        this.automata.addState("A", 50, 50, true, false);
-        this.automata.addState("B", 150, 150, false, true);
-        this.automata.addTransition("a", "A", "C");*/
-    }
 
     /**
      * Closes the tab the user is on
@@ -95,17 +97,31 @@ export default class Main extends Vue {
     }
 
     /**
-     * Creates a new automata tab
+     * Creates automata
+     * @param type - the type of the new automata
+     * @param name - the name of the new automata
      */
-    private newTab() {
-        const choice = prompt("What kind of automata? (f for finite, p for pushdown, t for turing)", "f");
+    private createAutomata(type: string, name: string) {
+        let newAutomata: Automata;
 
-        if (choice === "f")
-            this.automatas.push(new FiniteAutomata());
-        else if (choice === "p")
-            this.automatas.push(new PushdownAutomata());
-        else
-            this.automatas.push(new TuringMachine());
+        // Sets type
+        switch (type) {
+            case "FA":
+            default:
+                newAutomata = new FiniteAutomata();
+                break;
+            case "PDA":
+                newAutomata = new PushdownAutomata();
+                break;
+            case "TM":
+                newAutomata = new TuringMachine();
+        }
+
+        // Sets name
+        newAutomata.setName(name);
+
+        // Pushes to array
+        this.automatas.push(newAutomata);
     }
 }
 </script>

@@ -27,6 +27,9 @@ export default abstract class Automata {
     /** Cytoscape data for all the graph objects */
     protected data: any = {};
 
+    /** The name of the automata itself */
+    private name: string = '';
+
     /**
      * Sets the input string stored in the automata
      * @param inputString - the new input string to put into the automata
@@ -41,6 +44,21 @@ export default abstract class Automata {
      */
     public getInput(): string {
         return this.inputString;
+    }
+
+    /**
+     * Accessor for automata name
+     */
+    public getName(): string {
+        return this.name;
+    }
+
+    /**
+     * Mutator for automata name
+     * @param value - the new name for the automata
+     */
+    public setName(value: string) {
+        this.name = value;
     }
 
     /**

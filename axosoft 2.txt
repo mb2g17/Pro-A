@@ -1,4 +1,5 @@
 - add edge dragging; a way to control how the transition line is positioned (https://github.com/iVis-at-Bilkent/cytoscape.js-edge-editing)
 - make automata operations support PDA and TM
-- give the ability to name your automata tag (and rename it)
 - add validation to automata operations
+
+- give the ability to rename your automata tag
