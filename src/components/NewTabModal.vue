@@ -71,7 +71,7 @@
             this.name = "";
 
             // Toggles the modal
-            this.$refs['newTabModal'].toggle("newTabModal");
+            (this.$refs['newTabModal'] as any).toggle("newTabModal");
         }
 
         /**
@@ -109,7 +109,7 @@
             });
 
             // Hides modal
-            this.$refs['newTabModal'].hide("newTabModal");
+            (this.$refs['newTabModal'] as any).hide("newTabModal");
         }
 
         /**
@@ -117,7 +117,7 @@
          */
         private onCancelClick() {
             // Hides the modal
-            this.$refs['newTabModal'].hide("newTabModal");
+            (this.$refs['newTabModal'] as any).hide("newTabModal");
         }
     }
 </script>

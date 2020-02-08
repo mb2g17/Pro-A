@@ -1,5 +1,6 @@
-- add edge dragging; a way to control how the transition line is positioned (https://github.com/iVis-at-Bilkent/cytoscape.js-edge-editing)
 - make automata operations support PDA and TM
 - add validation to automata operations
 
 - reorder tabs
+
+- make add automata modal create automata on enter keypress

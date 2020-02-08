@@ -84,7 +84,7 @@ export default class Main extends Vue {
      * When the user wants to rename a tab
      */
     private async renameTab(index: number) {
-        let response = await this.$dialog.prompt({
+        let response = await (this as any).$dialog.prompt({
             text: `Type new automata name here`,
             title: `Renaming '${this.automatas[index].getName()}'`
         });

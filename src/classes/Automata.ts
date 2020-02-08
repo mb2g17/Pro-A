@@ -1,7 +1,7 @@
 import uuidv1 from 'uuid/v1';
 import {Outcome} from '@/classes/Outcome';
-import Vue from "vue";
-import AutomataConfig from "@/classes/AutomataConfig";
+import Vue from 'vue';
+import AutomataConfig from '@/classes/AutomataConfig';
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -70,7 +70,7 @@ export default abstract class Automata {
     }
 
     public setData(newData: any) {
-        Vue.set(this, "data", newData);
+        Vue.set(this, 'data', newData);
     }
 
     /**
@@ -85,13 +85,15 @@ export default abstract class Automata {
         // If this state doesn't already exist
         if (!this.nodeID[name]) {
             // If it's initial or final, add to sets
-            if (initial)
+            if (initial) {
                 this.initialStates.add(name);
-            if (final)
+            }
+            if (final) {
                 this.finalStates.add(name);
+            }
 
             // Creates ID
-            let ID = uuidv1();
+            const ID = uuidv1();
 
             // Sets node name -> id mapping
             this.nodeID[name] = ID;
@@ -106,9 +108,9 @@ export default abstract class Automata {
                     id: ID,
                     name,
                     type: 'node',
-                    initial, final
+                    initial, final,
                 },
-                position: {x, y}
+                position: {x, y},
             });
         }
     }
@@ -128,15 +130,17 @@ export default abstract class Automata {
         // If the source and target states exist
         if (this.nodeID[source] && this.nodeID[target]) {
             // Creates the parent branches of edgeID
-            if (!this.edgeID[symbol])
+            if (!this.edgeID[symbol]) {
                 this.edgeID[symbol] = {};
-            if (!this.edgeID[symbol][source])
+            }
+            if (!this.edgeID[symbol][source]) {
                 this.edgeID[symbol][source] = {};
+            }
 
             // If the transition doesn't already exist
             if (!this.edgeID[symbol][source][target]) {
                 // Create ID
-                let ID = uuidv1();
+                const ID = uuidv1();
 
                 // Create edge name -> id mapping
                 this.edgeID[symbol][source][target] = ID;
@@ -150,12 +154,12 @@ export default abstract class Automata {
                     data: {
                         id: ID,
                         label: symbol,
-                        symbol: symbol,
+                        symbol,
                         source: sourceID,
                         target: targetID,
                         sourceName: source,
                         targetName: target,
-                        type: 'edge'
+                        type: 'edge',
                     },
                 });
             }
@@ -168,7 +172,7 @@ export default abstract class Automata {
      * @returns state object if found, null if not found
      */
     public getState(name: string): any | null {
-        let ID = this.nodeID[name];
+        const ID = this.nodeID[name];
         return this.getStateById(ID);
     }
 
@@ -182,6 +186,48 @@ export default abstract class Automata {
     }
 
     /**
+     * Changes the source node of a transition
+     * @param edgeID - the edge to change
+     * @param newSourceID - the new source of the edge
+     */
+    public changeSourceOfTransition(edgeID: string, newSourceID: string) {
+        const currentSymbol = this.data[edgeID].data.symbol;
+        const currentTargetName = this.data[edgeID].data.targetName;
+        const oldSourceName = this.data[edgeID].data.sourceName;
+        const newSourceName = this.data[newSourceID].data.name;
+
+        // Edits data
+        this.data[edgeID].data.source = newSourceID;
+        this.data[edgeID].data.sourceName = newSourceName;
+
+        // Edits edge ID lookup
+        delete this.edgeID[currentSymbol][oldSourceName][currentTargetName];
+        if (!this.edgeID[currentSymbol][newSourceName])
+            this.edgeID[currentSymbol][newSourceName] = {};
+        this.edgeID[currentSymbol][newSourceName][currentTargetName] = edgeID;
+    }
+
+    /**
+     * Changes the target node of a transition
+     * @param edgeID - the edge to change
+     * @param newTargetID - the new target of the edge
+     */
+    public changeTargetOfTransition(edgeID: string, newTargetID: string) {
+        const currentSymbol = this.data[edgeID].data.symbol;
+        const currentSourceName = this.data[edgeID].data.sourceName;
+        const oldTargetName = this.data[edgeID].data.targetName;
+        const newTargetName = this.data[newTargetID].data.name;
+
+        // Edits data
+        this.data[edgeID].data.target = newTargetID;
+        this.data[edgeID].data.targetName = newTargetName;
+
+        // Edits edge ID lookup
+        delete this.edgeID[currentSymbol][currentSourceName][oldTargetName];
+        this.edgeID[currentSymbol][currentSourceName][newTargetName] = edgeID;
+    }
+
+    /**
      * Gets a transition with symbol, source and target
      * @param symbol - the symbol of the transition
      * @param source - the source state
@@ -190,12 +236,14 @@ export default abstract class Automata {
      */
     public getTransition(symbol: string, source: string, target: string): object | null {
         // If edge branch exists, return transition object
-        if (this.edgeID[symbol])
-            if (this.edgeID[symbol][source])
+        if (this.edgeID[symbol]) {
+            if (this.edgeID[symbol][source]) {
                 if (this.edgeID[symbol][source][target]) {
-                    let edgeID = this.edgeID[symbol][source][target];
+                    const edgeID = this.edgeID[symbol][source][target];
                     return this.data[edgeID];
                 }
+            }
+        }
         // It must not exist; return null
         return null;
     }
@@ -260,8 +308,9 @@ export default abstract class Automata {
     public simulate() {
         // Check to see if the initial config accepts
         this.configInit();
-        if (this.getOutcome() === Outcome.ACCEPT)
+        if (this.getOutcome() === Outcome.ACCEPT) {
             return;
+        }
 
         // It doesn't; compute steps until we do or run out of configs
         do {
@@ -299,15 +348,15 @@ export default abstract class Automata {
             this.initialStates.delete(stateName);
 
             // Gets class index
-            const classIndex = this.data[id].classes.indexOf("initial-node");
+            const classIndex = this.data[id].classes.indexOf('initial-node');
             this.data[id].classes.splice(classIndex, 1);
         } else {
             this.initialStates.add(stateName);
-            this.data[id].classes.push("initial-node");
+            this.data[id].classes.push('initial-node');
         }
 
         // Sets initial
-        Vue.set(this.data[id].data, "initial", initial);
+        Vue.set(this.data[id].data, 'initial', initial);
     }
 
     /**
@@ -324,15 +373,15 @@ export default abstract class Automata {
             this.finalStates.delete(stateName);
 
             // Gets class index
-            const classIndex = this.data[id].classes.indexOf("final-node");
+            const classIndex = this.data[id].classes.indexOf('final-node');
             this.data[id].classes.splice(classIndex, 1);
         } else {
             this.finalStates.add(stateName);
-            this.data[id].classes.push("final-node");
+            this.data[id].classes.push('final-node');
         }
 
         // Sets final
-        Vue.set(this.data[id].data, "final", final);
+        Vue.set(this.data[id].data, 'final', final);
     }
 
     /**
@@ -346,26 +395,11 @@ export default abstract class Automata {
         let stateNameNumber = states.size + 1;
 
         // Keep generating state names and incrementing the number until we get unique name
-        while (states.has("s" + stateNameNumber))
+        while (states.has('s' + stateNameNumber)) {
             stateNameNumber++;
+        }
 
-        return "s" + stateNameNumber;
-    }
-
-    /**
-     * Gets the target states from an input symbol and source state
-     * @param inputSymbol - the input symbol of the transition
-     * @param sourceState - the source state of the transition
-     * @returns an array of target state IDs if the transition exists, null if it doesn't
-     */
-    protected getTargetStates(inputSymbol: string, sourceState: string): any[] | null {
-        // If a transition for this state exists
-        if (this.edgeID[inputSymbol])
-            if (this.edgeID[inputSymbol][sourceState]) {
-                // Gets all the target states
-                return Object.keys(this.edgeID[inputSymbol][sourceState]);
-            }
-        return null;
+        return 's' + stateNameNumber;
     }
 
     /**
@@ -379,25 +413,27 @@ export default abstract class Automata {
         const newCurrentConfigs: Set<AutomataConfig> = new Set();
 
         // Goes through each config
-        for (let config of this.getCurrentConfigs()) {
+        for (const config of this.getCurrentConfigs()) {
             // Gets epsilon move target states
-            let epsilonTargetStates = this.getTargetStates("__epsilon", config.state);
+            let epsilonTargetStates = this.getTargetStates('__epsilon', config.state);
 
             // If there are none, change to empty array
-            if (!epsilonTargetStates)
+            if (!epsilonTargetStates) {
                 epsilonTargetStates = [];
+            }
 
             // Apply this transition for each epsilon target state
             for (const targetState of epsilonTargetStates) {
                 // Gets edge ID
-                const edgeID = this.edgeID["__epsilon"][config.state][targetState];
+                const edgeID = this.edgeID.__epsilon[config.state][targetState];
 
                 // Gets new config by applying transition
                 const newConfig = this.applyTransition(config, edgeID, true);
 
                 // If the transition was succesful, add
-                if (newConfig)
+                if (newConfig) {
                     newCurrentConfigs.add(newConfig);
+                }
             }
 
             // Gets first input symbol
@@ -409,8 +445,9 @@ export default abstract class Automata {
                 let normalTargetStates = this.getTargetStates(inputSymbol, config.state);
 
                 // If they are null, replace with empty array
-                if (!normalTargetStates)
+                if (!normalTargetStates) {
                     normalTargetStates = [];
+                }
 
                 // Apply this transition for each normal target state
                 for (const targetState of normalTargetStates) {
@@ -421,8 +458,9 @@ export default abstract class Automata {
                     const newConfig = this.applyTransition(config, edgeID, false);
 
                     // If the transition was succesful, add
-                    if (newConfig)
+                    if (newConfig) {
                         newCurrentConfigs.add(newConfig);
+                    }
                 }
             }
         }
@@ -435,12 +473,6 @@ export default abstract class Automata {
      * Returns a list of the current configurations of the automata
      */
     public abstract getCurrentConfigs(): Set<AutomataConfig>;
-
-    /**
-     * Sets the set of configs to a new one
-     * @param newConfigs - a new set of configs
-     */
-    protected abstract setCurrentConfigs(newConfigs: Set<AutomataConfig>): void;
 
     /**
      * Resets the animation of this automata
@@ -456,6 +488,29 @@ export default abstract class Automata {
      * Returns the name of this model
      */
     public abstract getModelName(): string;
+
+    /**
+     * Gets the target states from an input symbol and source state
+     * @param inputSymbol - the input symbol of the transition
+     * @param sourceState - the source state of the transition
+     * @returns an array of target state IDs if the transition exists, null if it doesn't
+     */
+    protected getTargetStates(inputSymbol: string, sourceState: string): any[] | null {
+        // If a transition for this state exists
+        if (this.edgeID[inputSymbol]) {
+            if (this.edgeID[inputSymbol][sourceState]) {
+                // Gets all the target states
+                return Object.keys(this.edgeID[inputSymbol][sourceState]);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the set of configs to a new one
+     * @param newConfigs - a new set of configs
+     */
+    protected abstract setCurrentConfigs(newConfigs: Set<AutomataConfig>): void;
 
     /**
      * Sets up initial configurations if needed

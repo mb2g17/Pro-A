@@ -17,17 +17,20 @@
 
 <script lang="ts">
 import {Vue, Component, Prop} from 'vue-property-decorator';
-import Automata from '@/classes/Automata';
-import jquery from "jquery";
+import $ from "jquery";
 import edgehandles from 'cytoscape-edgehandles';
 import contextMenus from 'cytoscape-context-menus';
 import expandCollapse from 'cytoscape-expand-collapse';
+import edgeEditing from 'cytoscape-edge-editing';
 
 // Automata config
 import config from './config';
 
 // CSS for cytoscape-context-menus
 import 'cytoscape-context-menus/cytoscape-context-menus.css';
+
+// Automata
+import Automata from '@/classes/Automata';
 import PushdownAutomata from "@/classes/PushdownAutomata";
 import TuringMachine from "@/classes/TuringMachine";
 
@@ -47,13 +50,14 @@ export default class AutomataPreview extends Vue {
 
     public preConfig(cytoscape: any) {
         try {
-            contextMenus(cytoscape, jquery);
-            edgehandles(cytoscape, jquery);
-            expandCollapse(cytoscape, jquery);
+            contextMenus(cytoscape, $);
+            edgehandles(cytoscape, $);
+            expandCollapse(cytoscape, $);
+            edgeEditing(cytoscape, $);
         } catch (e) {
             console.log(e.fullStackTrace);
         }
-        //cytoscape.use(contextMenus, jquery);
+        //cytoscape.use(contextMenus, $);
         //cytoscape.use(edgehandles);
     }
 
@@ -61,9 +65,10 @@ export default class AutomataPreview extends Vue {
         this.cy = cy; // Stores cytoscape instance
 
         // Sets up extensions
-        this.initEdgeHandles();
+        //this.initEdgeHandles();
         this.initContextMenu();
         this.initExpandCollapse();
+        this.initEdgeEditing();
 
         // When the user selects a node
         cy.on('select', (event: any) => {
@@ -308,6 +313,18 @@ export default class AutomataPreview extends Vue {
                     },
                     hasTrailingDivider: true
                 },
+                /*{
+                    id: 'add-bend-point',
+                    content: 'Add Bend Point',
+                    selector: 'edge',
+                    onClickFunction: (event: any) => {
+                        let edge = event.target || event.cyTarget;
+                        if(!bendPointUtilities.isIgnoredEdge(edge)) {
+
+                            bendPointUtilities.addBendPoint();
+                        }
+                    }
+                },*/
                 {
                     id: 'add-node',
                     content: 'Add node',
@@ -352,6 +369,34 @@ export default class AutomataPreview extends Vue {
         this.cy.nodes().on("expandcollapse.afterexpand", (event: any) => {
             console.log("afterexpand");
         });
+    }
+
+    /**
+     * Sets up edge editing
+     */
+    private initEdgeEditing() {
+        (window as any)['$'] = $; // Globally defines jQuery so that this dumb plugin will work
+        let instance = this.cy.edgeEditing({
+            bendRemovalSensitivity: 16,
+            handleReconnectEdge: (sourceID: any, targetID: any, edge: any) => {
+                // Gets source and target names
+                const sourceName = this.automata.getStateById(sourceID).data.name;
+                const targetName = this.automata.getStateById(targetID).data.name;
+
+                // Updates on automata instance
+                this.automata.changeSourceOfTransition(edge.id, sourceID);
+                this.automata.changeTargetOfTransition(edge.id, targetID);
+
+                // Updates on cytoscape
+                let edgeData = this.cy.getElementById(edge.id)[0].json();
+                edgeData.data.source = sourceID;
+                edgeData.data.sourceName = sourceName;
+                edgeData.data.target = targetID;
+                edgeData.data.targetName = targetName;
+                this.cy.getElementById(edge.id)[0].json(edgeData);
+            }
+        });
+        this.cy.style().update();
     }
 }
 </script>

@@ -78,9 +78,9 @@ const myConfig: object = {
                 'content': 'data(label)',
 
                 'curve-style': 'bezier',
-                'target-arrow-color': '#ccc',
+                'target-arrow-color': '#eee',
                 'target-arrow-shape': 'triangle',
-                'arrow-scale': 2,
+                'arrow-scale': 1,
             },
         },
         { // Parent (state fold node)
