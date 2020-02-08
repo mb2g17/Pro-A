@@ -138,6 +138,25 @@ describe('FiniteAutomata.ts', () => {
         assert.equal(automata.getOutcome(), Outcome.REJECT);
     });*/
 
+    it('handles implicit union with multiple initial states and handles multiple final states', () => {
+        automata.addState('s1', 0, 0, true, false);
+        automata.addState('s2', 0, 0, false, true);
+        automata.addState('s3', 0, 0, true, false);
+        automata.addState('s4', 0, 0, false, true);
+
+        automata.addTransition('a', 's1', 's2');
+        automata.addTransition('b', 's3', 's4');
+
+        [
+            ['a', Outcome.ACCEPT],
+            ['b', Outcome.ACCEPT]
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1]);
+        });
+    });
+
     it('cannot simulate with incorrect symbols', () => {
         automata.addState('A', 10, 10, true, false);
         automata.addState('B', 50, 50, false, true);
