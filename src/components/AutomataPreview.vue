@@ -65,7 +65,7 @@ export default class AutomataPreview extends Vue {
         this.cy = cy; // Stores cytoscape instance
 
         // Sets up extensions
-        //this.initEdgeHandles();
+        this.initEdgeHandles();
         this.initContextMenu();
         this.initExpandCollapse();
         this.initEdgeEditing();
