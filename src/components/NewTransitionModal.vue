@@ -44,7 +44,7 @@
                             </b-col>
                             <b-col cols="2" class="pl-0">
                                 <!-- Delete button -->
-                                <b-button class="w-100" variant="danger"
+                                <b-button class="w-100" variant="outline-danger"
                                           @click="pdaState.inputtedOutputStackSymbols.splice(outputStackSymbolIndex, 1)"
                                 >-</b-button>
                             </b-col>
@@ -54,7 +54,7 @@
                             <b-col cols="3"></b-col>
                             <b-col>
                                 <!-- Add button -->
-                                <b-button class="w-100 mt-2" variant="primary" align-h="center" @click="pdaState.inputtedOutputStackSymbols.push('')">+</b-button>
+                                <b-button class="w-100 mt-2" variant="outline-primary" align-h="center" @click="pdaState.inputtedOutputStackSymbols.push('')">+</b-button>
                             </b-col>
                             <b-col cols="3"></b-col>
                         </b-row>

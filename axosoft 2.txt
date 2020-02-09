@@ -10,10 +10,13 @@ TODO:
 - change null or "any symbol" for input stack symbol to ε (PDA)
 - change "__empty" written tape symbol to □ (TM)
 - add validation to stop duplicate transitions (e.g. trying to do (a,A,B) twice)
+- transitions should be made by pressing "enter", like with new automata
 
 - make "step"s start at initial state
 - change config table to allow stack trace
 - make nodes light up in animation
+
+- make filled buttons and outline buttons consistent in the menus
 
 - BUG: toggling final state doesn't actually make it non-final in the simulation
 - BUG: disable transitions to state folds
