@@ -2,5 +2,3 @@
 - add validation to automata operations
 
 - reorder tabs
-
-- make add automata modal create automata on enter keypress

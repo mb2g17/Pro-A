@@ -1,13 +1,13 @@
 <template>
 
     <!-- New tab modal -->
-    <b-modal ref="newTabModal">
+    <b-modal ref="newTabModal" @show="onModalShow" v-model="isModalVisible">
         <template v-slot:modal-title>
             New Automata
         </template>
 
         <!-- Body -->
-        <b-form @submit="onAddClick">
+        <b-form @submit="">
             <b-form-group :label="`Automata type: ${getAutomataName()}`">
                 <b-button-group>
                     <b-button variant="primary" :disabled="type === 'FA'" @click="onTypeClick('FA')">Finite Automata</b-button>
@@ -49,6 +49,7 @@
         BTabs
     } from 'bootstrap-vue';
     import TabBody from '@/components/TabBody.vue';
+    import $ from 'jquery';
 
     @Component({
         components: {
@@ -61,6 +62,18 @@
 
         /** Name of automata inputted */
         private name: string = "";
+
+        /** If true, modal is visible. If false, it is not */
+        private isModalVisible: boolean = false;
+
+        mounted() {
+            // Hacky jQuery event that creates automata upon 'enter' keypress
+            $(document).on('keypress', e => {
+                // If user pressed enter *and* modal is visibile, add automata
+                if (e.key === "Enter" && this.isModalVisible)
+                    this.onAddClick();
+            });
+        }
 
         /**
          * Toggles the modal
@@ -118,6 +131,10 @@
         private onCancelClick() {
             // Hides the modal
             (this.$refs['newTabModal'] as any).hide("newTabModal");
+        }
+
+        private onModalShow() {
+            console.log("Showed modal");
         }
     }
 </script>
