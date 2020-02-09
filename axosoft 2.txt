@@ -6,12 +6,18 @@ TODO:
 
 - make transition symbols into words, not just letters
 - change "__epsilon" to ε
+- change "__empty" input stack symbol to ⊥ (PDA)
+- change null or "any symbol" for input stack symbol to ε (PDA)
+- change "__empty" written tape symbol to □ (TM)
+- add validation to stop duplicate transitions (e.g. trying to do (a,A,B) twice)
 
 - make "step"s start at initial state
 - change config table to allow stack trace
 - make nodes light up in animation
 
+- BUG: toggling final state doesn't actually make it non-final in the simulation
+- BUG: disable transitions to state folds
+
 
 
 IN PROGRESS:
-- make transition creation modal support PDA and TM
