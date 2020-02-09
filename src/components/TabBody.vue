@@ -1,89 +1,96 @@
 <template>
 
     <!-- Body -->
-    <b-container fluid>
-        <b-row>
+    <div>
+        <b-container fluid>
+            <b-row>
 
-            <!-- FOLDING, AUTOMATA OPERATIONS, EXPLORATION AND SEARCH -->
-            <b-col>
-                <!-- Automata type display -->
-                <h2>{{ automata.getModelName() }}</h2>
+                <!-- FOLDING, AUTOMATA OPERATIONS, EXPLORATION AND SEARCH -->
+                <b-col>
+                    <!-- Automata type display -->
+                    <h2>{{ automata.getModelName() }}</h2>
 
-                <!-- Operations -->
-                <div id="operations">
-                    <b-button variant="warning" @click="onStateFoldClick">State fold</b-button>
-                    <b-button :variant="operationState.operationName !== 'union' ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
-                    <b-button :variant="operationState.operationName !== 'concatenation' ? 'primary' : 'success'" @click="onConcatenationClick">Concatenation</b-button>
-                    <b-button :variant="operationState.operationName !== 'kleene-star' ? 'primary' : 'success'" @click="onKleeneStarClick">Kleene Star</b-button>
-                    <b-button v-if="operationState.operationName" variant="danger" @click="clearOperationState">Cancel</b-button>
-                </div>
-
-                <!-- Multi-level exploration -->
-                <div id="multilevel-exploration">
-                    <b-form-checkbox
-                            class="mt-2"
-                            v-model="isMultilevelExplorationEnabled"
-                            :value="true"
-                            :unchecked-value="false"
-                    >
-                        Multi-level exploration
-                    </b-form-checkbox>
-                    <b-form-input :disabled="!isMultilevelExplorationEnabled" type="number"
-                                  placeholder="Abstraction level"/>
-                </div>
-
-                <!-- Search -->
-                <b-form-input type="text" placeholder="State search" class="mt-3"/>
-            </b-col>
-
-            <!-- CYTOSCAPE -->
-            <b-col cols="6">
-
-                <!-- Zoom and styles -->
-                <div id="zoom-and-styles">
-                    <div id="zoom">
-                        <b-button variant="warning" @click="zoom('in')">
-                            <font-awesome-icon :icon="['fas', 'search-plus']" />
-                        </b-button>
-                        <b-button variant="warning" @click="zoom('out')">
-                            <font-awesome-icon :icon="['fas', 'search-minus']" />
-                        </b-button>
+                    <!-- Operations -->
+                    <div id="operations">
+                        <b-button variant="warning" @click="onStateFoldClick">State fold</b-button>
+                        <b-button :variant="operationState.operationName !== 'union' ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
+                        <b-button :variant="operationState.operationName !== 'concatenation' ? 'primary' : 'success'" @click="onConcatenationClick">Concatenation</b-button>
+                        <b-button :variant="operationState.operationName !== 'kleene-star' ? 'primary' : 'success'" @click="onKleeneStarClick">Kleene Star</b-button>
+                        <b-button v-if="operationState.operationName" variant="danger" @click="clearOperationState">Cancel</b-button>
                     </div>
-                    <b-button variant="success">Styles</b-button>
-                </div>
 
-                <!-- AUTOMATA PREVIEW -->
-                <AutomataPreview
-                        :automata="automata"
-                        :ref="`automata` + index"
-                />
+                    <!-- Multi-level exploration -->
+                    <div id="multilevel-exploration">
+                        <b-form-checkbox
+                                class="mt-2"
+                                v-model="isMultilevelExplorationEnabled"
+                                :value="true"
+                                :unchecked-value="false"
+                        >
+                            Multi-level exploration
+                        </b-form-checkbox>
+                        <b-form-input :disabled="!isMultilevelExplorationEnabled" type="number"
+                                      placeholder="Abstraction level"/>
+                    </div>
 
-            </b-col>
+                    <!-- Search -->
+                    <b-form-input type="text" placeholder="State search" class="mt-3"/>
+                </b-col>
 
-            <!-- INPUTS -->
-            <b-col>
-                <b-form-textarea
-                        class="mb-3"
-                        v-model="inputString"
-                        placeholder="Input string"
-                        rows="3"
-                        max-rows="6"
-                />
-                <div class="d-flex justify-content-center mb-2">
-                    <b-button variant="primary" @click="onPassInputClick" class="mr-2">Compute immediately</b-button>
-                    <b-button variant="primary" @click="onStepClick">Step</b-button>
-                </div>
-                <b-button variant="danger" class="mb-3" @click="onCancelClick">Cancel</b-button>
+                <!-- CYTOSCAPE -->
+                <b-col cols="6">
 
-                <!-- Decision -->
-                <h2 id="decision" v-if="isSimulating">{{ outcome }}</h2>
+                    <!-- Zoom and styles -->
+                    <div id="zoom-and-styles">
+                        <div id="zoom">
+                            <b-button variant="warning" @click="zoom('in')">
+                                <font-awesome-icon :icon="['fas', 'search-plus']" />
+                            </b-button>
+                            <b-button variant="warning" @click="zoom('out')">
+                                <font-awesome-icon :icon="['fas', 'search-minus']" />
+                            </b-button>
+                        </div>
+                        <b-button variant="success">Styles</b-button>
+                    </div>
 
-                <!-- Config -->
-                <ConfigTable :configs="automata.getCurrentConfigs()" />
-            </b-col>
+                    <!-- AUTOMATA PREVIEW -->
+                    <AutomataPreview
+                            :automata="automata"
+                            :ref="`automata${index}`"
+                            @createTransition="onCreateTransition"
+                    />
 
-        </b-row>
-    </b-container>
+                </b-col>
+
+                <!-- INPUTS -->
+                <b-col>
+                    <b-form-textarea
+                            class="mb-3"
+                            v-model="inputString"
+                            placeholder="Input string"
+                            rows="3"
+                            max-rows="6"
+                    />
+                    <div class="d-flex justify-content-center mb-2">
+                        <b-button variant="primary" @click="onPassInputClick" class="mr-2">Compute immediately</b-button>
+                        <b-button variant="primary" @click="onStepClick">Step</b-button>
+                    </div>
+                    <b-button variant="danger" class="mb-3" @click="onCancelClick">Cancel</b-button>
+
+                    <!-- Decision -->
+                    <h2 id="decision" v-if="isSimulating">{{ outcome }}</h2>
+
+                    <!-- Config -->
+                    <ConfigTable :configs="automata.getCurrentConfigs()" />
+                </b-col>
+
+            </b-row>
+        </b-container>
+
+        <!-- New transition modal -->
+        <NewTransitionModal :ref="`newTransitionModal${index}`" :automata="automata" />
+
+    </div>
 
 </template>
 
@@ -95,11 +102,12 @@
     import Automata from "../classes/Automata";
     import uuidv1 from "uuid/v1";
     import AutomataOperations from "@/classes/AutomataOperations";
+    import NewTransitionModal from "@/components/NewTransitionModal.vue";
 
     @Component({
         components: {
             // Custom components
-            ConfigTable, AutomataPreview,
+            ConfigTable, AutomataPreview, NewTransitionModal,
 
             // Bootstrap components
             BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea, BFormCheckbox,
@@ -158,6 +166,23 @@
             this.$set(this.operationState, "operationName", '');
             this.$set(this.operationState, "selectStage", 0);
             this.$set(this.operationState, "selectedStates", new Set());
+        }
+
+        /**
+         * When user wants to create a transition
+         */
+        private onCreateTransition(args: any) {
+            // Gets automata preview
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // Destructures arguments
+            const {event, sourceNode, targetNode, addedEles} = args;
+
+            // Removes automatically created element
+            automataPreview.cy.remove(addedEles);
+
+            // Shows modal
+            (this.$refs[`newTransitionModal${this.index}`] as any).show(sourceNode, targetNode);
         }
 
         /**

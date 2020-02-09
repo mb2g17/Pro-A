@@ -1,7 +1,7 @@
 <template>
 
     <!-- New tab modal -->
-    <b-modal ref="newTabModal" @show="onModalShow" v-model="isModalVisible">
+    <b-modal ref="newTabModal" v-model="isModalVisible">
         <template v-slot:modal-title>
             New Automata
         </template>
@@ -131,10 +131,6 @@
         private onCancelClick() {
             // Hides the modal
             (this.$refs['newTabModal'] as any).hide("newTabModal");
-        }
-
-        private onModalShow() {
-            console.log("Showed modal");
         }
     }
 </script>

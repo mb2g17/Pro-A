@@ -1,4 +1,17 @@
+TODO:
 - make automata operations support PDA and TM
 - add validation to automata operations
 
 - reorder tabs
+
+- make transition symbols into words, not just letters
+- change "__epsilon" to ε
+
+- make "step"s start at initial state
+- change config table to allow stack trace
+- make nodes light up in animation
+
+
+
+IN PROGRESS:
+- make transition creation modal support PDA and TM

@@ -29,7 +29,7 @@ import config from './config';
 // CSS for cytoscape-context-menus
 import 'cytoscape-context-menus/cytoscape-context-menus.css';
 
-// Automata
+// Custom components and classes
 import Automata from '@/classes/Automata';
 import PushdownAutomata from "@/classes/PushdownAutomata";
 import TuringMachine from "@/classes/TuringMachine";
@@ -134,7 +134,9 @@ export default class AutomataPreview extends Vue {
 
         // On edge creation
         this.cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
-            this.cy.remove(addedEles);
+            this.$emit('createTransition', {event, sourceNode, targetNode, addedEles});
+
+            /*this.cy.remove(addedEles);
             const symbol = prompt('Please enter transition symbol (__epsilon for epsilon move. If TM, use __empty for empty tape symbol):', 'a');
             if (symbol === null)
                 return;
@@ -165,7 +167,7 @@ export default class AutomataPreview extends Vue {
                 }
             }
 
-            this.automata.addTransition(symbol, sourceNode._private.data.name, targetNode._private.data.name, payload);
+            this.automata.addTransition(symbol, sourceNode._private.data.name, targetNode._private.data.name, payload);*/
         });
     }
 
