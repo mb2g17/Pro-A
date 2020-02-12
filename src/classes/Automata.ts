@@ -2,6 +2,7 @@ import uuidv1 from 'uuid/v1';
 import {Outcome} from '@/classes/Outcome';
 import Vue from 'vue';
 import AutomataConfig from '@/classes/AutomataConfig';
+import FiniteAutomata from "@/classes/FiniteAutomata";
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -467,6 +468,53 @@ export default abstract class Automata {
 
         // Updates this set of current states with the new one
         this.setCurrentConfigs(newCurrentConfigs);
+    }
+
+    /**
+     * Serializes this automata into a JSON string (does not include animations)
+     * @returns JSON string representing this automata
+     */
+    public serialize(): string {
+        // Initial JSON
+        let json: any = {
+            modelName: this.getModelName(),
+            name: this.name,
+            edgeID: this.edgeID,
+            nodeID: this.nodeID,
+            data: {},
+            initialStates: [...this.initialStates],
+            finalStates : [...this.finalStates],
+            folds: []
+        };
+
+        // Goes through items, checking if they're good
+        for (const itemID in this.data) {
+            // Get item
+            const item: any = this.data[itemID];
+
+            // If there's no 'classes' property, it's a transition and it's good to go
+            if (!item.classes)
+                json.data[itemID] = item;
+            else {
+                // If there's no 'parent' class, it's a normal node and can be added
+                if (![...item.classes].includes("parent")) {
+                    json.data[itemID] = item;
+                }
+            }
+        }
+
+        return window.btoa(JSON.stringify(json));
+    }
+
+    /**
+     * Deserializes an automata
+     * @param serializedAutomata - the serialization of the automata to instantiate
+     * @returns a new Automata based on the passed serialization
+     */
+    public static deserialize(serializedAutomata: string): Automata {
+        // Convert back to JSON
+        const json: any = JSON.parse(window.atob(serializedAutomata));
+        return new FiniteAutomata();
     }
 
     /**

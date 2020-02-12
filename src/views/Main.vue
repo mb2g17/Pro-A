@@ -7,6 +7,7 @@
             <!-- Logo at the start of the tabs -->
             <template v-slot:tabs-start>
                 <img id="logo" src="../assets/logo.png" />
+                <b-button class="mr-3" variant="primary" @click="onLoadAutomataClick">Load Automata</b-button>
             </template>
 
             <b-tab v-for="(automata, index) in automatas" active>
@@ -15,6 +16,7 @@
                 <template v-slot:title>
                     {{ automata.getName() }}
                     <!--<b-button variant="danger" @click="closeTab(index)">X</b-button>-->
+                    <font-awesome-icon class="mr-1" :icon="['fas', 'save']" @click="onSaveAutomataClick(index)" />
                     <font-awesome-icon class="mr-1" :icon="['fas', 'pen-square']" @click="renameTab(index)" />
                     <font-awesome-icon :icon="['fas', 'times-circle']" @click="closeTab(index)" />
                 </template>
@@ -141,6 +143,51 @@ export default class Main extends Vue {
 
         // Pushes to array
         this.automatas.push(newAutomata);
+    }
+
+    private async onLoadAutomataClick() {
+        let response = await (this as any).$dialog.prompt({
+            text: `Type automata string here`,
+            title: `Loading an existing Automata`
+        });
+
+        // If it wasn't cancelled, rename
+        if (response) {
+            // Deserialize
+            const json: any = JSON.parse(window.atob(response));
+
+            // Creates automata
+            let automata: Automata;
+
+            // Depending on type, instantiate automata
+            switch (json.modelName) {
+                case "Finite Automata":
+                default:
+                    automata = new FiniteAutomata();
+                    break;
+                case "Pushdown Automata":
+                    automata = new PushdownAutomata();
+                    break;
+                case "Turing Machine":
+                    automata = new TuringMachine();
+                    break;
+            }
+
+            // Sets properties
+            automata.setName(json.name);
+            automata.setData(json.data);
+            // @ts-ignore
+            automata.edgeID = json.edgeID;
+            // @ts-ignore
+            automata.nodeID = json.nodeID;
+
+            // Save as new automata
+            this.automatas.push(automata);
+        }
+    }
+
+    private onSaveAutomataClick(index: any) {
+        console.log(this.automatas[index].serialize());
     }
 }
 </script>

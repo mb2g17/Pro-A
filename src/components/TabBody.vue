@@ -255,6 +255,11 @@
                 automataPreview.cy.getElementById(node).move({
                     parent: parentID
                 });
+
+                // Sets parent property in data
+                let data: any = this.automata.getData();
+                data[node].parent = parentID;
+                this.automata.setData(data);
             }
 
             // Sets grandparent (parent of parent)

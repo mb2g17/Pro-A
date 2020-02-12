@@ -224,6 +224,11 @@ export default class AutomataPreview extends Vue {
                             this.cy.getElementById(node).move({
                                 parent: parentID
                             });
+
+                            // Sets parent property in data
+                            let data: any = this.automata.getData();
+                            data[node].parent = parentID;
+                            this.automata.setData(data);
                         }
                     }
                 },
@@ -249,6 +254,11 @@ export default class AutomataPreview extends Vue {
                             this.cy.getElementById(node).move({
                                 parent: null
                             });
+
+                            // Sets parent property in data
+                            let data: any = this.automata.getData();
+                            data[node].parent = null;
+                            this.automata.setData(data);
                         }
                     }
                 },

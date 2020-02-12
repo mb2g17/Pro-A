@@ -20,6 +20,7 @@ TODO:
 
 - BUG: toggling final state doesn't actually make it non-final in the simulation
 - BUG: disable transitions to state folds
+- BUG: moving state shape doesn't change position properties in the Automata class
 
 
 
