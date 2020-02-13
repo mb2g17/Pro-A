@@ -61,6 +61,7 @@ import TuringMachine from "@/classes/TuringMachine";
 import ConfigTable from '@/components/ConfigTable.vue';
 import TabBody from "@/components/TabBody.vue";
 import NewTabModal from '@/components/NewTabModal.vue';
+import deserialize from '../classes/AutomataDeserializer';
 
 @Component({
     components: {
@@ -153,36 +154,8 @@ export default class Main extends Vue {
 
         // If it wasn't cancelled, rename
         if (response) {
-            // Deserialize
-            const json: any = JSON.parse(window.atob(response));
-
-            // Creates automata
-            let automata: Automata;
-
-            // Depending on type, instantiate automata
-            switch (json.modelName) {
-                case "Finite Automata":
-                default:
-                    automata = new FiniteAutomata();
-                    break;
-                case "Pushdown Automata":
-                    automata = new PushdownAutomata();
-                    break;
-                case "Turing Machine":
-                    automata = new TuringMachine();
-                    break;
-            }
-
-            // Sets properties
-            automata.setName(json.name);
-            automata.setData(json.data);
-            // @ts-ignore
-            automata.edgeID = json.edgeID;
-            // @ts-ignore
-            automata.nodeID = json.nodeID;
-
             // Save as new automata
-            this.automatas.push(automata);
+            this.automatas.push(deserialize(response));
         }
     }
 

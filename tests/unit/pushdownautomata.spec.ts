@@ -3,6 +3,7 @@ import Automata from '@/classes/Automata';
 import FiniteAutomata from '@/classes/FiniteAutomata';
 import {Outcome} from '@/classes/Outcome';
 import PushdownAutomata from "@/classes/PushdownAutomata";
+import deserialize from '@/classes/AutomataDeserializer';
 
 /**
  * Tests the abstract class FiniteAutomata.ts
@@ -208,5 +209,36 @@ describe('PushdownAutomata.ts', () => {
         automata.setInput('aaabbbbc');
         automata.simulate();
         assert.equal(automata.getOutcome(), Outcome.REJECT);
+    });
+
+    it('can simulate a deserialized automata', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 50, 50, false, true);
+        automata.addTransition('a', 'A', 'B', {
+            input: null,
+            output: ['A']
+        });
+        automata.addTransition('b', 'B', 'C', {
+            input: 'A',
+            output: ['B']
+        });
+
+        // Serializes the string
+        const serialization: string = automata.serialize();
+
+        // Deserializes it
+        const newAutomata: Automata = deserialize(serialization);
+
+        // Tests automata
+        [
+            ['ab', Outcome.ACCEPT],
+            ['a', Outcome.REJECT],
+            ['b', Outcome.REJECT],
+        ].forEach(testCase => {
+            newAutomata.setInput(testCase[0]);
+            newAutomata.simulate();
+            assert.equal(newAutomata.getOutcome(), testCase[1]);
+        });
     });
 });

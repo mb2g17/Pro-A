@@ -3,6 +3,7 @@ import Automata from '@/classes/Automata';
 import FiniteAutomata from '@/classes/FiniteAutomata';
 import {Outcome} from '@/classes/Outcome';
 import AutomataOperations from "@/classes/AutomataOperations";
+import deserialize from '@/classes/AutomataDeserializer';
 
 /**
  * Tests the class FiniteAutomata.ts
@@ -303,6 +304,29 @@ describe('FiniteAutomata.ts', () => {
             automata.setInput(testCase[0]);
             automata.simulate();
             assert.equal(automata.getOutcome(), testCase[1]);
+        });
+    });
+
+    it('can simulate a deserialized automata', () => {
+        automata.addState("s1", 10, 10, true, false);
+        automata.addState("s2", 10, 10, false, true);
+        automata.addTransition('a', 's1', 's2');
+
+        // Serializes the string
+        const serialization: string = automata.serialize();
+
+        // Deserializes it
+        const newAutomata: Automata = deserialize(serialization);
+
+        // Tests automata
+        [
+            ['a', Outcome.ACCEPT],
+            ['aa', Outcome.REJECT],
+            ['b', Outcome.REJECT],
+        ].forEach(testCase => {
+            newAutomata.setInput(testCase[0]);
+            newAutomata.simulate();
+            assert.equal(newAutomata.getOutcome(), testCase[1]);
         });
     });
 });

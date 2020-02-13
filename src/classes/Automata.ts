@@ -507,17 +507,6 @@ export default abstract class Automata {
     }
 
     /**
-     * Deserializes an automata
-     * @param serializedAutomata - the serialization of the automata to instantiate
-     * @returns a new Automata based on the passed serialization
-     */
-    public static deserialize(serializedAutomata: string): Automata {
-        // Convert back to JSON
-        const json: any = JSON.parse(window.atob(serializedAutomata));
-        return new FiniteAutomata();
-    }
-
-    /**
      * Returns a list of the current configurations of the automata
      */
     public abstract getCurrentConfigs(): Set<AutomataConfig>;

@@ -6,6 +6,7 @@ import PushdownAutomata from "@/classes/PushdownAutomata";
 import TuringMachine from "@/classes/TuringMachine";
 import TuringMachineTape from "@/classes/TuringMachineTape";
 import TuringMachineConfig from "@/classes/TuringMachineConfig";
+import deserialize from '@/classes/AutomataDeserializer';
 
 /**
  * Tests the class TuringMachine.ts
@@ -227,5 +228,36 @@ describe('TuringMachine.ts', () => {
             automata.simulate();
             assert.equal(automata.getOutcome(), Outcome.REJECT);
         }
+    });
+
+    it('can simulate a deserialized automata', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 50, 50, false, true);
+        automata.addTransition('a', 'A', 'B', {
+            writeTapeSymbol: 'a',
+            direction: 'R'
+        });
+        automata.addTransition('b', 'B', 'C', {
+            writeTapeSymbol: 'a',
+            direction: 'R'
+        });
+
+        // Serializes the string
+        const serialization: string = automata.serialize();
+
+        // Deserializes it
+        const newAutomata: Automata = deserialize(serialization);
+
+        // Tests automata
+        [
+            ['ab', Outcome.ACCEPT],
+            ['a', Outcome.REJECT],
+            ['b', Outcome.REJECT],
+        ].forEach(testCase => {
+            newAutomata.setInput(testCase[0]);
+            newAutomata.simulate();
+            assert.equal(newAutomata.getOutcome(), testCase[1]);
+        });
     });
 });

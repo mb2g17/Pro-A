@@ -1,6 +1,7 @@
 import {assert} from 'chai';
 import Automata from '@/classes/Automata';
 import FiniteAutomata from '@/classes/FiniteAutomata';
+import deserialize from '@/classes/AutomataDeserializer';
 
 /**
  * Tests the abstract class Automata.ts
@@ -160,5 +161,22 @@ describe('Automata.ts', () => {
         // Asserts that there are target states and that there are two of them
         assert.isNotNull(targetStates);
         assert.equal(targetStates!.length, 2);
+    });
+
+    it('can deserialize a serialized automata', () => {
+        automata.addState("s1", 10, 10, true, false);
+        automata.addState("s2", 10, 10, false, true);
+        automata.addTransition('a', 's1', "s2");
+
+        // Serializes the string
+        const serialization: string = automata.serialize();
+
+        // Deserializes it
+        const newAutomata: Automata = deserialize(serialization);
+
+        // Checks states and transitions
+        assert.isNotNull(newAutomata.getState("s1"));
+        assert.isNotNull(newAutomata.getState("s2"));
+        assert.isNotNull(newAutomata.getTransition("a", "s1", "s2"));
     });
 });
