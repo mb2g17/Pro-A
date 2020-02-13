@@ -22,7 +22,7 @@
                 </template>
 
                 <!-- Body -->
-                <TabBody :automata="automata" :index="index"></TabBody>
+                <TabBody :automata="automata" :index="index" :ref="`tab${index}`"></TabBody>
 
             </b-tab>
 
@@ -62,6 +62,7 @@ import ConfigTable from '@/components/ConfigTable.vue';
 import TabBody from "@/components/TabBody.vue";
 import NewTabModal from '@/components/NewTabModal.vue';
 import deserialize from '../classes/AutomataDeserializer';
+import { saveAs } from 'file-saver';
 
 @Component({
     components: {
@@ -161,6 +162,21 @@ export default class Main extends Vue {
 
     private onSaveAutomataClick(index: any) {
         console.log(this.automatas[index].serialize());
+
+        console.log(this.$refs[`tab${index}`]);
+        console.log(this.$refs[`tab${index}`][0].$refs[`automata${index}`]);
+        const cy = this.$refs[`tab${index}`][0].$refs[`automata${index}`].cy;
+
+        // Gets cytoscape element
+        const elem = (this.$refs["tab" + index] as any);
+
+        // If it exists
+        if (elem) {
+            let jsonBlob = new Blob([ JSON.stringify( cy.json() ) ], { type: 'application/javascript;charset=utf-8' });
+            saveAs( jsonBlob, 'graph.json' );
+        } else {
+            console.log("Element doesn't exist!");
+        }
     }
 }
 </script>

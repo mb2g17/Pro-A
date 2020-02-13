@@ -484,7 +484,7 @@ export default abstract class Automata {
             data: {},
             initialStates: [...this.initialStates],
             finalStates : [...this.finalStates],
-            folds: []
+            folds: {}
         };
 
         // Goes through items, checking if they're good
@@ -499,6 +499,17 @@ export default abstract class Automata {
                 // If there's no 'parent' class, it's a normal node and can be added
                 if (![...item.classes].includes("parent")) {
                     json.data[itemID] = item;
+                    if (item.parent)
+                        json.folds[item.parent] = item.data.id;
+                } else {
+                    json.data[itemID] = {
+                        data: item.data,
+                        position: item.position,
+                        autoWidth: item.autoWidth,
+                        autoHeight: item.autoHeight,
+                        group: item.group,
+                        classes: item.classes
+                    };
                 }
             }
         }
