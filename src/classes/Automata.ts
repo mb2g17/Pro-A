@@ -550,6 +550,24 @@ export default abstract class Automata {
     }
 
     /**
+     * Gets the states reachable by an initial state
+     * @param initialState - the initial state name
+     * @returns a set of states reachable by the specified initial state
+     */
+    public getReachableStates(initialState: string) : Set<string> {
+        return this.cacheMachine.getReachableStates(initialState);
+    }
+
+    /**
+     * Gets the final states reachable by an initial state
+     * @param initialState - the initial state name
+     * @returns a set of final states reachable by the specified initial state
+     */
+    public getReachableFinalStates(initialState: string) : Set<string> {
+        return this.cacheMachine.getReachableFinalStates(initialState);
+    }
+
+    /**
      * Returns a list of the current configurations of the automata
      */
     public abstract getCurrentConfigs(): Set<AutomataConfig>;

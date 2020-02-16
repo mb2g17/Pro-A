@@ -2,19 +2,20 @@ import _ from 'lodash';
 import Automata from "@/classes/Automata";
 
 /**
- * Handles the machine cache of the automata class
+ * Handles storing just the mappings concerning machines, such as states -> initial states
+ * or initial states -> reachable final states
  */
-export default class AutomataMachineCache {
-    /** Mapping from source state --> target states --> number of transitions */
-    protected cacheEdgeIDNoSymbol: any = {};
-
-    /** Mapping from target state --> source states --> number of transitions */
-    protected cacheEdgeIDReverseNoSymbol: any = {};
-
+class AutomataMachineCacheCacheMachine {
     /** Mapping from state --> set of initial states (stores machines) */
-    protected cacheMachine: any = {};
+    private cacheMachine: any = {};
 
-    /** Reference to the automata class this is referring to */
+    /** Mapping from initial state --> set of reachable states */
+    private cacheMachineReverse: any = {};
+
+    /** Mapping from initial state --> set of reachable final states */
+    private cacheMachineReverseFinal: any = {};
+
+    /** Instance to automata this object is referring to */
     private automata: Automata;
 
     public constructor(automata: Automata) {
@@ -34,18 +35,178 @@ export default class AutomataMachineCache {
     }
 
     /**
+     * Gets the states reachable by an initial state
+     * @param initialState - the initial state name
+     * @returns a set of states reachable by the specified initial state
+     */
+    public getReachableStates(initialState: string) : Set<string> {
+        if (!this.cacheMachineReverse[initialState])
+            return new Set();
+        else
+            return this.cacheMachineReverse[initialState];
+    }
+
+    /**
+     * Gets the final states reachable by an initial state
+     * @param initialState - the initial state name
+     * @returns a set of final states reachable by the specified initial state
+     */
+    public getReachableFinalStates(initialState: string) : Set<string> {
+        if (!this.cacheMachineReverseFinal[initialState])
+            return new Set();
+        else
+            return this.cacheMachineReverseFinal[initialState];
+    }
+
+    /**
+     * Adds a mapping from state to initial state
+     * @param state - the state name
+     * @param initialState - the initial state name
+     */
+    public addMapping(state: string, initialState: string) {
+        // If mappings don't exist, instantiate them
+        if (!this.cacheMachine[state])
+            this.cacheMachine[state] = new Set();
+        if (!this.cacheMachineReverse[initialState])
+            this.cacheMachineReverse[initialState] = new Set();
+        if (!this.cacheMachineReverseFinal[initialState])
+            this.cacheMachineReverseFinal[initialState] = new Set();
+
+        // Update caches
+        this.cacheMachine[state].add(initialState);
+        this.cacheMachineReverse[initialState].add(state);
+
+        // If state is final, add to final mapping
+        if (this.automata.getState(state).data.final)
+            this.cacheMachineReverseFinal[initialState].add(state);
+    }
+
+    /**
+     * Sets a mapping from state to initial states
+     * @param state - the state name
+     * @param initialStates - the set of initial states to set
+     */
+    public setMapping(state: string, initialStates: Set<string>) {
+        // Sets default cache values, if they don't exist
+        if (!this.cacheMachine[state])
+            this.cacheMachine[state] = new Set();
+        for (const initialState of initialStates) {
+            if (!this.cacheMachineReverse[initialState])
+                this.cacheMachineReverse[initialState] = new Set();
+            if (!this.cacheMachineReverseFinal[initialState])
+                this.cacheMachineReverseFinal[initialState] = new Set();
+        }
+
+        // Gathers initial states to delete and states to add
+        const deleteInitialStates: Set<string> = new Set();
+        const addInitialStates: Set<string> = new Set();
+        for (const initialState of [...initialStates, ...this.cacheMachine[state]]) {
+            // If it's not in the states we want to add and it's in the cache, we want to delete it
+            if (!initialStates.has(initialState) && this.cacheMachine[state].has(initialState))
+                deleteInitialStates.add(initialState);
+
+            // If it's in the states we want to add, but not in the cache yet, we want to add it
+            if (initialStates.has(initialState) && !this.cacheMachine[state].has(initialState))
+                addInitialStates.add(initialState);
+        }
+
+        // Adds and deletes desired states
+        for (const deleteInitialState of deleteInitialStates)
+            this.deleteMapping(state, deleteInitialState);
+        for (const addInitialState of addInitialStates)
+            this.addMapping(state, addInitialState);
+    }
+
+    /**
+     * Deletes a mapping from state to initial state
+     * @param state - the state name
+     * @param initialState - the initial state name
+     */
+    public deleteMapping(state: string, initialState: string) {
+        // Removes mappings in initial states --> reachable states
+        this.cacheMachineReverse[initialState].delete(state);
+        this.cacheMachineReverseFinal[initialState].delete(state);
+
+        // Removes mapping in state --> initial states
+        this.cacheMachine[state].delete(initialState);
+    }
+
+    /**
+     * Deletes anything to do with a state
+     * @param state - the state name to delete
+     */
+    public deleteState(state: string) {
+        // Removes mappings in initial states --> reachable states
+        for (const initialState of this.cacheMachine[state]) {
+            this.cacheMachineReverse[initialState].delete(state);
+            this.cacheMachineReverseFinal[initialState].delete(state);
+        }
+
+        // Removes mapping in state --> initial states
+        delete this.cacheMachine[state];
+    }
+}
+
+/**
+ * Handles the machine cache of the automata class
+ */
+export default class AutomataMachineCache {
+    /** Mapping from source state --> target states --> number of transitions */
+    protected cacheEdgeIDNoSymbol: any = {};
+
+    /** Mapping from target state --> source states --> number of transitions */
+    protected cacheEdgeIDReverseNoSymbol: any = {};
+
+    /** Mapping from state --> set of initial states (stores machines) */
+    protected readonly cacheMachine: AutomataMachineCacheCacheMachine;
+
+    /** Reference to the automata class this is referring to */
+    private readonly automata: Automata;
+
+    public constructor(automata: Automata) {
+        this.automata = automata;
+        this.cacheMachine = new AutomataMachineCacheCacheMachine(this.automata);
+    }
+
+    /**
+     * Gets the machines that have this state
+     * @param state - the state to get the machines of
+     * @returns a set of initial state names that can reach that state
+     */
+    public getMachine(state: string) : Set<string> {
+        return this.cacheMachine.getMachine(state);
+    }
+
+    /**
+     * Gets the states reachable by an initial state
+     * @param initialState - the initial state name
+     * @returns a set of states reachable by the specified initial state
+     */
+    public getReachableStates(initialState: string) : Set<string> {
+        return this.cacheMachine.getReachableStates(initialState);
+    }
+
+    /**
+     * Gets the final states reachable by an initial state
+     * @param initialState - the initial state name
+     * @returns a set of final states reachable by the specified initial state
+     */
+    public getReachableFinalStates(initialState: string) : Set<string> {
+        return this.cacheMachine.getReachableFinalStates(initialState);
+    }
+
+    /**
      * Updating cache when adding a state
      * @param state - the name of the new state
      */
     public addState(state: string) {
         // Adds entry to cache dictionary
-        this.cacheMachine[state] = new Set();
         this.cacheEdgeIDNoSymbol[state] = {};
         this.cacheEdgeIDReverseNoSymbol[state] = {};
 
         // If we're making an initial state, add it to the machine
         if (this.automata.getState(state).data.initial)
-            this.cacheMachine[state].add(state);
+            this.cacheMachine.addMapping(state, state);
     }
 
 
@@ -61,13 +222,6 @@ export default class AutomataMachineCache {
         this.cacheEdgeIDNoSymbol[sourceState][targetState] += 1;
         this.cacheEdgeIDReverseNoSymbol[targetState][sourceState] += 1;
 
-        // If the source state is initial, add it to machine cache
-        /*if (this.automata.getState(sourceState).data.initial) {
-            if (!this.cacheMachine[targetState])
-                this.cacheMachine[targetState] = new Set();
-            this.cacheMachine[targetState].add(sourceState);
-        }*/
-
         // Updates cache of sub-tree from target node
         this.updateMachineCache(targetState);
     }
@@ -82,7 +236,7 @@ export default class AutomataMachineCache {
         const nextStates = Object.keys(this.cacheEdgeIDNoSymbol[removedState]);
 
         // Removes caches of this state
-        delete this.cacheMachine[removedState];
+        this.cacheMachine.deleteState(removedState);
         delete this.cacheEdgeIDNoSymbol[removedState];
         delete this.cacheEdgeIDReverseNoSymbol[removedState];
 
@@ -149,14 +303,10 @@ export default class AutomataMachineCache {
      * @param initial - if true, state has turned initial. If false, state is no longer initial
      */
     public setInitialState(toggledState: string, initial: boolean) {
-        // Update cache machine for toggled state
-        if (!this.cacheMachine[toggledState])
-            this.cacheMachine[toggledState] = new Set();
-
         if (initial)
-            this.cacheMachine[toggledState].add(toggledState);
+            this.cacheMachine.addMapping(toggledState, toggledState);
         else
-            this.cacheMachine[toggledState].delete(toggledState);
+            this.cacheMachine.deleteMapping(toggledState, toggledState);
 
         // Updates cache for all the following states
         const nextStates = Object.keys(this.cacheEdgeIDNoSymbol[toggledState]);
@@ -190,17 +340,17 @@ export default class AutomataMachineCache {
         const prevStates = Object.keys(this.cacheEdgeIDReverseNoSymbol[state]);
 
         // Gets the union of all the machines the previous states are in
-        const machines = new Set();
+        const machines: Set<string> = new Set();
         for (const prevState of prevStates) {
-            const prevStateMachines = this.cacheMachine[prevState];
+            const prevStateMachines = this.cacheMachine.getMachine(prevState);
             for (const machine of prevStateMachines)
                 machines.add(machine);
         }
 
-        const needRecursiveCase = !_.isEqual(this.cacheMachine[state], machines);
+        const needRecursiveCase = !_.isEqual(this.cacheMachine.getMachine(state), machines);
 
         // Sets the union to this state
-        this.cacheMachine[state] = machines;
+        this.cacheMachine.setMapping(state, machines);
 
         // Recursive case, if needed
         if (needRecursiveCase) {
