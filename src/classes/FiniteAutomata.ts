@@ -28,7 +28,7 @@ export default class FiniteAutomata extends Automata {
                 continue;
 
             // Gets ID of state of this config
-            const currentStateID = this.nodeID[config.state];
+            const currentStateID = this.cacheNodeID[config.state];
 
             // If this is final, we're finished
             if (this.data[currentStateID].data.final)
@@ -46,7 +46,7 @@ export default class FiniteAutomata extends Automata {
             this.currentConfigs.clear();
 
             // Add initial configs
-            for (const initialState of this.initialStates) {
+            for (const initialState of this.cacheInitialStates) {
                 this.currentConfigs.add(new AutomataConfig(initialState, this.inputString));
             }
         }

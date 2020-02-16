@@ -161,11 +161,7 @@ export default class Main extends Vue {
     }
 
     private onSaveAutomataClick(index: any) {
-        console.log(this.automatas[index].serialize());
-
-        console.log(this.$refs[`tab${index}`]);
-        console.log(this.$refs[`tab${index}`][0].$refs[`automata${index}`]);
-        const cy = this.$refs[`tab${index}`][0].$refs[`automata${index}`].cy;
+        const cy = (this.$refs[`tab${index}`] as any)[0].$refs[`automata${index}`].cy;
 
         // Gets cytoscape element
         const elem = (this.$refs["tab" + index] as any);

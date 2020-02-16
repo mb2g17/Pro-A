@@ -33,7 +33,7 @@ export default class PushdownAutomata extends Automata {
             this.currentConfigs.clear();
 
             // Add initial configs
-            for (const initialState of this.initialStates) {
+            for (const initialState of this.cacheInitialStates) {
                 this.currentConfigs.add(new PushdownAutomataConfig(initialState, this.inputString, []));
             }
         }
@@ -82,7 +82,7 @@ export default class PushdownAutomata extends Automata {
             output = [];
 
         // Gets transition ID
-        const id = this.edgeID[symbol][source][target];
+        const id = this.cacheEdgeID[symbol][source][target];
 
         // Adds input and output stack symbols to data, and sets the label
         this.data[id].data = {
@@ -105,7 +105,7 @@ export default class PushdownAutomata extends Automata {
                 continue;
 
             // Gets ID
-            const currentStateID = this.nodeID[config.state];
+            const currentStateID = this.cacheNodeID[config.state];
 
             // If this is final, we're finished
             if (this.data[currentStateID].data.final)

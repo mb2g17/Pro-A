@@ -3,27 +3,29 @@ import {Outcome} from '@/classes/Outcome';
 import Vue from 'vue';
 import AutomataConfig from '@/classes/AutomataConfig';
 import FiniteAutomata from "@/classes/FiniteAutomata";
+import AutomataMachineCache from "@/classes/AutomataMachineCache";
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
  */
 export default abstract class Automata {
-    /**
-     * The input string stored in the automata
-     */
+    /** The input string stored in the automata */
     protected inputString: string = '';
 
     /** Mapping from node names "A" to ID */
-    protected nodeID: any = {};
+    protected cacheNodeID: any = {};
 
     /** Mapping from edge name "a: A: B" to ID */
-    protected edgeID: any = {};
+    protected cacheEdgeID: any = {};
 
     /** Set of initial state names */
-    protected initialStates: Set<string> = new Set();
+    protected cacheInitialStates: Set<string> = new Set();
 
     /** Set of final state names */
-    protected finalStates: Set<string> = new Set();
+    protected cacheFinalStates: Set<string> = new Set();
+
+    /** Cache storing machines */
+    protected cacheMachine: AutomataMachineCache = new AutomataMachineCache(this);
 
     /** Cytoscape data for all the graph objects */
     protected data: any = {};
@@ -84,20 +86,20 @@ export default abstract class Automata {
      */
     public addState(name: string, x: number, y: number, initial: boolean, final: boolean) {
         // If this state doesn't already exist
-        if (!this.nodeID[name]) {
+        if (!this.cacheNodeID[name]) {
             // If it's initial or final, add to sets
             if (initial) {
-                this.initialStates.add(name);
+                this.cacheInitialStates.add(name);
             }
             if (final) {
-                this.finalStates.add(name);
+                this.cacheFinalStates.add(name);
             }
 
             // Creates ID
             const ID = uuidv1();
 
             // Sets node name -> id mapping
-            this.nodeID[name] = ID;
+            this.cacheNodeID[name] = ID;
 
             // Sets data
             Vue.set(this.data, ID, {
@@ -113,6 +115,9 @@ export default abstract class Automata {
                 },
                 position: {x, y},
             });
+
+            // Updates machine cache
+            this.cacheMachine.addState(name);
         }
     }
 
@@ -129,26 +134,26 @@ export default abstract class Automata {
      */
     public addTransition(symbol: string, source: string, target: string, payload?: any) {
         // If the source and target states exist
-        if (this.nodeID[source] && this.nodeID[target]) {
+        if (this.cacheNodeID[source] && this.cacheNodeID[target]) {
             // Creates the parent branches of edgeID
-            if (!this.edgeID[symbol]) {
-                this.edgeID[symbol] = {};
+            if (!this.cacheEdgeID[symbol]) {
+                this.cacheEdgeID[symbol] = {};
             }
-            if (!this.edgeID[symbol][source]) {
-                this.edgeID[symbol][source] = {};
+            if (!this.cacheEdgeID[symbol][source]) {
+                this.cacheEdgeID[symbol][source] = {};
             }
 
             // If the transition doesn't already exist
-            if (!this.edgeID[symbol][source][target]) {
+            if (!this.cacheEdgeID[symbol][source][target]) {
                 // Create ID
                 const ID = uuidv1();
 
                 // Create edge name -> id mapping
-                this.edgeID[symbol][source][target] = ID;
+                this.cacheEdgeID[symbol][source][target] = ID;
 
                 // Gets IDs of the states
-                const sourceID = this.nodeID[source];
-                const targetID = this.nodeID[target];
+                const sourceID = this.cacheNodeID[source];
+                const targetID = this.cacheNodeID[target];
 
                 // Sets data
                 Vue.set(this.data, ID, {
@@ -163,6 +168,9 @@ export default abstract class Automata {
                         type: 'edge',
                     },
                 });
+
+                // Updates machine cache
+                this.cacheMachine.addTransition(source, target);
             }
         }
     }
@@ -173,7 +181,7 @@ export default abstract class Automata {
      * @returns state object if found, null if not found
      */
     public getState(name: string): any | null {
-        const ID = this.nodeID[name];
+        const ID = this.cacheNodeID[name];
         return this.getStateById(ID);
     }
 
@@ -201,11 +209,14 @@ export default abstract class Automata {
         this.data[edgeID].data.source = newSourceID;
         this.data[edgeID].data.sourceName = newSourceName;
 
-        // Edits edge ID lookup
-        delete this.edgeID[currentSymbol][oldSourceName][currentTargetName];
-        if (!this.edgeID[currentSymbol][newSourceName])
-            this.edgeID[currentSymbol][newSourceName] = {};
-        this.edgeID[currentSymbol][newSourceName][currentTargetName] = edgeID;
+        // Edits edge ID lookup cache
+        delete this.cacheEdgeID[currentSymbol][oldSourceName][currentTargetName];
+        if (!this.cacheEdgeID[currentSymbol][newSourceName])
+            this.cacheEdgeID[currentSymbol][newSourceName] = {};
+        this.cacheEdgeID[currentSymbol][newSourceName][currentTargetName] = edgeID;
+
+        // Updates machine cache
+        this.cacheMachine.moveTransitionNewSourceState(oldSourceName, newSourceName, currentTargetName);
     }
 
     /**
@@ -224,8 +235,11 @@ export default abstract class Automata {
         this.data[edgeID].data.targetName = newTargetName;
 
         // Edits edge ID lookup
-        delete this.edgeID[currentSymbol][currentSourceName][oldTargetName];
-        this.edgeID[currentSymbol][currentSourceName][newTargetName] = edgeID;
+        delete this.cacheEdgeID[currentSymbol][currentSourceName][oldTargetName];
+        this.cacheEdgeID[currentSymbol][currentSourceName][newTargetName] = edgeID;
+
+        // Updates machine cache
+        this.cacheMachine.moveTransitionNewTargetState(currentSourceName, oldTargetName, newTargetName);
     }
 
     /**
@@ -235,12 +249,12 @@ export default abstract class Automata {
      * @param target - the target state
      * @returns the transition object if found, null if not found
      */
-    public getTransition(symbol: string, source: string, target: string): object | null {
+    public getTransition(symbol: string, source: string, target: string): any | null {
         // If edge branch exists, return transition object
-        if (this.edgeID[symbol]) {
-            if (this.edgeID[symbol][source]) {
-                if (this.edgeID[symbol][source][target]) {
-                    const edgeID = this.edgeID[symbol][source][target];
+        if (this.cacheEdgeID[symbol]) {
+            if (this.cacheEdgeID[symbol][source]) {
+                if (this.cacheEdgeID[symbol][source][target]) {
+                    const edgeID = this.cacheEdgeID[symbol][source][target];
                     return this.data[edgeID];
                 }
             }
@@ -255,15 +269,18 @@ export default abstract class Automata {
      */
     public removeState(stateName: string) {
         // If this state exists
-        if (this.nodeID[stateName]) {
+        if (this.cacheNodeID[stateName]) {
             // Gets state ID
-            const id = this.nodeID[stateName];
+            const id = this.cacheNodeID[stateName];
 
             // Delets nodeID entry
-            delete this.nodeID[stateName];
+            delete this.cacheNodeID[stateName];
 
             // Deletes data entry
             delete this.data[id];
+
+            // Updates machine cache
+            this.cacheMachine.removeState(stateName);
         }
     }
 
@@ -275,15 +292,18 @@ export default abstract class Automata {
      */
     public removeTransition(symbol: string, source: string, target: string) {
         // If this transition exists
-        if (this.edgeID[symbol][source][target]) {
+        if (this.cacheEdgeID[symbol][source][target]) {
             // Gets edge ID
-            const id = this.edgeID[symbol][source][target];
+            const id = this.cacheEdgeID[symbol][source][target];
 
             // Delete edgeID entry
-            delete this.edgeID[symbol][source][target];
+            delete this.cacheEdgeID[symbol][source][target];
 
             // Deletes data entry
             delete this.data[id];
+
+            // Updates machine cache
+            this.cacheMachine.removeTransition(source, target, true);
         }
     }
 
@@ -292,7 +312,7 @@ export default abstract class Automata {
      * @returns the number of states
      */
     public getNumberOfStates(): number {
-        return Object.keys(this.nodeID).length;
+        return Object.keys(this.cacheNodeID).length;
     }
 
     /**
@@ -300,7 +320,7 @@ export default abstract class Automata {
      * @returns the number of transitions
      */
     public getNumberOfTransitions(): number {
-        return Object.keys(this.edgeID).length;
+        return Object.keys(this.cacheEdgeID).length;
     }
 
     /**
@@ -324,7 +344,7 @@ export default abstract class Automata {
      * @returns a Set of initial state names
      */
     public getInitialStates(): Set<string> {
-        return this.initialStates;
+        return this.cacheInitialStates;
     }
 
     /**
@@ -332,7 +352,7 @@ export default abstract class Automata {
      * @returns a Set of final state names
      */
     public getFinalStates(): Set<string> {
-        return this.finalStates;
+        return this.cacheFinalStates;
     }
 
     /**
@@ -342,22 +362,25 @@ export default abstract class Automata {
      */
     public setInitialState(stateName: string, initial: boolean) {
         // Gets ID
-        const id = this.nodeID[stateName];
+        const id = this.cacheNodeID[stateName];
 
         // Updates set and classes
         if (this.data[id].data.initial) {
-            this.initialStates.delete(stateName);
+            this.cacheInitialStates.delete(stateName);
 
             // Gets class index
             const classIndex = this.data[id].classes.indexOf('initial-node');
             this.data[id].classes.splice(classIndex, 1);
         } else {
-            this.initialStates.add(stateName);
+            this.cacheInitialStates.add(stateName);
             this.data[id].classes.push('initial-node');
         }
 
         // Sets initial
         Vue.set(this.data[id].data, 'initial', initial);
+
+        // Updates the machine cache
+        this.cacheMachine.setInitialState(stateName, initial);
     }
 
     /**
@@ -367,17 +390,17 @@ export default abstract class Automata {
      */
     public setFinalState(stateName: string, final: boolean) {
         // Gets ID
-        const id = this.nodeID[stateName];
+        const id = this.cacheNodeID[stateName];
 
         // Updates set
         if (this.data[id].data.final) {
-            this.finalStates.delete(stateName);
+            this.cacheFinalStates.delete(stateName);
 
             // Gets class index
             const classIndex = this.data[id].classes.indexOf('final-node');
             this.data[id].classes.splice(classIndex, 1);
         } else {
-            this.finalStates.add(stateName);
+            this.cacheFinalStates.add(stateName);
             this.data[id].classes.push('final-node');
         }
 
@@ -390,7 +413,7 @@ export default abstract class Automata {
      */
     public getNewStateName(): string {
         // Gets set of states
-        const states = new Set(Object.keys(this.nodeID));
+        const states = new Set(Object.keys(this.cacheNodeID));
 
         // Gets the first state name number
         let stateNameNumber = states.size + 1;
@@ -426,7 +449,7 @@ export default abstract class Automata {
             // Apply this transition for each epsilon target state
             for (const targetState of epsilonTargetStates) {
                 // Gets edge ID
-                const edgeID = this.edgeID.__epsilon[config.state][targetState];
+                const edgeID = this.cacheEdgeID.__epsilon[config.state][targetState];
 
                 // Gets new config by applying transition
                 const newConfig = this.applyTransition(config, edgeID, true);
@@ -453,7 +476,7 @@ export default abstract class Automata {
                 // Apply this transition for each normal target state
                 for (const targetState of normalTargetStates) {
                     // Gets edge ID
-                    const edgeID = this.edgeID[inputSymbol][config.state][targetState];
+                    const edgeID = this.cacheEdgeID[inputSymbol][config.state][targetState];
 
                     // Gets new config by applying transition
                     const newConfig = this.applyTransition(config, edgeID, false);
@@ -479,11 +502,11 @@ export default abstract class Automata {
         let json: any = {
             modelName: this.getModelName(),
             name: this.name,
-            edgeID: this.edgeID,
-            nodeID: this.nodeID,
+            edgeID: this.cacheEdgeID,
+            nodeID: this.cacheNodeID,
             data: {},
-            initialStates: [...this.initialStates],
-            finalStates : [...this.finalStates],
+            initialStates: [...this.cacheInitialStates],
+            finalStates : [...this.cacheFinalStates],
             folds: {}
         };
 
@@ -518,6 +541,15 @@ export default abstract class Automata {
     }
 
     /**
+     * Gets the machines that have this state (proxy of AutomataMachineCache method)
+     * @param state - the state to get the machines of
+     * @returns a set of initial state names that can reach that state
+     */
+    public getMachine(state: string) : Set<string> {
+        return this.cacheMachine.getMachine(state);
+    }
+
+    /**
      * Returns a list of the current configurations of the automata
      */
     public abstract getCurrentConfigs(): Set<AutomataConfig>;
@@ -545,10 +577,10 @@ export default abstract class Automata {
      */
     protected getTargetStates(inputSymbol: string, sourceState: string): any[] | null {
         // If a transition for this state exists
-        if (this.edgeID[inputSymbol]) {
-            if (this.edgeID[inputSymbol][sourceState]) {
+        if (this.cacheEdgeID[inputSymbol]) {
+            if (this.cacheEdgeID[inputSymbol][sourceState]) {
                 // Gets all the target states
-                return Object.keys(this.edgeID[inputSymbol][sourceState]);
+                return Object.keys(this.cacheEdgeID[inputSymbol][sourceState]);
             }
         }
         return null;

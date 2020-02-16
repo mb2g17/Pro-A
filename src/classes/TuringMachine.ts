@@ -34,7 +34,7 @@ export default class TuringMachine extends Automata {
         let {writeTapeSymbol, direction} = payload;
 
         // Gets transition ID
-        const id = this.edgeID[symbol][source][target];
+        const id = this.cacheEdgeID[symbol][source][target];
 
         // Adds input and output stack symbols to data, and sets the label
         Vue.set(this.data, id, {
@@ -57,7 +57,7 @@ export default class TuringMachine extends Automata {
             this.currentConfigs.clear();
 
             // Add initial configs
-            for (const initialState of this.initialStates) {
+            for (const initialState of this.cacheInitialStates) {
                 this.currentConfigs.add(new TuringMachineConfig(initialState, new TuringMachineTape(this.inputString), 0));
             }
         }
@@ -110,7 +110,7 @@ export default class TuringMachine extends Automata {
         // Checks if any of our current configs are on a final state
         for (const config of this.currentConfigs) {
             // Gets ID of current state
-            const currentStateID = this.nodeID[config.state];
+            const currentStateID = this.cacheNodeID[config.state];
 
             // If this is final, we're finished
             if (this.data[currentStateID].data.final)

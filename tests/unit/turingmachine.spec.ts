@@ -127,7 +127,7 @@ describe('TuringMachine.ts', () => {
         const srcConfig: TuringMachineConfig = new TuringMachineConfig("A", new TuringMachineTape("aab"), 0);
 
         // Applies the transition and gets the destination configuration
-        const destConfig: TuringMachineConfig | null = automata["applyTransition"](srcConfig, automata["edgeID"]['a']["A"]["B"], false);
+        const destConfig: TuringMachineConfig | null = automata["applyTransition"](srcConfig, automata["cacheEdgeID"]['a']["A"]["B"], false);
 
         // Assert that the transition actually worked
         assert.isNotNull(destConfig);

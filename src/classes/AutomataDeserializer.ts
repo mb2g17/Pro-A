@@ -32,10 +32,10 @@ export default function(serialized: string): Automata {
     // Sets properties
     automata.setName(json.name);
     automata.setData(json.data);
-    automata["edgeID"] = json.edgeID;
-    automata["nodeID"] = json.nodeID;
-    automata["initialStates"] = new Set(json.initialStates);
-    automata["finalStates"] = new Set(json.finalStates);
+    automata["cacheEdgeID"] = json.cacheEdgeID;
+    automata["cacheNodeID"] = json.cacheNodeID;
+    automata["cacheInitialStates"] = new Set(json.cacheInitialStates);
+    automata["cacheFinalStates"] = new Set(json.cacheFinalStates);
 
     // Return automata
     return automata;
