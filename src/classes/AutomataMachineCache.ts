@@ -145,6 +145,23 @@ class AutomataMachineCacheCacheMachine {
         // Removes mapping in state --> initial states
         delete this.cacheMachine[state];
     }
+
+    /**
+     * Updating cache when toggling between final states
+     * @param toggledState - the name of the state that has been toggled
+     * @param final - if true, state has turned final. If false, state is no longer final
+     */
+    public setFinalState(toggledState: string, final: boolean) {
+        // Gets the initial states that lead to this toggled state
+        const initialStates = this.cacheMachine[toggledState];
+        for (const initialState of initialStates) {
+            if (final) {
+                this.cacheMachineReverseFinal[initialState].add(toggledState);
+            } else {
+                this.cacheMachineReverseFinal[initialState].delete(toggledState);
+            }
+        }
+    }
 }
 
 /**
@@ -312,6 +329,15 @@ export default class AutomataMachineCache {
         const nextStates = Object.keys(this.cacheEdgeIDNoSymbol[toggledState]);
         for (const nextState of nextStates)
             this.updateMachineCache(nextState);
+    }
+
+    /**
+     * Updating cache when toggling between final states
+     * @param toggledState - the name of the state that has been toggled
+     * @param final - if true, state has turned final. If false, state is no longer final
+     */
+    public setFinalState(toggledState: string, final: boolean) {
+        this.cacheMachine.setFinalState(toggledState, final);
     }
 
     /**

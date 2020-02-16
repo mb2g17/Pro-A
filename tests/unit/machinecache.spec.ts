@@ -333,4 +333,39 @@ describe('Automata Machine Cache', () => {
         assert.isTrue(reachableStates.has('s3'), "s3 is not in the machine 's1'");
         assert.isTrue(reachableStates.has('s4'), "s4 is not in the machine 's1'");
     });
+
+    // ---------------------------------------------
+    // --* TOGGLING FINAL STATE
+    // ---------------------------------------------
+    it('can stop identifying final state if toggled to false', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, false);
+        automata.addState('s3', 10, 10, false, false);
+        automata.addState('s4', 10, 10, false, true);
+
+        automata.addTransition('a', 's1', 's2');
+        automata.addTransition('a', 's2', 's3');
+        automata.addTransition('a', 's3', 's4');
+
+        automata.setFinalState('s4', false);
+
+        const reachableFinalStates = automata.getReachableFinalStates('s1');
+        assert.isFalse(reachableFinalStates.has('s4'), "Final state s4 is still recognised as a reachable final state");
+    });
+
+    it('can identify a final state if toggled to true', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, false);
+        automata.addState('s3', 10, 10, false, false);
+        automata.addState('s4', 10, 10, false, false);
+
+        automata.addTransition('a', 's1', 's2');
+        automata.addTransition('a', 's2', 's3');
+        automata.addTransition('a', 's3', 's4');
+
+        automata.setFinalState('s4', true);
+
+        const reachableFinalStates = automata.getReachableFinalStates('s1');
+        assert.isTrue(reachableFinalStates.has('s4'), "Final state s4 is not recognised as a reachable final state");
+    });
 });

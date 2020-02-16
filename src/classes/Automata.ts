@@ -406,6 +406,9 @@ export default abstract class Automata {
 
         // Sets final
         Vue.set(this.data[id].data, 'final', final);
+
+        // Updates the machine cache
+        this.cacheMachine.setFinalState(stateName, final);
     }
 
     /**
