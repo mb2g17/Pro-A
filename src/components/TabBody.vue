@@ -280,40 +280,49 @@
             // Gets automata preview
             const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
-            // If we're on the first group
-            if (this.operationState.selectStage === 0) {
-                this.operationState.selectStage = 1;
+            switch (this.operationState.selectStage) {
+                case 0:
+                    this.operationState.selectStage = 1;
 
-                // Stores operation type
-                this.operationState.operationName = "union";
+                    // Stores operation type
+                    this.operationState.operationName = "union";
 
-                // Remember selected nodes
-                this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
+                    // Tell user to input another group
+                    this.$bvToast.toast("Select the first automata using ALT + click on a state in the automata, and press Union.", {
+                        title: 'Select the first automata',
+                        variant: "warning",
+                        autoHideDelay: 5000
+                    });
+                    break;
+                case 1:
+                    this.operationState.selectStage = 2;
 
-                // Tell user to input another group
-                this.$bvToast.toast("Select a second automata group and press the button again to perform union!", {
-                    title: 'Select a second automata group',
-                    variant: "success",
-                    autoHideDelay: 5000
-                });
-            }
+                    // Remember selected nodes
+                    this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
 
-            // If we're on the second group
-            else if (this.operationState.selectStage === 1) {
-                this.operationState.selectStage = 0;
+                    // Tell user to input another group
+                    this.$bvToast.toast("Select the second automata and press Union.", {
+                        title: 'Select the second automata',
+                        variant: "warning",
+                        autoHideDelay: 5000
+                    });
+                    break;
+                case 2:
+                    this.operationState.selectStage = 0;
 
-                // Performs union
-                AutomataOperations.union(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
+                    // Performs union
+                    AutomataOperations.union(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
 
-                // Tell user that union is finished
-                this.$bvToast.toast("Union successfully computed!", {
-                    title: 'Success!',
-                    variant: "success",
-                    autoHideDelay: 5000
-                });
+                    // Tell user that union is finished
+                    this.$bvToast.toast("Union successfully computed!", {
+                        title: 'Success!',
+                        variant: "success",
+                        autoHideDelay: 5000
+                    });
 
-                // Updates operation state to be empty
-                this.clearOperationState();
+                    // Updates operation state to be empty
+                    this.clearOperationState();
+                    break;
             }
         }
 
@@ -332,9 +341,9 @@
                     this.operationState.selectStage++;
 
                     // Tells user to select final states of the first sub-automata
-                    this.$bvToast.toast("Select the final states of the first sub-automata and press Concatenation", {
+                    this.$bvToast.toast("Select the first automata using ALT + click on a state in the automata, and press Concatenation.", {
                         title: 'Concatenation',
-                        variant: "success",
+                        variant: "warning",
                         autoHideDelay: 5000
                     });
                     break;
@@ -347,16 +356,20 @@
                     this.operationState.selectStage++;
 
                     // Tells user to select initial states of the second sub-automata
-                    this.$bvToast.toast("Select the initial states of the second sub-automata and press Concatenation", {
+                    this.$bvToast.toast("Select the second automata and press Concatenation.", {
                         title: 'Concatenation',
-                        variant: "success",
+                        variant: "warning",
                         autoHideDelay: 5000
                     });
                     break;
 
                 case 2:
+                    // Gets final states of automata 1 and initial states of automata 2
+                    const finalStateAutomata1 = AutomataOperations.getFinalStates(this.automata, this.operationState.selectedStates);
+                    const initialStateAutomata2 = AutomataOperations.getInitialStates(this.automata, automataPreview.selectedNodes);
+
                     // Concatenate
-                    AutomataOperations.concatenation(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
+                    AutomataOperations.concatenation(this.automata, finalStateAutomata1, initialStateAutomata2, automataPreview.cy);
                     this.$forceUpdate();
 
                     // Tells user to select initial states of the second sub-automata
@@ -387,31 +400,20 @@
                     this.operationState.selectStage++;
 
                     // Tells user to select final states of the first sub-automata
-                    this.$bvToast.toast("Select the final states of the sub-automata and press Kleene Star", {
+                    this.$bvToast.toast("Select the automata using ALT + click on a state in the automata, and press Kleene Star.", {
                         title: 'Kleene Star',
-                        variant: "success",
+                        variant: "warning",
                         autoHideDelay: 5000
                     });
                     break;
 
                 case 1:
-                    // Remembers the final states of 1st sub-automata
-                    this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
+                    // Gets final states and initial states of the automata
+                    const finalStates = AutomataOperations.getFinalStates(this.automata, automataPreview.selectedNodes);
+                    const initialStates = AutomataOperations.getInitialStates(this.automata, automataPreview.selectedNodes);
 
-                    // Increments operation stage
-                    this.operationState.selectStage++;
-
-                    // Tells user to select initial states of the second sub-automata
-                    this.$bvToast.toast("Select the initial states of the sub-automata and press Kleene Star", {
-                        title: 'Kleene Star',
-                        variant: "success",
-                        autoHideDelay: 5000
-                    });
-                    break;
-
-                case 2:
                     // Concatenate
-                    AutomataOperations.kleeneStar(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
+                    AutomataOperations.kleeneStar(this.automata, finalStates, initialStates, automataPreview.cy);
                     this.$forceUpdate();
 
                     // Tells user to select initial states of the second sub-automata

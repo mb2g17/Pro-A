@@ -5,6 +5,26 @@ import Automata from "@/classes/Automata";
  */
 export default class AutomataOperations {
     /**
+     * Filters out initial states from a group of state IDs
+     * @param automata - the automata instace of which these states belong to
+     * @param group - a set of state IDs to filter
+     * @returns a set of initial states filtered from the given set of states
+     */
+    public static getInitialStates(automata: Automata, group: Set<string>) {
+        return new Set([...group].filter(n => automata.getStateById(n).data.initial));
+    }
+
+    /**
+     * Filters out final states from a group of state IDs
+     * @param automata - the automata instace of which these states belong to
+     * @param group - a set of state IDs to filter
+     * @returns a set of final states filtered from the given set of states
+     */
+    public static getFinalStates(automata: Automata, group: Set<string>) {
+        return new Set([...group].filter(n => automata.getStateById(n).data.final));
+    }
+
+    /**
      * Performs union
      * @param automata - the automata object to edit
      * @param group1 - the first group of node IDs
