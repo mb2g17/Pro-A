@@ -23,6 +23,7 @@ TODO:
 - BUG: toggling final state doesn't actually make it non-final in the simulation (also initial state is buggy too)
 - BUG: disable transitions to state folds
 - BUG: moving state shape doesn't change position properties in the Automata class
+- BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 
 - CRITICAL: make cache that maps initial states to states it can reach, then use that in automata operations
 

@@ -34,6 +34,9 @@ import Automata from '@/classes/Automata';
 import PushdownAutomata from "@/classes/PushdownAutomata";
 import TuringMachine from "@/classes/TuringMachine";
 
+// Lodash
+import _ from 'lodash';
+
 @Component
 export default class AutomataPreview extends Vue {
     /** The automata to preview */
@@ -47,6 +50,12 @@ export default class AutomataPreview extends Vue {
 
     /** Set of selected nodes */
     public selectedNodes: Set<any> = new Set();
+
+    /** If true, alt key is down, if false it's not */
+    private isAltDown: boolean = false;
+
+    /** If true, we are doing a machine select. Prevents infinite loop select events */
+    private isDoingMachineSelect: boolean = false;
 
     public preConfig(cytoscape: any) {
         try {
@@ -70,10 +79,44 @@ export default class AutomataPreview extends Vue {
         this.initExpandCollapse();
         this.initEdgeEditing();
 
+        // Hacky event that remembers if ALT is held down
+        document.body.addEventListener('keydown', evt => {
+            if (evt.key === "Alt")
+                this.isAltDown = true;
+        });
+        document.body.addEventListener('keyup', evt => {
+            if (evt.key === "Alt")
+                this.isAltDown = false;
+        });
+
         // When the user selects a node
         cy.on('select', (event: any) => {
             const id = event.target.id();
             this.selectedNodes.add(id);
+
+            // If alt is held down, select the whole machine
+            if (this.isAltDown && !this.isDoingMachineSelect) {
+                this.isDoingMachineSelect = true;
+                this.selectedNodes.clear();
+                this.cy.$(`#${id}`).unselect();
+
+                // Gets initial states of this machine
+                const selectedState: any = this.automata.getStateById(id);
+                const initialStates: Set<string> = this.automata.getMachine(selectedState.data.name);
+
+                // Gets all the states of this machine
+                const machineStates: string[] = _.flatMap([...initialStates], i => [...this.automata.getReachableStates(i)]);
+
+                // Selects all the states of the machine
+                for (const machineState of machineStates) {
+                    const machineStateID = this.automata.getState(machineState).data.id;
+                    this.cy.$(`#${machineStateID}`).select();
+                    this.selectedNodes.add(machineStateID);
+                }
+
+                // Sets flag to false
+                this.isDoingMachineSelect = false;
+            }
         });
 
         // When the user deselects a node

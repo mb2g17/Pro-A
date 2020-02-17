@@ -152,6 +152,10 @@ class AutomataMachineCacheCacheMachine {
      * @param final - if true, state has turned final. If false, state is no longer final
      */
     public setFinalState(toggledState: string, final: boolean) {
+        // Sets default cache values, if they don't exist
+        if (!this.cacheMachine[toggledState])
+            this.cacheMachine[toggledState] = new Set();
+
         // Gets the initial states that lead to this toggled state
         const initialStates = this.cacheMachine[toggledState];
         for (const initialState of initialStates) {
