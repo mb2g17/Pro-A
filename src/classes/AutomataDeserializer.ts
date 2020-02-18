@@ -2,6 +2,7 @@ import Automata from '@/classes/Automata';
 import FiniteAutomata from '@/classes/FiniteAutomata';
 import PushdownAutomata from '@/classes/PushdownAutomata';
 import TuringMachine from '@/classes/TuringMachine';
+import _ from "lodash";
 
 /**
  * Deserializes an automata
@@ -28,6 +29,10 @@ export default function(serialized: string): Automata {
             automata = new TuringMachine();
             break;
     }
+    // Sets up a quick function to convert str --> array to str --> set
+    function arrayToSetMap(setObj: any) {
+        return _.mapValues(setObj, array => new Set(array));
+    }
 
     // Sets properties
     automata.setName(json.name);
@@ -36,6 +41,13 @@ export default function(serialized: string): Automata {
     automata["cacheNodeID"] = json.cacheNodeID;
     automata["cacheInitialStates"] = new Set(json.cacheInitialStates);
     automata["cacheFinalStates"] = new Set(json.cacheFinalStates);
+
+    automata["cacheMachine"]["cacheEdgeIDNoSymbol"] = json.cacheMachine_cacheEdgeIDNoSymbol;
+    automata["cacheMachine"]["cacheEdgeIDReverseNoSymbol"] = json.cacheMachine_cacheEdgeIDReverseNoSymbol;
+
+    automata["cacheMachine"]["cacheMachine"]["cacheMachine"] = arrayToSetMap(json.cacheMachine_cacheMachine_cacheMachine);
+    automata["cacheMachine"]["cacheMachine"]["cacheMachineReverse"] = arrayToSetMap(json.cacheMachine_cacheMachine_cacheMachineReverse);
+    automata["cacheMachine"]["cacheMachine"]["cacheMachineReverseFinal"] = arrayToSetMap(json.cacheMachine_cacheMachine_cacheMachineReverseFinal);
 
     // Return automata
     return automata;

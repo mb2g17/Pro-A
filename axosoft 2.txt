@@ -24,8 +24,7 @@ TODO:
 - BUG: disable transitions to state folds
 - BUG: moving state shape doesn't change position properties in the Automata class
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
-
-- CRITICAL: make cache that maps initial states to states it can reach, then use that in automata operations
+- BUG: deleting a state fold should delete all the objects inside it too
 
 
 

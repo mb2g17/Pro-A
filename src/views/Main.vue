@@ -8,6 +8,8 @@
             <template v-slot:tabs-start>
                 <img id="logo" src="../assets/logo.png" />
                 <b-button class="mr-3" variant="primary" @click="onLoadAutomataClick">Load Automata</b-button>
+                <input id="loadFileInput" type="file" style="display:none" @change="onFileLoad" />
+
             </template>
 
             <b-tab v-for="(automata, index) in automatas" active>
@@ -62,7 +64,9 @@ import ConfigTable from '@/components/ConfigTable.vue';
 import TabBody from "@/components/TabBody.vue";
 import NewTabModal from '@/components/NewTabModal.vue';
 import deserialize from '../classes/AutomataDeserializer';
-import { saveAs } from 'file-saver';
+import {FileSaverOptions, saveAs} from 'file-saver';
+import {readFileAsync} from "@/misc/filereader";
+import AutomataDeserializer from "../classes/AutomataDeserializer";
 
 @Component({
     components: {
@@ -147,8 +151,14 @@ export default class Main extends Vue {
         this.automatas.push(newAutomata);
     }
 
-    private async onLoadAutomataClick() {
-        let response = await (this as any).$dialog.prompt({
+    /**
+     * When the user clicks the Load Automata button
+     */
+    private onLoadAutomataClick() {
+        const fileInput = document.getElementById('loadFileInput');
+        if (fileInput)
+            fileInput.click();
+        /*let response = await (this as any).$dialog.prompt({
             text: `Type automata string here`,
             title: `Loading an existing Automata`
         });
@@ -157,19 +167,64 @@ export default class Main extends Vue {
         if (response) {
             // Save as new automata
             this.automatas.push(deserialize(response));
+        }*/
+    }
+
+    /**
+     * When the user loads an automata file
+     * @param event - file selected event
+     */
+    private async onFileLoad(event: any) {
+        console.log(event);
+        // Gets handle on file input tag
+        const fileInput: any = document.getElementById('loadFileInput');
+        if (fileInput) {
+            const file: File = fileInput.files[0];
+            const contents = await readFileAsync(file) as string;
+            let jsonContents = JSON.parse(contents);
+
+            // Parses new automata
+            const newAutomata: Automata = deserialize(jsonContents.automata);
+
+            // Adds it to array and gets new index of this automata
+            this.automatas.push(newAutomata);
+            const automataTabIndex = this.automatas.length - 1;
+
+            // Waits for next tick
+            await this.$nextTick();
+
+            // Gets cytoscape element
+            const elem = (this.$refs[`tab${automataTabIndex}`] as any);
+            const cy = elem[0].$refs[`automata${automataTabIndex}`].cy;
+
+            // Updates json of cytoscape
+            cy.json(jsonContents.cy);
         }
     }
 
+    /**
+     * When the user saves an automata
+     * @param index - index of the automata which is being saved
+     */
     private onSaveAutomataClick(index: any) {
-        const cy = (this.$refs[`tab${index}`] as any)[0].$refs[`automata${index}`].cy;
-
         // Gets cytoscape element
         const elem = (this.$refs["tab" + index] as any);
+        const cy = elem[0].$refs[`automata${index}`].cy;
+
+        // Gets cytoscape json
+        const cytoscapeJSON = cy.json();
+        delete cytoscapeJSON.style;
+
+        // Creates JSON object to save
+        const jsonToSave = {
+            cy: cytoscapeJSON,
+            automata: this.automatas[index].serialize()
+        };
 
         // If it exists
         if (elem) {
-            let jsonBlob = new Blob([ JSON.stringify( cy.json() ) ], { type: 'application/javascript;charset=utf-8' });
-            saveAs( jsonBlob, 'graph.json' );
+            let jsonBlob = new Blob([ JSON.stringify( jsonToSave ) ], { type: 'application/javascript;charset=utf-8' });
+            saveAs(jsonBlob, 'graph.json');
         } else {
             console.log("Element doesn't exist!");
         }

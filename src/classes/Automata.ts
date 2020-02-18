@@ -4,6 +4,7 @@ import Vue from 'vue';
 import AutomataConfig from '@/classes/AutomataConfig';
 import FiniteAutomata from "@/classes/FiniteAutomata";
 import AutomataMachineCache from "@/classes/AutomataMachineCache";
+import _ from "lodash";
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -501,16 +502,27 @@ export default abstract class Automata {
      * @returns JSON string representing this automata
      */
     public serialize(): string {
+        // Sets up a quick function to convert str --> Set to str --> array
+        function setToArrayMap(setObj: any) {
+            return _.mapValues(setObj, set => [...set]);
+        }
+
         // Initial JSON
         let json: any = {
             modelName: this.getModelName(),
             name: this.name,
-            edgeID: this.cacheEdgeID,
-            nodeID: this.cacheNodeID,
             data: {},
-            initialStates: [...this.cacheInitialStates],
-            finalStates : [...this.cacheFinalStates],
-            folds: {}
+            cacheEdgeID: this.cacheEdgeID,
+            cacheNodeID: this.cacheNodeID,
+            cacheInitialStates: [...this.cacheInitialStates],
+            cacheFinalStates : [...this.cacheFinalStates],
+
+            cacheMachine_cacheEdgeIDNoSymbol: this.cacheMachine["cacheEdgeIDNoSymbol"],
+            cacheMachine_cacheEdgeIDReverseNoSymbol: this.cacheMachine["cacheEdgeIDReverseNoSymbol"],
+
+            cacheMachine_cacheMachine_cacheMachine: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachine"]),
+            cacheMachine_cacheMachine_cacheMachineReverse: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachineReverse"]),
+            cacheMachine_cacheMachine_cacheMachineReverseFinal: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachineReverseFinal"]),
         };
 
         // Goes through items, checking if they're good
@@ -525,8 +537,6 @@ export default abstract class Automata {
                 // If there's no 'parent' class, it's a normal node and can be added
                 if (![...item.classes].includes("parent")) {
                     json.data[itemID] = item;
-                    if (item.parent)
-                        json.folds[item.parent] = item.data.id;
                 } else {
                     json.data[itemID] = {
                         data: item.data,
