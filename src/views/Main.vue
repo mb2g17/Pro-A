@@ -155,7 +155,8 @@ export default class Main extends Vue {
      * When the user clicks the Load Automata button
      */
     private onLoadAutomataClick() {
-        const fileInput = document.getElementById('loadFileInput');
+        const fileInput: any = document.getElementById('loadFileInput');
+        fileInput.value = null; // Resets what file had already been loaded, so we can load the same multiple times
         if (fileInput)
             fileInput.click();
     }
@@ -165,7 +166,6 @@ export default class Main extends Vue {
      * @param event - file selected event
      */
     private async onFileLoad(event: any) {
-        console.log(event);
         // Gets handle on file input tag
         const fileInput: any = document.getElementById('loadFileInput');
         if (fileInput) {
