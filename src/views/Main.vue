@@ -158,16 +158,6 @@ export default class Main extends Vue {
         const fileInput = document.getElementById('loadFileInput');
         if (fileInput)
             fileInput.click();
-        /*let response = await (this as any).$dialog.prompt({
-            text: `Type automata string here`,
-            title: `Loading an existing Automata`
-        });
-
-        // If it wasn't cancelled, rename
-        if (response) {
-            // Save as new automata
-            this.automatas.push(deserialize(response));
-        }*/
     }
 
     /**
@@ -180,8 +170,9 @@ export default class Main extends Vue {
         const fileInput: any = document.getElementById('loadFileInput');
         if (fileInput) {
             const file: File = fileInput.files[0];
-            const contents = await readFileAsync(file) as string;
-            let jsonContents = JSON.parse(contents);
+            const contents: string = await readFileAsync(file) as string;
+            const decryptedBase64: string = window.atob(contents);
+            let jsonContents: any = JSON.parse(decryptedBase64);
 
             // Parses new automata
             const newAutomata: Automata = deserialize(jsonContents.automata);
@@ -221,10 +212,14 @@ export default class Main extends Vue {
             automata: this.automatas[index].serialize()
         };
 
+        // Creates save blob and encodes into Base64
+        let saveBlob: string = JSON.stringify(jsonToSave);
+        saveBlob = window.btoa(saveBlob);
+
         // If it exists
         if (elem) {
-            let jsonBlob = new Blob([ JSON.stringify( jsonToSave ) ], { type: 'application/javascript;charset=utf-8' });
-            saveAs(jsonBlob, 'graph.json');
+            let jsonBlob = new Blob([ saveBlob ], { type: 'text/plain;charset=utf-8' });
+            saveAs(jsonBlob, `${this.automatas[index].getName()}.automata`);
         } else {
             console.log("Element doesn't exist!");
         }
