@@ -484,7 +484,19 @@ export default class AutomataPreview extends Vue {
                 // Creates new state
                 this.automata.addState(uniqueName, this.mousePositionX, this.mousePositionY, false, false);
             }
-        })
+            else {
+                // If we're double clicking on a transition
+                if (event.target._private.data.type === "edge") {
+                    // Get edge ID
+                    const edgeID = event.target._private.data.id;
+
+                    // Call event
+                    this.$emit("editTransition", edgeID);
+                } else {
+                    console.log("node");
+                }
+            }
+        });
     }
 }
 </script>

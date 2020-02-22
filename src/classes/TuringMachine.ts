@@ -36,7 +36,7 @@ export default class TuringMachine extends Automata {
         // Gets transition ID
         const id = this.cacheEdgeID[symbol][source][target];
 
-        // Adds input and output stack symbols to data, and sets the label
+        // Adds payload to data, and sets the label
         Vue.set(this.data, id, {
             data: {
                 ...this.data[id].data,

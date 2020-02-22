@@ -69,12 +69,21 @@ export default abstract class Automata {
      * Clones and returns the data to put into Cytoscape
      * @returns the object to insert into cytoscape
      */
-    public getData(): object {
+    public getData(): any {
         return this.data;
     }
 
     public setData(newData: any) {
         Vue.set(this, 'data', newData);
+    }
+
+    /**
+     * Updates one item in the data object
+     * @param itemID - the ID of the data object to update
+     * @param newItem - the new data object to replace
+     */
+    public updateItem(itemID: string, newItem: any) {
+        Vue.set(this.data, itemID, newItem);
     }
 
     /**
@@ -305,6 +314,20 @@ export default abstract class Automata {
 
             // Updates machine cache
             this.cacheMachine.removeTransition(source, target, true);
+        }
+    }
+
+    /**
+     * Removes a transition via ID
+     * @param transitionID - the ID of the transition to remove
+     */
+    public removeTransitionWithID(transitionID: string) {
+        if (this.data[transitionID]) {
+            // Gets transition object
+            const transition = this.data[transitionID].data;
+
+            // Deletes
+            this.removeTransition(transition.symbol, transition.sourceName, transition.targetName);
         }
     }
 

@@ -3,7 +3,7 @@
     <!-- New transition modal -->
     <b-modal :id="modalID" v-model="isModalVisible">
         <template v-slot:modal-title>
-            New Transition ({{ automataType }})
+            {{ mode === NewTransitionModalMode.ADD ? `New Transition (${automataType})` : `Edit transition (${automataType})` }}
         </template>
 
         <!-- Body -->
@@ -91,7 +91,8 @@
         <template v-slot:modal-footer>
             <div class="w-100">
                 <b-button variant="danger" class="float-left" @click="onCancelClick">Cancel</b-button>
-                <b-button variant="primary" class="float-right" @click="onAddClick">Add</b-button>
+                <b-button v-if="mode === NewTransitionModalMode.ADD" variant="primary" class="float-right" @click="onAddClick">Add</b-button>
+                <b-button v-if="mode === NewTransitionModalMode.EDIT" variant="primary" class="float-right" @click="onEditClick">Edit</b-button>
             </div>
         </template>
     </b-modal>
@@ -107,11 +108,22 @@
     import PushdownAutomata from "@/classes/PushdownAutomata";
     import TuringMachine from "@/classes/TuringMachine";
 
+    /** The types of modes the modal can be in */
+    export enum NewTransitionModalMode {
+        /** Will add a new transition */
+        ADD,
+        /** Will edit an existing transition */
+        EDIT
+    }
+
     @Component
     export default class NewTransitionModal extends Vue {
 
         /** The automata being modelled */
         @Prop() public readonly automata!: Automata;
+
+        /** The mode the modal is in right now */
+        private mode: NewTransitionModalMode = NewTransitionModalMode.ADD;
 
         /** ID of this modal (there will be multiple) */
         private modalID: string = "";
@@ -140,14 +152,21 @@
         /** If true, this is an epsilon move. False if not */
         private isEpsilonMove: boolean = false;
 
-        /** Stores source node of this new transition */
+        /** Stores source node of this new transition (if add mode) */
         private sourceNode: any;
 
-        /** Stores target node of this new transition */
+        /** Stores target node of this new transition (if add mode) */
         private targetNode: any;
+
+        /** Stores the transition ID we are editing (if edit mode) */
+        private transitionID: string = "";
 
         mounted() {
             this.modalID = uuid(); // Sets random modal ID
+        }
+
+        get NewTransitionModalMode() {
+            return NewTransitionModalMode;
         }
 
         /**
@@ -218,14 +237,74 @@
         }
 
         /**
-         * Shows the modal
+         * Shows the modal, "add" mode
          */
         public show(sourceNode: any, targetNode: any) {
+            // Sets mode
+            this.mode = NewTransitionModalMode.ADD;
+
             // Stores data
             this.sourceNode = sourceNode;
             this.targetNode = targetNode;
 
             // Clears data
+            this.clearData();
+
+            // Shows the modal
+            this.$bvModal.show(this.modalID);
+        }
+
+        /**
+         * Shows the modal, "edit" mode
+         */
+        public showEdit(transitionID: string) {
+            // Sets mode
+            this.mode = NewTransitionModalMode.EDIT;
+
+            // Remembers transition ID
+            this.transitionID = transitionID;
+
+            // Clears data
+            this.clearData();
+
+            // Gets transition
+            const transition = this.automata.getData()[transitionID].data;
+
+            // Gets source and target states
+            const [source, target] = [this.automata.getData()[transition.source], this.automata.getData()[transition.target]];
+            this.sourceNode = {
+                "_private": source
+            };
+            this.targetNode = {
+                "_private": target
+            };
+
+            // Fills in data
+            this.isEpsilonMove = transition.symbol === "__epsilon";
+
+            if (this.automata instanceof PushdownAutomata) {
+                this.pdaState.isEmptyStackSymbol = transition.input === "__empty";
+                this.pdaState.isAnySymbol = transition.input === null;
+                if (!this.pdaState.isEmptyStackSymbol && !this.pdaState.isAnySymbol)
+                    this.pdaState.inputtedInputStackSymbol = transition.input;
+                this.pdaState.inputtedOutputStackSymbols = transition.output;
+            } else if (this.automata instanceof TuringMachine) {
+                this.tmState.isEmptySymbol = transition.symbol === "__empty";
+                this.tmState.symbolToWrite = transition.writeTapeSymbol;
+                this.tmState.direction = transition.direction;
+            }
+
+            if (!this.isEpsilonMove && !this.tmState.isEmptySymbol)
+                this.inputtedTransitionSymbol = transition.symbol;
+
+            // Shows the modal
+            this.$bvModal.show(this.modalID);
+        }
+
+        /**
+         * Clears data
+         */
+        private clearData() {
             this.inputtedTransitionSymbol = "";
             this.isEpsilonMove = false;
             this.pdaState = {
@@ -239,9 +318,6 @@
                 symbolToWrite: '',
                 direction: 'L'
             };
-
-            // Shows the modal
-            this.$bvModal.show(this.modalID);
         }
 
         /**
@@ -261,6 +337,15 @@
 
             // Hides the modal
             this.$bvModal.hide(this.modalID);
+        }
+
+        /**
+         * When the user clicks edit
+         */
+        private onEditClick() {
+            // Removes existing transition, then add the new one (updates cache too)
+            this.automata.removeTransitionWithID(this.transitionID);
+            this.onAddClick();
         }
 
         @Watch('isEpsilonMove')

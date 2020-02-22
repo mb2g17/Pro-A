@@ -58,6 +58,7 @@
                             :automata="automata"
                             :ref="`automata${index}`"
                             @createTransition="onCreateTransition"
+                            @editTransition="onEditTransition"
                     />
 
                 </b-col>
@@ -183,6 +184,15 @@
 
             // Shows modal
             (this.$refs[`newTransitionModal${this.index}`] as any).show(sourceNode, targetNode);
+        }
+
+        /**
+         * When user wants to edit a transition
+         * @param transitionID - the ID of the transition to edit
+         */
+        private onEditTransition(transitionID: string) {
+            // Shows modal
+            (this.$refs[`newTransitionModal${this.index}`] as any).showEdit(transitionID);
         }
 
         /**
