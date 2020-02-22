@@ -59,6 +59,7 @@
                             :ref="`automata${index}`"
                             @createTransition="onCreateTransition"
                             @editTransition="onEditTransition"
+                            @editState="onEditState"
                     />
 
                 </b-col>
@@ -193,6 +194,26 @@
         private onEditTransition(transitionID: string) {
             // Shows modal
             (this.$refs[`newTransitionModal${this.index}`] as any).showEdit(transitionID);
+        }
+
+        /**
+         * When user wants to edit a state
+         * @param stateID - the ID of the state to edit
+         */
+        private async onEditState(stateID: string) {
+            // Gets state
+            let state = this.automata.getData()[stateID];
+
+            let response = await (this as any).$dialog.prompt({
+                text: `Type new state name here`,
+                title: `Renaming '${state.data.name}'`
+            });
+
+            // If it wasn't cancelled, rename
+            if (response) {
+                state.data.name = response;
+                this.automata.updateItem(stateID, state);
+            }
         }
 
         /**

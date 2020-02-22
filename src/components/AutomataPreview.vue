@@ -493,7 +493,11 @@ export default class AutomataPreview extends Vue {
                     // Call event
                     this.$emit("editTransition", edgeID);
                 } else {
-                    console.log("node");
+                    // Get node ID
+                    const nodeID = event.target._private.data.id;
+
+                    // Call event
+                    this.$emit("editState", nodeID);
                 }
             }
         });
