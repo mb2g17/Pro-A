@@ -22,6 +22,7 @@ import edgehandles from 'cytoscape-edgehandles';
 import contextMenus from 'cytoscape-context-menus';
 import expandCollapse from 'cytoscape-expand-collapse';
 import edgeEditing from 'cytoscape-edge-editing';
+import dblclick from 'cytoscape-dblclick';
 
 // Automata config
 import config from './config';
@@ -51,6 +52,12 @@ export default class AutomataPreview extends Vue {
     /** Set of selected nodes */
     public selectedNodes: Set<any> = new Set();
 
+    /** The x position of the mouse on the automata canvas, updated by mousemove */
+    public mousePositionX: number = 0;
+
+    /** The y position of the mouse on the automata canvas, updated by mousemove */
+    public mousePositionY: number = 0;
+
     /** If true, alt key is down, if false it's not */
     private isAltDown: boolean = false;
 
@@ -63,6 +70,7 @@ export default class AutomataPreview extends Vue {
             edgehandles(cytoscape, $);
             expandCollapse(cytoscape, $);
             edgeEditing(cytoscape, $);
+            dblclick(cytoscape, $);
         } catch (e) {
             console.log(e.fullStackTrace);
         }
@@ -78,6 +86,7 @@ export default class AutomataPreview extends Vue {
         this.initContextMenu();
         this.initExpandCollapse();
         this.initEdgeEditing();
+        this.initDoubleClick();
 
         // Hacky event that remembers if ALT is held down
         document.body.addEventListener('keydown', evt => {
@@ -153,6 +162,12 @@ export default class AutomataPreview extends Vue {
             }
 
             // Gets x and y of parent
+        });
+
+        // When the user moves the mouse
+        cy.on('mousemove', (event: any) => {
+            this.mousePositionX = event.position.x;
+            this.mousePositionY = event.position.y;
         });
     }
 
@@ -452,6 +467,24 @@ export default class AutomataPreview extends Vue {
             }
         });
         this.cy.style().update();
+    }
+
+    /**
+     * Sets up double clicking
+     */
+    private initDoubleClick() {
+        this.cy.dblclick();
+
+        this.cy.on('dblclick', (event: any) => {
+            // If we're double clicking on empty space, create a new state
+            if (event.target.constructor.name === "Core") {
+                // Gets unique name
+                const uniqueName = this.automata.getNewStateName();
+
+                // Creates new state
+                this.automata.addState(uniqueName, this.mousePositionX, this.mousePositionY, false, false);
+            }
+        })
     }
 }
 </script>
