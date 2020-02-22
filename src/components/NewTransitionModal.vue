@@ -197,7 +197,7 @@
                 };
             if (this.automataType === "TM")
                 return {
-                    writeTapeSymbol: this.tmState.symbolToWrite,
+                    writeTapeSymbol: this.tmState.symbolToWrite ? this.tmState.symbolToWrite : 'a',
                     direction: this.tmState.direction
                 };
             return {};
