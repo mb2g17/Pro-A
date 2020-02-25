@@ -19,7 +19,6 @@ TODO:
 - make filled buttons and outline buttons consistent in the menus
 
 - BUG: toggling final state doesn't actually make it non-final in the simulation (also initial state is buggy too)
-- BUG: disable transitions to state folds
 - BUG: moving state shape doesn't change position properties in the Automata class
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 - BUG: deleting a state fold should delete all the objects inside it too

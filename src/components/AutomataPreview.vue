@@ -179,6 +179,17 @@ export default class AutomataPreview extends Vue {
             handleInDrawMode: true,
             nodeLoopOffset: 50, // offset for edgeType: 'node' loops
             snap: true,
+            edgeType: (sourceNode: any, targetNode: any) => {
+                // If we're selecting nothing
+                if (targetNode.length === 0)
+                    return "flat";
+
+                // If we're trying to select a fold, don't allow the edge
+                if (targetNode._private.classes.has("parent"))
+                    return null;
+                else
+                    return "flat";
+            },
             loopAllowed: function loopAllowed(node: any) {
                 // for the specified node, return whether edges from itself to itself are allowed
                 return true;
