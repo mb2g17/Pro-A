@@ -169,6 +169,19 @@ export default class AutomataPreview extends Vue {
             this.mousePositionX = event.position.x;
             this.mousePositionY = event.position.y;
         });
+
+        // When the user drags an object
+        cy.on('drag', (event: any) => {
+            // Gets ID and new position
+            const stateID = event.target._private.data.id;
+
+            // Updates position of state
+            let state = this.automata.getData()[stateID];
+            this.automata.updateItem(stateID, {
+                ...state,
+                position: event.target._private.position
+            });
+        });
     }
 
     /**
