@@ -119,7 +119,8 @@ export default abstract class Automata {
                 ],
                 data: {
                     id: ID,
-                    name,
+                    name, // The original name
+                    displayName: name, // The name that shows on the graph
                     type: 'node',
                     initial, final,
                 },
@@ -329,6 +330,15 @@ export default abstract class Automata {
             // Deletes
             this.removeTransition(transition.symbol, transition.sourceName, transition.targetName);
         }
+    }
+
+    /**
+     * Renames a state
+     * @param stateID - the ID of the state to rename
+     * @param newStateName - the new state name
+     */
+    public renameState(stateID: string, newStateName: string) {
+        Vue.set(this.data[stateID].data, "displayName", newStateName);
     }
 
     /**

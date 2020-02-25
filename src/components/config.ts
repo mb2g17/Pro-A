@@ -4,7 +4,7 @@ const myConfig: object = {
             selector: 'node',
             style: {
                 'background-color': '#666',
-                'content': 'data(name)',
+                'content': 'data(displayName)',
             },
         },
         { // Selected state
@@ -18,14 +18,14 @@ const myConfig: object = {
             selector: '.initial-node',
             style: {
                 'background-color': '#00f',
-                'content': 'data(name)',
+                'content': 'data(displayName)',
             },
         },
         { // Final state
             selector: '.final-node',
             style: {
                 'border-width': 4,
-                'content': 'data(name)',
+                'content': 'data(displayName)',
             },
         },
         { // Edge handle

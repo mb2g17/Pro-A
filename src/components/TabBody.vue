@@ -206,13 +206,12 @@
 
             let response = await (this as any).$dialog.prompt({
                 text: `Type new state name here`,
-                title: `Renaming '${state.data.name}'`
+                title: `Renaming '${state.data.displayName}'`
             });
 
             // If it wasn't cancelled, rename
             if (response) {
-                state.data.name = response;
-                this.automata.updateItem(stateID, state);
+                this.automata.renameState(stateID, response);
             }
         }
 
