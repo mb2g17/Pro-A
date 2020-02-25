@@ -295,6 +295,12 @@ export default abstract class Automata {
         }
     }
 
+    public removeStateFold(foldID: string) {
+        // Deletes data entry
+        if (this.data[foldID])
+            delete this.data[foldID];
+    }
+
     /**
      * Removes a transition
      * @param symbol - the symbol of the transition to remove

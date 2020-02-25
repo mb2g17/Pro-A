@@ -363,7 +363,7 @@ export default class AutomataPreview extends Vue {
                 },
                 {
                     id: 'remove',
-                    content: 'Remove node/edge',
+                    content: 'Remove',
                     tooltipText: 'remove',
                     selector: 'node, edge',
                     onClickFunction: (event: any) => {
@@ -381,7 +381,8 @@ export default class AutomataPreview extends Vue {
                                 const name = elem._private.data.name;
                                 this.automata.removeState(name);
                             }
-                            else {
+                            // If this is a transition
+                            else if (elem._private.data.type === "edge") {
                                 // Removes edge from data
                                 const [symbol, source, target] = [
                                     elem._private.data.symbol,
@@ -389,6 +390,10 @@ export default class AutomataPreview extends Vue {
                                     elem._private.data.targetName
                                 ];
                                 this.automata.removeTransition(symbol, source, target);
+                            }
+                            // If this is a state fold
+                            else {
+                                this.automata.removeStateFold(elem._private.data.id);
                             }
                         }
                     },
