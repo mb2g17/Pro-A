@@ -367,7 +367,7 @@ export default class AutomataPreview extends Vue {
                     onClickFunction: (event: any) => {
                         // Gets state name and final property
                         const stateName = event.target._private.data.name;
-                        const final = this.automata.getState(stateName).final;
+                        const final = this.automata.getState(stateName).data.final;
 
                         // Toggles initial state
                         this.automata.setFinalState(stateName, !final);
