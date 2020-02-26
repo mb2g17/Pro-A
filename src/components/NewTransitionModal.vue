@@ -69,8 +69,13 @@
             <template v-if="automataType === 'TM'">
 
                 <!-- Symbol to write -->
-                <b-form-group :label="`Symbol to write:`">
-                    <b-form-input v-model="tmState.symbolToWrite" placeholder="a"></b-form-input>
+                <b-form-group :label="`Symbol to write: ${payload.writeTapeSymbol}`">
+                    <b-form-input v-model="tmState.symbolToWrite" placeholder="a" :disabled="tmState.isWriteEmptySymbol"></b-form-input>
+                </b-form-group>
+
+                <!-- Special write symbols -->
+                <b-form-group>
+                    <b-form-checkbox v-model="tmState.isWriteEmptySymbol">Empty symbol</b-form-checkbox>
                 </b-form-group>
 
                 <!-- Direction -->
@@ -145,6 +150,7 @@
         /** State of inputs if it's a TM */
         private tmState: any = {
             isEmptySymbol: false,
+            isWriteEmptySymbol: false,
             symbolToWrite: '',
             direction: 'L'
         };
@@ -216,7 +222,8 @@
                 };
             if (this.automataType === "TM")
                 return {
-                    writeTapeSymbol: this.tmState.symbolToWrite ? this.tmState.symbolToWrite : 'a',
+                    writeTapeSymbol: this.tmState.isWriteEmptySymbol ? '□' :
+                        this.tmState.symbolToWrite ? this.tmState.symbolToWrite : 'a',
                     direction: this.tmState.direction
                 };
             return {};
@@ -290,7 +297,9 @@
                 this.pdaState.inputtedOutputStackSymbols = transition.output;
             } else if (this.automata instanceof TuringMachine) {
                 this.tmState.isEmptySymbol = transition.symbol === "□";
-                this.tmState.symbolToWrite = transition.writeTapeSymbol;
+                this.$set(this.tmState, "isWriteEmptySymbol", transition.writeTapeSymbol === "□");
+                if (!this.tmState.isWriteEmptySymbol)
+                    this.tmState.symbolToWrite = transition.writeTapeSymbol;
                 this.tmState.direction = transition.direction;
             }
 

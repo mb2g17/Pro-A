@@ -20,6 +20,5 @@ TODO:
 
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 
-- In new transition modal, add option for write tape symbol to "clear" the tape symbol (use __empty or □ as the write tape symbol)
 
 IN PROGRESS:
