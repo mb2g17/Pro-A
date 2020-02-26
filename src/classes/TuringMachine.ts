@@ -82,7 +82,7 @@ export default class TuringMachine extends Automata {
         const newTape: TuringMachineTape = new TuringMachineTape(srcTape);
 
         // If write symbol is "empty", erase, otherwise write new symbol
-        if (this.data[edgeID].data.writeTapeSymbol === "__empty")
+        if (this.data[edgeID].data.writeTapeSymbol === "□")
             newTape.delete(srcTapeIndex);
         else
             newTape.write(srcTapeIndex, this.data[edgeID].data.writeTapeSymbol);

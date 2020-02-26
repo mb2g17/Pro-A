@@ -7,7 +7,6 @@ TODO:
 - change "__empty" input stack symbol to ⊥ (PDA)
 - change null or "any symbol" for input stack symbol to ε (PDA)
 - change no output stack symbols to ε (PDA)
-- change "__empty" written tape symbol to □ (TM)
 
 - make transition symbols into words, not just letters
 - add validation to stop duplicate transitions (e.g. trying to do (a,A,B) twice)
@@ -21,6 +20,6 @@ TODO:
 
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 
-
+- In new transition modal, add option for write tape symbol to "clear" the tape symbol (use __empty or □ as the write tape symbol)
 
 IN PROGRESS:

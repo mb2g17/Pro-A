@@ -25,7 +25,7 @@ export default class TuringMachineConfig extends AutomataConfig {
 
     getInputSymbol(): string {
         const symbol = this._tape.read(this._index);
-        return symbol ? symbol : "__empty";
+        return symbol ? symbol : "□";
     }
 
     getInputLength(): number {

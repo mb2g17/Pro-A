@@ -208,8 +208,8 @@ describe('TuringMachine.ts', () => {
             writeTapeSymbol: 'Z',
             direction: 'R'
         });
-        automata.addTransition("__empty", "q4", "qf", {
-            writeTapeSymbol: '__empty',
+        automata.addTransition("□", "q4", "qf", {
+            writeTapeSymbol: '□',
             direction: 'L'
         });
 

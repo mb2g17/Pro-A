@@ -178,7 +178,7 @@
                 return 'ε';
 
             if (this.tmState.isEmptySymbol)
-                return '__empty';
+                return '□';
 
             // Default value
             if (this.inputtedTransitionSymbol)
@@ -289,7 +289,7 @@
                     this.pdaState.inputtedInputStackSymbol = transition.input;
                 this.pdaState.inputtedOutputStackSymbols = transition.output;
             } else if (this.automata instanceof TuringMachine) {
-                this.tmState.isEmptySymbol = transition.symbol === "__empty";
+                this.tmState.isEmptySymbol = transition.symbol === "□";
                 this.tmState.symbolToWrite = transition.writeTapeSymbol;
                 this.tmState.direction = transition.direction;
             }
