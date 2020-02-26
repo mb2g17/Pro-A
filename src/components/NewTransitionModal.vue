@@ -175,7 +175,7 @@
         get transitionSymbol() {
             // Epsilon move
             if (this.isEpsilonMove)
-                return /*'ε'*/'__epsilon';
+                return 'ε';
 
             if (this.tmState.isEmptySymbol)
                 return '__empty';
@@ -280,7 +280,7 @@
             };
 
             // Fills in data
-            this.isEpsilonMove = transition.symbol === "__epsilon";
+            this.isEpsilonMove = transition.symbol === "ε";
 
             if (this.automata instanceof PushdownAutomata) {
                 this.pdaState.isEmptyStackSymbol = transition.input === "__empty";

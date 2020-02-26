@@ -75,11 +75,11 @@ describe('PushdownAutomata.ts', () => {
         automata.addState('F', 50, 50, false, true);
         automata.addState('G', 50, 50, false, false);
 
-        automata.addTransition('__epsilon', 'A', 'B', {
+        automata.addTransition('ε', 'A', 'B', {
             input: null,
             output: []
         });
-        automata.addTransition('__epsilon', 'A', 'C', {
+        automata.addTransition('ε', 'A', 'C', {
             input: null,
             output: []
         });

@@ -73,7 +73,7 @@ describe('TuringMachine.ts', () => {
             writeTapeSymbol: 'b',
             direction: 'R'
         });
-        automata.addTransition('__epsilon', 'B', 'C', {
+        automata.addTransition('ε', 'B', 'C', {
             writeTapeSymbol: 'a',
             direction: 'L'
         });

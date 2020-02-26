@@ -482,7 +482,7 @@ export default abstract class Automata {
         // Goes through each config
         for (const config of this.getCurrentConfigs()) {
             // Gets epsilon move target states
-            let epsilonTargetStates = this.getTargetStates('__epsilon', config.state);
+            let epsilonTargetStates = this.getTargetStates('ε', config.state);
 
             // If there are none, change to empty array
             if (!epsilonTargetStates) {
@@ -492,7 +492,7 @@ export default abstract class Automata {
             // Apply this transition for each epsilon target state
             for (const targetState of epsilonTargetStates) {
                 // Gets edge ID
-                const edgeID = this.cacheEdgeID.__epsilon[config.state][targetState];
+                const edgeID = this.cacheEdgeID['ε'][config.state][targetState];
 
                 // Gets new config by applying transition
                 const newConfig = this.applyTransition(config, edgeID, true);

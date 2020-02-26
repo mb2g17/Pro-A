@@ -49,7 +49,7 @@ export default class AutomataOperations {
             const initialStateName: string = automata.getStateById(initialState).data.name;
 
             // Make transition from new node to this initial node
-            automata.addTransition("__epsilon", newStateName, initialStateName);
+            automata.addTransition("ε", newStateName, initialStateName);
 
             // Makes all the other initial states not initial states
             automata.setInitialState(initialStateName, false);
@@ -84,7 +84,7 @@ export default class AutomataOperations {
                 const initialStateName = automata.getStateById(initialState).data.name;
 
                 // Create an epsilon move for this
-                automata.addTransition("__epsilon", finalStateName, initialStateName);
+                automata.addTransition("ε", finalStateName, initialStateName);
 
                 // Make this not an initial state anymore
                 automata.setInitialState(initialStateName, false);
@@ -118,7 +118,7 @@ export default class AutomataOperations {
             const finalStateName = automata.getStateById(finalState).data.name;
 
             // Creates transition
-            automata.addTransition("__epsilon", finalStateName, newNodeName);
+            automata.addTransition("ε", finalStateName, newNodeName);
         }
 
         // Makes it go to all the initial states
@@ -127,7 +127,7 @@ export default class AutomataOperations {
             const initialStateName = automata.getStateById(initialState).data.name;
 
             // Creates transition
-            automata.addTransition("__epsilon", newNodeName, initialStateName);
+            automata.addTransition("ε", newNodeName, initialStateName);
 
             // Make this not an initial state anymore
             automata.setInitialState(initialStateName, false);
