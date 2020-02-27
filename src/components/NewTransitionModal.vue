@@ -198,7 +198,7 @@
          */
         get inputStackSymbol() {
             if (this.pdaState.isEmptyStackSymbol)
-                return "__empty";
+                return "⊥";
             if (this.pdaState.isAnySymbol)
                 return null;
             return this.pdaState.inputtedInputStackSymbol ? this.pdaState.inputtedInputStackSymbol : "A";
@@ -290,7 +290,7 @@
             this.isEpsilonMove = transition.symbol === "ε";
 
             if (this.automata instanceof PushdownAutomata) {
-                this.pdaState.isEmptyStackSymbol = transition.input === "__empty";
+                this.pdaState.isEmptyStackSymbol = transition.input === "⊥";
                 this.pdaState.isAnySymbol = transition.input === null;
                 if (!this.pdaState.isEmptyStackSymbol && !this.pdaState.isAnySymbol)
                     this.pdaState.inputtedInputStackSymbol = transition.input;

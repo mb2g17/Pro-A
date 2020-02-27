@@ -4,7 +4,6 @@ TODO:
 
 - reorder tabs
 
-- change "__empty" input stack symbol to ⊥ (PDA)
 - change null or "any symbol" for input stack symbol to ε (PDA)
 - change no output stack symbols to ε (PDA)
 
@@ -22,3 +21,4 @@ TODO:
 
 
 IN PROGRESS:
+- change "__empty" input stack symbol to ⊥ (PDA)

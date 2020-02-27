@@ -113,15 +113,15 @@ describe('PushdownAutomata.ts', () => {
         automata.addState('A', 10, 10, true, false);
         automata.addState('B', 50, 50, false, true);
         automata.addTransition('a', 'A', 'B', {
-            input: "__empty",
+            input: "⊥",
             output: []
         });
         automata.addTransition('b', 'A', 'B', {
-            input: "__empty",
+            input: "⊥",
             output: ['A']
         });
         automata.addTransition('a', 'B', 'B', {
-            input: "__empty",
+            input: "⊥",
             output: []
         });
         automata.setInput('a');
@@ -178,7 +178,7 @@ describe('PushdownAutomata.ts', () => {
             output: []
         });
         automata.addTransition('c', 'B', 'C', {
-            input: "__empty",
+            input: "⊥",
             output: []
         });
         // Accepts by final state
