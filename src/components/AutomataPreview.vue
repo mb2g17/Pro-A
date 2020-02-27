@@ -90,6 +90,20 @@ export default class AutomataPreview extends Vue {
 
         // Hacky event that remembers if ALT is held down
         document.body.addEventListener('keydown', evt => {
+            /*if (evt.key === "ArrowUp")
+            {
+                for (const selectedObj of this.selectedNodes)
+                {
+                    this.cy.style()
+                        .selector(`#${selectedObj}`)
+                            .style('control-point-step-size', '200px')
+                        .update();
+
+                    let oldSize = cy.style().selector(`#${selectedObj}`).json();
+                    console.log(oldSize);
+                }
+            }*/
+
             if (evt.key === "Alt")
                 this.isAltDown = true;
         });

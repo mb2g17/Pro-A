@@ -81,6 +81,11 @@ const myConfig: object = {
                 'target-arrow-color': '#eee',
                 'target-arrow-shape': 'triangle',
                 'arrow-scale': 1,
+
+                'loop-direction': '-45deg',
+                'loop-sweep': '90deg',
+
+                //'control-point-step-size': '70px',
             },
         },
         { // Parent (state fold node)
