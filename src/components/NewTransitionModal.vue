@@ -200,7 +200,7 @@
             if (this.pdaState.isEmptyStackSymbol)
                 return "⊥";
             if (this.pdaState.isAnySymbol)
-                return null;
+                return 'ε';
             return this.pdaState.inputtedInputStackSymbol ? this.pdaState.inputtedInputStackSymbol : "A";
         }
 
@@ -291,7 +291,7 @@
 
             if (this.automata instanceof PushdownAutomata) {
                 this.pdaState.isEmptyStackSymbol = transition.input === "⊥";
-                this.pdaState.isAnySymbol = transition.input === null;
+                this.pdaState.isAnySymbol = transition.input === 'ε';
                 if (!this.pdaState.isEmptyStackSymbol && !this.pdaState.isAnySymbol)
                     this.pdaState.inputtedInputStackSymbol = transition.input;
                 this.pdaState.inputtedOutputStackSymbols = transition.output;

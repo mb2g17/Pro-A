@@ -42,8 +42,8 @@ export default class PushdownAutomata extends Automata {
     protected applyTransition(srcConfig: PushdownAutomataConfig, edgeID: number, epsilonMove: boolean): PushdownAutomataConfig | null {
         // If one of these conditions is true, do the transition
         const stackSymbol = this.data[edgeID].data.input === srcConfig.stack[0];
-        const emptyStack = this.data[edgeID].data.input === "⊥" && srcConfig.stack.length === 0;
-        const nullSymbol = this.data[edgeID].data.input === null;
+        const emptyStack = this.data[edgeID].data.input === '⊥' && srcConfig.stack.length === 0;
+        const nullSymbol = this.data[edgeID].data.input === 'ε';
         if (stackSymbol || emptyStack || nullSymbol) {
             // Pops element off stack, then push output stack symbols
             let newStack = srcConfig.stack;
@@ -100,7 +100,7 @@ export default class PushdownAutomata extends Automata {
 
         // Checks if any of our current states are final
         for (const config of this.currentConfigs) {
-            // If we haven't exhuasted the whole input yet, it hasn't accepted
+            // If we haven't exhausted the whole input yet, it hasn't accepted
             if (config.getInputLength() > 0)
                 continue;
 

@@ -20,4 +20,3 @@ TODO:
 
 
 IN PROGRESS:
-- change null or "any symbol" for input stack symbol to ε (PDA)

@@ -5,14 +5,14 @@ import AutomataConfig from "@/classes/AutomataConfig";
  */
 export default class PushdownAutomataConfig extends AutomataConfig {
     /** The current stack this config has */
-    private readonly _stack: (string | null)[];
+    private readonly _stack: string[];
     /**
      * Creates an automata configuration
      * @param state - the current state this config is on
      * @param input - the current input this config has
      * @param stack - the current stack this config has
      */
-    public constructor(state: string, input: string, stack: (string | null)[]) {
+    public constructor(state: string, input: string, stack: string[]) {
         super(state, input);
         this._stack = stack;
     }
@@ -20,7 +20,7 @@ export default class PushdownAutomataConfig extends AutomataConfig {
     /**
      * The current stack this config has
      */
-    get stack(): (string | null)[] {
+    get stack(): string[] {
         return this._stack;
     }
 

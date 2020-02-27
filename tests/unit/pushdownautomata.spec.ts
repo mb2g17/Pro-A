@@ -22,7 +22,7 @@ describe('PushdownAutomata.ts', () => {
         automata.addState('B', 50, 50, false, false);
         automata.addState('C', 50, 50, false, true);
         automata.addTransition('a', 'A', 'B', {
-            input: null,
+            input: 'ε',
             output: ['A']
         });
         automata.addTransition('b', 'B', 'C', {
@@ -40,7 +40,7 @@ describe('PushdownAutomata.ts', () => {
         automata.addState('B', 50, 50, false, false);
         automata.addState('C', 50, 50, false, false);
         automata.addTransition('a', 'A', 'B', {
-            input: null,
+            input: 'ε',
             output: ['A']
         });
         automata.addTransition('b', 'B', 'C', {
@@ -58,7 +58,7 @@ describe('PushdownAutomata.ts', () => {
         automata.addState('A', 10, 10, true, false);
         automata.addState('B', 50, 50, false, false);
         automata.addTransition('a', 'A', 'B', {
-            input: null,
+            input: 'ε',
             output: ['A']
         });
         automata.setInput('a');
@@ -76,15 +76,15 @@ describe('PushdownAutomata.ts', () => {
         automata.addState('G', 50, 50, false, false);
 
         automata.addTransition('ε', 'A', 'B', {
-            input: null,
+            input: 'ε',
             output: []
         });
         automata.addTransition('ε', 'A', 'C', {
-            input: null,
+            input: 'ε',
             output: []
         });
         automata.addTransition('a', 'B', 'D', {
-            input: null,
+            input: 'ε',
             output: ['A']
         });
         automata.addTransition('a', 'D', 'F', {
@@ -92,7 +92,7 @@ describe('PushdownAutomata.ts', () => {
             output: []
         });
         automata.addTransition('b', 'C', 'E', {
-            input: null,
+            input: 'ε',
             output: ['B']
         });
         automata.addTransition('b', 'E', 'G', {
@@ -137,7 +137,7 @@ describe('PushdownAutomata.ts', () => {
     it('can reject by empty stack', () => {
         automata.addState('A', 10, 10, true, false);
         automata.addTransition('a', 'A', 'A', {
-            input: null,
+            input: 'ε',
             output: []
         });
 
@@ -150,7 +150,7 @@ describe('PushdownAutomata.ts', () => {
     it('can accept by empty stack', () => {
         automata.addState('A', 10, 10, true, false);
         automata.addTransition('a', 'A', 'A', {
-            input: null,
+            input: 'ε',
             output: []
         });
 
@@ -166,7 +166,7 @@ describe('PushdownAutomata.ts', () => {
         automata.addState('B', 50, 50, false, false);
         automata.addState('C', 50, 50, false, true);
         automata.addTransition('a', 'A', 'A', {
-            input: null,
+            input: 'ε',
             output: ['A']
         });
         automata.addTransition('b', 'A', 'B', {
@@ -216,7 +216,7 @@ describe('PushdownAutomata.ts', () => {
         automata.addState('B', 50, 50, false, false);
         automata.addState('C', 50, 50, false, true);
         automata.addTransition('a', 'A', 'B', {
-            input: null,
+            input: 'ε',
             output: ['A']
         });
         automata.addTransition('b', 'B', 'C', {
