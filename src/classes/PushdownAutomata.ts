@@ -84,11 +84,14 @@ export default class PushdownAutomata extends Automata {
         // Gets transition ID
         const id = this.cacheEdgeID[symbol][source][target];
 
+        // Converts output stack symbol array to string
+        const outputStr: string = output.length === 0 ? 'ε' : output.toString();
+
         // Adds input and output stack symbols to data, and sets the label
         this.data[id].data = {
             ...this.data[id].data,
             input, output,
-            label: symbol + " ; " + input + " / " + output.toString()
+            label: `${symbol} ; ${input} / ${outputStr}`,
         };
     }
 
