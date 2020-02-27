@@ -589,7 +589,7 @@ export default abstract class Automata {
             }
         }
 
-        return window.btoa(JSON.stringify(json));
+        return JSON.stringify(json);
     }
 
     /**

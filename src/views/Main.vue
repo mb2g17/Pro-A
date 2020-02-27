@@ -67,6 +67,7 @@ import deserialize from '../classes/AutomataDeserializer';
 import {FileSaverOptions, saveAs} from 'file-saver';
 import {readFileAsync} from "@/misc/filereader";
 import AutomataDeserializer from "../classes/AutomataDeserializer";
+import { Base64 } from 'js-base64';
 
 @Component({
     components: {
@@ -171,7 +172,7 @@ export default class Main extends Vue {
         if (fileInput) {
             const file: File = fileInput.files[0];
             const contents: string = await readFileAsync(file) as string;
-            const decryptedBase64: string = window.atob(contents);
+            const decryptedBase64: string = Base64.decode(contents);
             let jsonContents: any = JSON.parse(decryptedBase64);
 
             // Parses new automata
@@ -214,7 +215,7 @@ export default class Main extends Vue {
 
         // Creates save blob and encodes into Base64
         let saveBlob: string = JSON.stringify(jsonToSave);
-        saveBlob = window.btoa(saveBlob);
+        saveBlob = Base64.encode(saveBlob);
 
         // If it exists
         if (elem) {
