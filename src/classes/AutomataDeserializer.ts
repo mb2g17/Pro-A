@@ -11,7 +11,7 @@ import _ from "lodash";
  */
 export default function(serialized: string): Automata {
     // Deserialize
-    const json: any = JSON.parse(window.atob(serialized));
+    const json: any = JSON.parse(serialized);
 
     // Creates automata
     let automata: Automata;

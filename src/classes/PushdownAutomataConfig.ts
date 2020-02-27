@@ -24,8 +24,8 @@ export default class PushdownAutomataConfig extends AutomataConfig {
         return this._stack;
     }
 
-    stackAsString(): string {
-        return this.stack
+    public stackAsString(): string {
+        return ['⊥', ...this.stack]
             .filter((s) => s !== null) // Removes nulls
             .join(" ; "); // Join them all into a string
     }
