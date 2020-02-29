@@ -234,8 +234,12 @@
             this.inputString = '';
             this.automata.simulate();
 
-            // Sets outcome
-            this.outcome = this.automata.getOutcome().toLocaleString();
+            // Gets outcome and current configuration
+            this.$set(this, "outcome", this.automata.getOutcome().toLocaleString());
+            this.$set(this, "currentConfigs", this.automata.getCurrentConfigs());
+
+            // Updates vue
+            this.$forceUpdate();
         }
 
         /**
