@@ -8,14 +8,16 @@ TODO:
 - add validation to stop duplicate transitions (e.g. trying to do (a,A,B) twice)
 - transitions should be made by pressing "enter", like with new automata
 
-- make "step"s start at initial state
 - change config table to allow stack trace
 - make nodes light up in animation
 
 - make filled buttons and outline buttons consistent in the menus
 
+- add controls to change the size of loop transitions
+
 - BUG: event handlers are still activated even when automata tab is closed
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
+- BUG: edge handles gets saved as their own objects when saving automata (also re-do saved automata)
 
 
 IN PROGRESS:

@@ -39,17 +39,19 @@ export default class FiniteAutomata extends Automata {
         return Outcome.UNDECIDED;
     }
 
-    protected configInit(): void {
+    protected configInit(): boolean {
         // If there is an outcome
         if (this.getOutcome() !== Outcome.UNDECIDED) {
             // Clear all the old configs
-            this.currentConfigs.clear();
+            Vue.set(this, "currentConfigs", new Set());
 
             // Add initial configs
             for (const initialState of this.cacheInitialStates) {
                 this.currentConfigs.add(new AutomataConfig(initialState, this.inputString));
             }
+            return true;
         }
+        return false;
     }
 
     protected applyTransition(srcConfig: AutomataConfig, edgeID: number, epsilonMove: boolean): AutomataConfig {

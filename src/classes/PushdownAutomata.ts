@@ -2,6 +2,7 @@ import Automata from "@/classes/Automata";
 import {Outcome} from "@/classes/Outcome";
 import AutomataConfig from "@/classes/AutomataConfig";
 import PushdownAutomataConfig from "@/classes/PushdownAutomataConfig";
+import Vue from "vue";
 
 /**
  * Implementation of a push-down automata
@@ -26,17 +27,19 @@ export default class PushdownAutomata extends Automata {
         this.currentConfigs = newConfigs;
     }
 
-    protected configInit(): void {
+    protected configInit(): boolean {
         // If there is an outcome
         if (this.getOutcome() !== Outcome.UNDECIDED) {
             // Clear all the old configs
-            this.currentConfigs.clear();
+            Vue.set(this, "currentConfigs", new Set());
 
             // Add initial configs
             for (const initialState of this.cacheInitialStates) {
                 this.currentConfigs.add(new PushdownAutomataConfig(initialState, this.inputString, []));
             }
+            return true;
         }
+        return false;
     }
 
     protected applyTransition(srcConfig: PushdownAutomataConfig, edgeID: number, epsilonMove: boolean): PushdownAutomataConfig | null {

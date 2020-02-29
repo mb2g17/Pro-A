@@ -47,20 +47,19 @@ export default class TuringMachine extends Automata {
         });
     }
 
-    /**
-     * Adds initial configs if there are no current configs
-     */
-    protected configInit() {
+    protected configInit(): boolean {
         // If there is an outcome
         if (this.getOutcome() !== Outcome.UNDECIDED) {
             // Clear all the old configs
-            this.currentConfigs.clear();
+            Vue.set(this, "currentConfigs", new Set());
 
             // Add initial configs
             for (const initialState of this.cacheInitialStates) {
                 this.currentConfigs.add(new TuringMachineConfig(initialState, new TuringMachineTape(this.inputString), 0));
             }
+            return true;
         }
+        return false;
     }
 
     /**

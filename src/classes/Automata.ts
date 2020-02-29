@@ -473,8 +473,11 @@ export default abstract class Automata {
      * Reads the next input symbol and travels to the next state
      */
     public step(): void {
-        // If there's no current states, add the initial ones
-        this.configInit();
+        // If there's no current states, add the initial ones and leave it at that
+        if (this.configInit()) {
+            this.setCurrentConfigs(this.getCurrentConfigs());
+            return;
+        }
 
         // Remember the new set of current states
         const newCurrentConfigs: Set<AutomataConfig> = new Set();
@@ -664,8 +667,9 @@ export default abstract class Automata {
 
     /**
      * Sets up initial configurations if needed
+     * @returns true if initial configs were added, false if not
      */
-    protected abstract configInit(): void;
+    protected abstract configInit(): boolean;
 
     /**
      * Applies a transition from a source config to a destination config

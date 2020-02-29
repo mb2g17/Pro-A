@@ -83,7 +83,7 @@
                     <h2 id="decision" v-if="isSimulating">{{ outcome }}</h2>
 
                     <!-- Config -->
-                    <ConfigTable :configs="automata.getCurrentConfigs()" />
+                    <ConfigTable :configs="currentConfigs" />
                 </b-col>
 
             </b-row>
@@ -105,6 +105,7 @@
     import uuidv1 from "uuid/v1";
     import AutomataOperations from "@/classes/AutomataOperations";
     import NewTransitionModal from "@/components/NewTransitionModal.vue";
+    import AutomataConfig from "@/classes/AutomataConfig";
 
     @Component({
         components: {
@@ -124,6 +125,9 @@
 
         /** The outcome of an animation */
         private outcome: string = "UNDECIDED";
+
+        /** The set of current configurations of this automata (to be displayed) */
+        private currentConfigs: Set<AutomataConfig> = new Set();
 
         /** If true, user wants to perform multi-level exploration */
         private isMultilevelExplorationEnabled: boolean = false;
@@ -246,10 +250,13 @@
 
             // Steps the automata
             this.automata.step();
-            this.$forceUpdate();
 
-            // Gets outcome
-            this.outcome = this.automata.getOutcome().toLocaleString();
+            // Gets outcome and current configurations
+            this.$set(this, "outcome", this.automata.getOutcome().toLocaleString());
+            this.$set(this, "currentConfigs", this.automata.getCurrentConfigs());
+
+            // Updates vue
+            this.$forceUpdate();
         }
 
         /**
@@ -257,7 +264,11 @@
          */
         public onCancelClick() {
             this.isSimulating = false; // We are no longer simulating
+            this.$set(this, "currentConfigs", new Set());
             this.automata.reset(); // Reset automata configurations and input
+
+            // Updates vue
+            this.$forceUpdate();
         }
 
         /**
