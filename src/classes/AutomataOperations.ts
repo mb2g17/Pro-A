@@ -1,4 +1,5 @@
 import Automata from "@/classes/Automata";
+import PushdownAutomata from "@/classes/PushdownAutomata";
 
 /**
  * Class containing a bunch of automata operations to perform
@@ -41,6 +42,15 @@ export default class AutomataOperations {
         const midY: number = initialStates.reduce((total, currentValue, currentIndex, arr) =>
             automata.getStateById(currentValue).position.y + total, 0) / initialStates.length;
 
+        // If it's a PDA, add a payload
+        let payload: any = {};
+        if (automata instanceof PushdownAutomata) {
+            payload = {
+                input: 'ε',
+                output: []
+            };
+        }
+
         // Create a node that epsilon moves to the initial states
         const newStateName: string = automata.getNewStateName();
         automata.addState(newStateName, midX, midY, true, false);
@@ -49,7 +59,7 @@ export default class AutomataOperations {
             const initialStateName: string = automata.getStateById(initialState).data.name;
 
             // Make transition from new node to this initial node
-            automata.addTransition("ε", newStateName, initialStateName);
+            automata.addTransition("ε", newStateName, initialStateName, payload);
 
             // Makes all the other initial states not initial states
             automata.setInitialState(initialStateName, false);
@@ -68,6 +78,15 @@ export default class AutomataOperations {
      * @param cy - the cytoscape instance (optional)
      */
     public static concatenation(automata: Automata, group1: Set<string>, group2: Set<string>, cy?: any) {
+        // If it's a PDA, add a payload
+        let payload: any = {};
+        if (automata instanceof PushdownAutomata) {
+            payload = {
+                input: 'ε',
+                output: []
+            };
+        }
+
         // For each final state
         for (const finalState of group1) {
             // Gets final state name
@@ -84,7 +103,7 @@ export default class AutomataOperations {
                 const initialStateName = automata.getStateById(initialState).data.name;
 
                 // Create an epsilon move for this
-                automata.addTransition("ε", finalStateName, initialStateName);
+                automata.addTransition("ε", finalStateName, initialStateName, payload);
 
                 // Make this not an initial state anymore
                 automata.setInitialState(initialStateName, false);
@@ -112,13 +131,22 @@ export default class AutomataOperations {
         const newNodeName = automata.getNewStateName();
         automata.addState(newNodeName, midX, midY, true, true);
 
+        // If it's a PDA, add a payload
+        let payload: any = {};
+        if (automata instanceof PushdownAutomata) {
+            payload = {
+                input: 'ε',
+                output: []
+            };
+        }
+
         // Makes all the final states go to it
         for (const finalState of group1) {
             // Gets final state name
             const finalStateName = automata.getStateById(finalState).data.name;
 
             // Creates transition
-            automata.addTransition("ε", finalStateName, newNodeName);
+            automata.addTransition("ε", finalStateName, newNodeName, payload);
         }
 
         // Makes it go to all the initial states
@@ -127,7 +155,7 @@ export default class AutomataOperations {
             const initialStateName = automata.getStateById(initialState).data.name;
 
             // Creates transition
-            automata.addTransition("ε", newNodeName, initialStateName);
+            automata.addTransition("ε", newNodeName, initialStateName, payload);
 
             // Make this not an initial state anymore
             automata.setInitialState(initialStateName, false);
@@ -202,11 +230,6 @@ export default class AutomataOperations {
         for (const srcObjID of group) {
             // Fetch object
             const srcObj = automata.getData()[srcObjID];
-
-            if (!srcObj) {
-                console.log("Undefined obj!");
-                console.log("ID: " + srcObjID);
-            }
 
             // If it's a node
             if (srcObj.data.type === "node") {
