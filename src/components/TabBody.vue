@@ -13,6 +13,7 @@
                     <!-- Operations -->
                     <div id="operations">
                         <b-button variant="warning" @click="onStateFoldClick">State fold</b-button>
+                        <b-button variant="primary" @click="onDuplicateClick">Duplicate</b-button>
                         <b-button :variant="operationState.operationName !== 'union' ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
                         <b-button :variant="operationState.operationName !== 'concatenation' ? 'primary' : 'success'" @click="onConcatenationClick">Concatenation</b-button>
                         <b-button :variant="operationState.operationName !== 'kleene-star' ? 'primary' : 'success'" @click="onKleeneStarClick">Kleene Star</b-button>
@@ -90,7 +91,7 @@
         </b-container>
 
         <!-- New transition modal -->
-        <NewTransitionModal :ref="`newTransitionModal${index}`" :automata="automata" />
+        <NewTransitionModal :ref="`newTransitionModal${index}`" :automata="automata" @hide="onNewTransitionModalHide" />
 
     </div>
 
@@ -196,6 +197,9 @@
          * @param transitionID - the ID of the transition to edit
          */
         private onEditTransition(transitionID: string) {
+            // Gets automata preview
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
             // Shows modal
             (this.$refs[`newTransitionModal${this.index}`] as any).showEdit(transitionID);
         }
@@ -316,6 +320,41 @@
             let newData: any = this.automata.getData();
             newData[parentID] = automataPreview.cy.nodes("#" + parentID)[0]._private;
             this.automata.setData(newData);
+        }
+
+        /**
+         * When the user clicks the "Duplicate" button
+         */
+        public async onDuplicateClick() {
+            // Gets automata preview
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // If there are selected nodes
+            if (automataPreview.selectedNodes.size > 0) {
+                // Duplicates
+                const newDuplicatedObjects: Set<string> = AutomataOperations.duplicate(this.automata, automataPreview.selectedNodes);
+
+                // Waits for one
+                await this.$nextTick();
+
+                // De-selects the currently selected nodes
+                for (const selectedObj of automataPreview.selectedNodes)
+                    automataPreview.cy.getElementById(selectedObj).unselect();
+
+                // Clears selected nodes
+                automataPreview.selectedNodes.clear();
+
+                // Selects all the duplicates
+                for (const newDuplicatedObject of newDuplicatedObjects)
+                    automataPreview.cy.getElementById(newDuplicatedObject).select();
+            } else {
+                // Tell user to select nodes
+                this.$bvToast.toast("Select a group of states/transitions, then click 'Duplicate' to copy them.", {
+                    title: 'Select a group first',
+                    variant: "warning",
+                    autoHideDelay: 5000
+                });
+            }
         }
 
         /**
@@ -472,6 +511,18 @@
                     this.clearOperationState();
                     break;
             }
+        }
+
+        /**
+         * Is called when the new transition modal is hidden
+         * (is mainly used for a bug fix)
+         */
+        private onNewTransitionModalHide() {
+            // Gets automata preview and deselects everything
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            for (const selectedID of automataPreview.selectedNodes)
+                automataPreview.cy.getElementById(selectedID).unselect();
+            automataPreview.selectedNodes.clear();
         }
     }
 </script>

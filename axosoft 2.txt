@@ -15,6 +15,9 @@ TODO:
 
 - add controls to change the size of loop transitions
 
+- make 'delete' delete all objects in your selection, not just the one you clicked on
+- make 'alt-click' also select transitions
+
 - BUG: event handlers are still activated even when automata tab is closed
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 - BUG: edge handles gets saved as their own objects when saving automata (also re-do saved automata)

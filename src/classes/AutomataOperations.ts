@@ -135,4 +135,87 @@ export default class AutomataOperations {
                 cy.$(`#${initialState}`).removeClass("initial-node");
         }
     }
+
+    /**
+     * Duplicates a group of objects in an automata
+     * @param automata - the automata to copy stuff from
+     * @param group - the group of objects to copy
+     * @returns the set of new duplicated objects
+     */
+    public static duplicate(automata: Automata, group: Set<string>): Set<string> {
+        // Stores mapping of old state names to new state names
+        const newName: any = {};
+
+        // Stores the set of new duplicated objects, by ID
+        const duplicatedObjects: Set<string> = new Set();
+
+        // Set up some functions to help, returns new name of this state
+        function addState(srcObj: any): string {
+            // If we've already duplicated this state, then leave
+            if (newName[srcObj.data.id])
+                return newName[srcObj.data.name];
+
+            // Get new name (if it doesn't already exist)
+            const targetObjName = newName[srcObj.data.name] ? newName[srcObj.data.name] : automata.getNewStateName();
+
+            // Store in the mapping
+            newName[srcObj.data.name] = targetObjName;
+
+            // Creates new node
+            automata.addState(targetObjName,
+                srcObj.position.x + 10,
+                srcObj.position.y + 10,
+                srcObj.data.initial,
+                srcObj.data.final);
+
+            // Stores this in return set
+            duplicatedObjects.add(automata.getState(targetObjName).data.id);
+
+            return targetObjName;
+        }
+
+        function addTransition(srcObj: any) {
+            // Gets data
+            const [srcSymbol, srcSrc, srcTarget] = [srcObj.data.symbol, srcObj.data.sourceName, srcObj.data.targetName];
+
+            // Gets new source and target names
+            let targetSrc: string;
+            let targetTarget: string;
+            if (newName[srcSrc])
+                targetSrc = newName[srcSrc];
+            else
+                targetSrc = addState(automata.getState(srcSrc));
+
+            if (newName[srcTarget])
+                targetTarget = newName[srcTarget];
+            else
+                targetTarget = addState(automata.getState(srcTarget));
+
+            // Creates transition
+            automata.addTransition(srcSymbol, targetSrc, targetTarget, srcObj.data);
+
+            // Stores this in return set
+            duplicatedObjects.add(automata.getTransition(srcSymbol, targetSrc, targetTarget).data.id);
+        }
+
+        // Goes through each object
+        for (const srcObjID of group) {
+            // Fetch object
+            const srcObj = automata.getData()[srcObjID];
+
+            if (!srcObj) {
+                console.log("Undefined obj!");
+                console.log("ID: " + srcObjID);
+            }
+
+            // If it's a node
+            if (srcObj.data.type === "node") {
+                addState(srcObj);
+            }
+            else if (srcObj.data.type === "edge")
+                addTransition(srcObj);
+        }
+
+        return duplicatedObjects;
+    }
 }

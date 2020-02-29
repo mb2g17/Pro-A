@@ -81,7 +81,7 @@ export default class PushdownAutomata extends Automata {
         // Converts string nulls to actual nulls
         if (input === "null")
             input = null;
-        if (output[0] === "null")
+        if (output.length > 0 && output[0] === "null")
             output = [];
 
         // Gets transition ID

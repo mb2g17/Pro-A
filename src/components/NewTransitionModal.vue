@@ -1,7 +1,7 @@
 <template>
 
     <!-- New transition modal -->
-    <b-modal :id="modalID" v-model="isModalVisible">
+    <b-modal :id="modalID" v-model="isModalVisible" @hide="$emit('hide')">
         <template v-slot:modal-title>
             {{ mode === NewTransitionModalMode.ADD ? `New Transition (${automataType})` : `Edit transition (${automataType})` }}
         </template>
