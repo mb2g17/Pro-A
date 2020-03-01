@@ -124,8 +124,10 @@ class AutomataMachineCacheCacheMachine {
      */
     public deleteMapping(state: string, initialState: string) {
         // Removes mappings in initial states --> reachable states
-        this.cacheMachineReverse[initialState].delete(state);
-        this.cacheMachineReverseFinal[initialState].delete(state);
+        if (this.cacheMachineReverse[initialState])
+            this.cacheMachineReverse[initialState].delete(state);
+        if (this.cacheMachineReverseFinal[initialState])
+            this.cacheMachineReverseFinal[initialState].delete(state);
 
         // Removes mapping in state --> initial states
         this.cacheMachine[state].delete(initialState);

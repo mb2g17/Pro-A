@@ -17,10 +17,13 @@ TODO:
 - make 'delete' delete all objects in your selection, not just the one you clicked on
 - make 'alt-click' also select transitions
 
+- make automata operations support TM
+- add test cases for TM automata operations
 - add 'non-empty symbol' turing machine read symbol
 - add 'write nothing' turing machine write symbol
 - add 'do not move' turing machine direction
 - make transition symbols into words, not just letters
+
 
 - BUG: event handlers are still activated even when automata tab is closed
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
@@ -29,4 +32,3 @@ TODO:
 
 
 IN PROGRESS:
-- make automata operations support PDA and TM

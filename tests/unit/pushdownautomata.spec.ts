@@ -4,6 +4,7 @@ import FiniteAutomata from '@/classes/FiniteAutomata';
 import {Outcome} from '@/classes/Outcome';
 import PushdownAutomata from "@/classes/PushdownAutomata";
 import deserialize from '@/classes/AutomataDeserializer';
+import AutomataOperations from "@/classes/AutomataOperations";
 
 /**
  * Tests the abstract class FiniteAutomata.ts
@@ -239,6 +240,131 @@ describe('PushdownAutomata.ts', () => {
             newAutomata.setInput(testCase[0]);
             newAutomata.simulate();
             assert.equal(newAutomata.getOutcome(), testCase[1]);
+        });
+    });
+
+    it('can run union on PDAs', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 50, 50, false, true);
+
+        automata.addState('A2', 10, 10, true, false);
+        automata.addState('B2', 50, 50, false, false);
+        automata.addState('C2', 50, 50, false, true);
+
+        automata.addTransition('a', 'A', 'B', {
+            input: 'ε',
+            output: ['A']
+        });
+        automata.addTransition('b', 'B', 'C', {
+            input: 'A',
+            output: ['B']
+        });
+
+        automata.addTransition('x', 'A2', 'B2', {
+            input: 'ε',
+            output: ['X']
+        });
+        automata.addTransition('y', 'B2', 'C2', {
+            input: 'X',
+            output: ['Y']
+        });
+
+        AutomataOperations.union(automata, new Set([
+            automata.getState("A").data.id,
+            automata.getState("B").data.id,
+            automata.getState("C").data.id,
+        ]), new Set([
+            automata.getState("A2").data.id,
+            automata.getState("B2").data.id,
+            automata.getState("C2").data.id,
+        ]));
+
+        [
+            ['ab', Outcome.ACCEPT],
+            ['xy', Outcome.ACCEPT],
+            ['ax', Outcome.REJECT],
+            ['by', Outcome.REJECT]
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1]);
+        });
+    });
+
+    it('can run concatenation on PDAs', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 50, 50, false, true);
+
+        automata.addState('A2', 10, 10, true, false);
+        automata.addState('B2', 50, 50, false, false);
+        automata.addState('C2', 50, 50, false, true);
+
+        automata.addTransition('a', 'A', 'B', {
+            input: 'ε',
+            output: ['A']
+        });
+        automata.addTransition('b', 'B', 'C', {
+            input: 'A',
+            output: ['B']
+        });
+
+        automata.addTransition('x', 'A2', 'B2', {
+            input: 'ε',
+            output: ['X']
+        });
+        automata.addTransition('y', 'B2', 'C2', {
+            input: 'X',
+            output: ['Y']
+        });
+
+        AutomataOperations.concatenation(automata, new Set([
+            automata.getState("C").data.id
+        ]), new Set([
+            automata.getState("A2").data.id
+        ]));
+
+        [
+            ['abxy', Outcome.ACCEPT],
+            ['ab', Outcome.REJECT],
+            ['xy', Outcome.REJECT],
+            ['abx', Outcome.REJECT]
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1], "Failed " + testCase[0]);
+        });
+    });
+
+    it('can run kleene star on PDAs', () => {
+        automata.addState('A', 10, 10, true, false);
+        automata.addState('B', 50, 50, false, false);
+        automata.addState('C', 50, 50, false, true);
+        automata.addTransition('a', 'A', 'B', {
+            input: 'ε',
+            output: ['A']
+        });
+        automata.addTransition('b', 'B', 'C', {
+            input: 'A',
+            output: ['B']
+        });
+
+        AutomataOperations.kleeneStar(automata, new Set([
+            automata.getState("C").data.id
+        ]), new Set([
+            automata.getState("A").data.id
+        ]));
+
+        [
+            ['abab', Outcome.ACCEPT],
+            ['ababab', Outcome.ACCEPT],
+            ['abb', Outcome.REJECT],
+            ['aab', Outcome.REJECT]
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1], "Failed " + testCase[0]);
         });
     });
 });
