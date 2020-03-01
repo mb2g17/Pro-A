@@ -44,14 +44,14 @@ export default class PushdownAutomata extends Automata {
 
     protected applyTransition(srcConfig: PushdownAutomataConfig, edgeID: number, epsilonMove: boolean): PushdownAutomataConfig | null {
         // If one of these conditions is true, do the transition
-        const stackSymbol = this.data[edgeID].data.input === srcConfig.stack[0];
+        const stackSymbol = this.data[edgeID].data.input === srcConfig.stack[srcConfig.stack.length - 1];
         const emptyStack = this.data[edgeID].data.input === '⊥' && srcConfig.stack.length === 0;
         const nullSymbol = this.data[edgeID].data.input === 'ε';
         if (stackSymbol || emptyStack || nullSymbol) {
             // Pops element off stack, then push output stack symbols
             let newStack = srcConfig.stack;
             if (stackSymbol)
-                newStack = newStack.slice(1);
+                newStack = newStack.slice(0, newStack.length - 1);
             newStack = newStack.concat(this.data[edgeID].data.output);
 
             // Gets target state ID and target state
