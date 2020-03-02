@@ -1,6 +1,6 @@
 TODO:
 - add validation to automata operations
-- validate no weird unicode characters in the input (only letters allowed)
+- validate no weird unicode characters in the input (only letters and numbers allowed)
 
 - reorder tabs
 
@@ -29,8 +29,8 @@ TODO:
 
 
 IN PROGRESS:
-- add 'uppercase' turing machine write symbol (↑)
-- add 'lowercase' turing machine write symbol (↓)
+- add 'circled' turing machine write symbol (⦿)
+- add 'uncircled' turing machine write symbol (⦻)
 - add 'do not move' or 'stay' turing machine direction (S)
 
 - make automata operations support TM

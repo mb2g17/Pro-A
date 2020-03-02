@@ -10,6 +10,6 @@ export class AutomataCharacters {
     public static readonly NonEmptySymbol = '■';
 
     public static readonly WriteNothingSymbol = '☒';
-    public static readonly UppercaseSymbol = '↑';
-    public static readonly LowercaseSymbol = '↓';
+    public static readonly CircleSymbol = '⦿';
+    public static readonly UncircleSymbol = '⦻';
 }
