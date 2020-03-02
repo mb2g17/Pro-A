@@ -92,7 +92,7 @@
                 <b-form-group :label="`Direction: ${tmState.direction}`">
                     <b-form-radio-group
                             v-model="tmState.direction"
-                            :options="[{text: 'L(eft)', value: 'L'}, {text: 'R(ight)', value: 'R'}]"
+                            :options="[{text: 'L(eft)', value: 'L'}, {text: 'S(tay)', value: 'S'}, {text: 'R(ight)', value: 'R'}]"
                             buttons
                             button-variant="outline-primary"
                             class="w-100"

@@ -23,6 +23,7 @@ describe('FiniteAutomata.ts', () => {
         automata.addTransition('a', 'A', 'B');
         automata.setInput('aa');
         automata.step();
+        automata.step();
 
         // Checks that the config input is now 'a'
         automata.getCurrentConfigs().forEach(config => {

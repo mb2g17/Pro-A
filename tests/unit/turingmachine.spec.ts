@@ -34,6 +34,7 @@ describe('TuringMachine.ts', () => {
         automata.setInput('ab');
         automata.step();
         automata.step();
+        automata.step();
         assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
 
@@ -355,6 +356,32 @@ describe('TuringMachine.ts', () => {
         });
 
         automata.setInput('①②③ⒶⒷⒸⓐⓑⓒ');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+    });
+
+    it('can decide not to move the head', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, true);
+
+        automata.addTransition('a', 's1', 's1', {
+            writeTapeSymbol: 'b',
+            direction: 'S',
+        });
+        automata.addTransition('b', 's1', 's1', {
+            writeTapeSymbol: 'c',
+            direction: 'S',
+        });
+        automata.addTransition('c', 's1', 's1', {
+            writeTapeSymbol: 'd',
+            direction: 'S',
+        });
+        automata.addTransition('d', 's1', 's2', {
+            writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+            direction: 'S',
+        });
+
+        automata.setInput('a');
         automata.simulate();
         assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });

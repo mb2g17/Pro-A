@@ -33,6 +33,7 @@ describe('PushdownAutomata.ts', () => {
         automata.setInput('ab');
         automata.step();
         automata.step();
+        automata.step();
         assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
 
@@ -50,6 +51,7 @@ describe('PushdownAutomata.ts', () => {
         });
         automata.acceptByEmptyStack = true;
         automata.setInput('ab');
+        automata.step();
         automata.step();
         automata.step();
         assert.equal(automata.getOutcome(), Outcome.ACCEPT);

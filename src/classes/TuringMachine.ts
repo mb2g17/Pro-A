@@ -3,7 +3,6 @@ import {Outcome} from "@/classes/Outcome";
 import TuringMachineTape from "@/classes/TuringMachineTape";
 import TuringMachineConfig from "@/classes/TuringMachineConfig";
 import Vue from "vue";
-import PushdownAutomataConfig from "@/classes/PushdownAutomataConfig";
 import {AutomataCharacters} from '@/classes/AutomataCharacters';
 import {Circle} from '@/classes/Circle';
 
@@ -43,7 +42,7 @@ export default class TuringMachine extends Automata {
 
         /* Gets payload info
          * writeTapeSymbol: the symbol to write on the tape
-         * direction: L to go left or R to go right
+         * direction: L to go left, R to go right, S to stay
         */
         let {writeTapeSymbol, direction} = payload;
 
@@ -118,7 +117,7 @@ export default class TuringMachine extends Automata {
         // Make tape index go left or right
         if (this.data[edgeID].data.direction === 'L')
             srcTapeIndex--;
-        else
+        else if (this.data[edgeID].data.direction === 'R')
             srcTapeIndex++;
 
         // Gets target state ID and target state
