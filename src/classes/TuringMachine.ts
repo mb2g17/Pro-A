@@ -25,6 +25,11 @@ export default class TuringMachine extends Automata {
     }
 
     addTransition(symbol: string, source: string, target: string, payload: any): void {
+        const nonEmptySymbol: boolean = symbol === '■';
+        // If transition looks for non-empty symbol, disguise it as an epsilon move
+        if (nonEmptySymbol)
+            symbol = 'ε';
+
         super.addTransition(symbol, source, target, payload);
 
         /* Gets payload info
@@ -41,8 +46,8 @@ export default class TuringMachine extends Automata {
             data: {
                 ...this.data[id].data,
                 writeTapeSymbol, direction,
-                readTapeSymbol: symbol,
-                label: symbol + " ; " + writeTapeSymbol + " , " + direction
+                readTapeSymbol: nonEmptySymbol ? '■' : symbol,
+                label: (nonEmptySymbol ? '■' : symbol) + " ; " + writeTapeSymbol + " , " + direction
             },
         });
     }
@@ -70,8 +75,11 @@ export default class TuringMachine extends Automata {
      * @returns the new config of the TM
      */
     protected applyTransition(srcConfig: TuringMachineConfig, edgeID: number, epsilonMove: boolean): TuringMachineConfig | null {
-        // Checks if the selected tape symbol is the transition symbol (or if it's an epsilon move)
-        if (srcConfig.getInputSymbol() !== this.data[edgeID].data.readTapeSymbol && !epsilonMove)
+        const nonEmptySymbol: boolean = this.data[edgeID].data.readTapeSymbol === '■';
+
+        // Quit if...
+        if ((nonEmptySymbol && srcConfig.getInputSymbol() === '□') || // We're looking for non-empty symbol and we find empty symbol
+            (srcConfig.getInputSymbol() !== this.data[edgeID].data.readTapeSymbol && !epsilonMove)) // Selected tape symbol is not the transition symbol (as long as it's not an epsilon move)
             return null;
 
         // Gets src state info
@@ -88,7 +96,7 @@ export default class TuringMachine extends Automata {
 
         // Make tape index go left or right
         if (this.data[edgeID].data.direction == "L")
-            srcTapeIndex = srcTapeIndex == 0 ? srcTapeIndex : srcTapeIndex - 1;
+            srcTapeIndex--;
         else
             srcTapeIndex++;
 

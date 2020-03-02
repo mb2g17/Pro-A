@@ -1,12 +1,11 @@
 import {assert} from 'chai';
 import Automata from '@/classes/Automata';
-import FiniteAutomata from '@/classes/FiniteAutomata';
 import {Outcome} from '@/classes/Outcome';
-import PushdownAutomata from "@/classes/PushdownAutomata";
-import TuringMachine from "@/classes/TuringMachine";
-import TuringMachineTape from "@/classes/TuringMachineTape";
-import TuringMachineConfig from "@/classes/TuringMachineConfig";
+import TuringMachine from '@/classes/TuringMachine';
+import TuringMachineTape from '@/classes/TuringMachineTape';
+import TuringMachineConfig from '@/classes/TuringMachineConfig';
 import deserialize from '@/classes/AutomataDeserializer';
+import {AutomataCharacters} from '@/classes/AutomataCharacters';
 
 /**
  * Tests the class TuringMachine.ts
@@ -259,5 +258,23 @@ describe('TuringMachine.ts', () => {
             newAutomata.simulate();
             assert.equal(newAutomata.getOutcome(), testCase[1]);
         });
+    });
+
+    it('can seek non-empty tape symbols', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, true);
+
+        automata.addTransition(AutomataCharacters.NonEmptySymbol, 's1', 's1', {
+            writeTapeSymbol: 'a',
+            direction: 'R',
+        });
+        automata.addTransition(AutomataCharacters.EmptySymbol, 's1', 's2', {
+            writeTapeSymbol: 'a',
+            direction: 'R',
+        });
+
+        automata.setInput('abcdefghijklmnopqrstuvwxyz');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
 });

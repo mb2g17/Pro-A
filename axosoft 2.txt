@@ -1,6 +1,6 @@
 TODO:
 - add validation to automata operations
-- validate no weird unicode characters in the input
+- validate no weird unicode characters in the input (only letters allowed)
 
 - reorder tabs
 
@@ -9,21 +9,18 @@ TODO:
 
 - change config table to allow stack trace
 - make nodes light up in animation
+- colour code the configurations
 
 - make filled buttons and outline buttons consistent in the menus
 
 - add controls to change the size of loop transitions
 
+- add ability to add labels to state folds
+
 - make 'delete' delete all objects in your selection, not just the one you clicked on
 - make 'alt-click' also select transitions
 
-- make automata operations support TM
-- add test cases for TM automata operations
-- add 'non-empty symbol' turing machine read symbol
-- add 'write nothing' turing machine write symbol
-- add 'do not move' turing machine direction
-- make transition symbols into words, not just letters
-
+- add "comments" to automata screen
 
 - BUG: event handlers are still activated even when automata tab is closed
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
@@ -32,3 +29,10 @@ TODO:
 
 
 IN PROGRESS:
+- add 'write nothing' turing machine write symbol (☒)
+- add 'uppercase' turing machine write symbol (↑)
+- add 'lowercase' turing machine write symbol (↓)
+- add 'do not move' or 'stay' turing machine direction (S)
+
+- make automata operations support TM
+- add test cases for TM automata operations

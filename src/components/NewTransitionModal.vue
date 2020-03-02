@@ -10,13 +10,16 @@
         <b-form @submit="">
             <!-- Transition symbol -->
             <b-form-group :label="`Transition symbol: ${transitionSymbol}`">
-                <b-form-input v-model="inputtedTransitionSymbol" placeholder="a" :disabled="isEpsilonMove || tmState.isEmptySymbol"></b-form-input>
+                <b-form-input v-model="inputtedTransitionSymbol" placeholder="a"
+                              :disabled="isEpsilonMove || tmState.isEmptySymbol || tmState.isNonEmptySymbol"
+                ></b-form-input>
             </b-form-group>
 
             <!-- Special transition symbols -->
             <b-form-group>
                 <b-form-checkbox v-model="isEpsilonMove">Epsilon move</b-form-checkbox>
                 <b-form-checkbox v-model="tmState.isEmptySymbol" v-if="automataType === 'TM'">Empty symbol</b-form-checkbox>
+                <b-form-checkbox v-model="tmState.isNonEmptySymbol" v-if="automataType === 'TM'">Non-empty symbol</b-form-checkbox>
             </b-form-group>
 
             <!-- Pushdown automata -->
@@ -150,6 +153,7 @@
         /** State of inputs if it's a TM */
         private tmState: any = {
             isEmptySymbol: false,
+            isNonEmptySymbol: false,
             isWriteEmptySymbol: false,
             symbolToWrite: '',
             direction: 'L'
@@ -185,6 +189,9 @@
 
             if (this.tmState.isEmptySymbol)
                 return '□';
+
+            if (this.tmState.isNonEmptySymbol)
+                return '■';
 
             // Default value
             if (this.inputtedTransitionSymbol)
@@ -296,7 +303,14 @@
                     this.pdaState.inputtedInputStackSymbol = transition.input;
                 this.pdaState.inputtedOutputStackSymbols = transition.output;
             } else if (this.automata instanceof TuringMachine) {
-                this.tmState.isEmptySymbol = transition.symbol === "□";
+                this.tmState.isEmptySymbol = transition.readTapeSymbol === "□";
+
+                // Because non-empty are technically epsilon moves, we need to deselect flag
+                if (transition.readTapeSymbol === "■") {
+                    this.tmState.isNonEmptySymbol = true;
+                    this.isEpsilonMove = false;
+                }
+
                 this.$set(this.tmState, "isWriteEmptySymbol", transition.writeTapeSymbol === "□");
                 if (!this.tmState.isWriteEmptySymbol)
                     this.tmState.symbolToWrite = transition.writeTapeSymbol;
@@ -324,6 +338,7 @@
             };
             this.tmState = {
                 isEmptySymbol: false,
+                isNonEmptySymbol: false,
                 symbolToWrite: '',
                 direction: 'L'
             };
@@ -359,14 +374,26 @@
 
         @Watch('isEpsilonMove')
         private onIsEpsilonMoveChange(val: any, oldVal: any) {
-            if (val)
+            if (val) {
                 this.tmState.isEmptySymbol = false;
+                this.tmState.isNonEmptySymbol = false;
+            }
         }
 
         @Watch('tmState.isEmptySymbol')
         private onIsEmptySymbolChange(val: any, oldVal: any) {
-            if (val)
+            if (val) {
                 this.isEpsilonMove = false;
+                this.tmState.isNonEmptySymbol = false;
+            }
+        }
+
+        @Watch('tmState.isNonEmptySymbol')
+        private onIsNonEmptySymbolChange(val: any, oldVal: any) {
+            if (val) {
+                this.isEpsilonMove = false;
+                this.tmState.isEmptySymbol = false;
+            }
         }
 
         @Watch('pdaState.isEmptyStackSymbol')
