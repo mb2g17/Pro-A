@@ -9,7 +9,7 @@ export class Circle {
      */
     public static circle(char: string): string {
         // If this is already circled, return the same char
-        if (char.charCodeAt(0) >= 9312)
+        if (this.isCircled(char))
             return char;
 
         // If it's zero
@@ -43,7 +43,7 @@ export class Circle {
         const charCode: number = char.charCodeAt(0);
 
         // If this is already uncircled, return the same char
-        if (charCode < 9312)
+        if (!this.isCircled(char))
             return char;
 
         // If it's zero
@@ -65,5 +65,14 @@ export class Circle {
         // If it's none, return nothing
         else
             return "";
+    }
+
+    /**
+     * Checks if a character is circled
+     * @param char - the character to check if its circled
+     * @returns true if char is circled, false if not
+     */
+    public static isCircled(char: string): boolean {
+        return char.charCodeAt(0) >= 9312 && char.charCodeAt(0) <= 9450;
     }
 }

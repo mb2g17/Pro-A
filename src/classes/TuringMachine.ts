@@ -28,9 +28,14 @@ export default class TuringMachine extends Automata {
 
     addTransition(symbol: string, source: string, target: string, payload: any): void {
         const nonEmptySymbol: boolean = symbol === AutomataCharacters.NonEmptySymbol;
-        // If transition looks for non-empty symbol, disguise it as an epsilon move
-        if (nonEmptySymbol)
+        const circleSymbol: boolean = symbol === AutomataCharacters.CircleSymbol;
+        // If transition looks for non-empty symbol or circle symbol, disguise it as an epsilon move
+        if (nonEmptySymbol || circleSymbol) {
             symbol = AutomataCharacters.Epsilon;
+        }
+
+        const readTapeSymbol = nonEmptySymbol ? AutomataCharacters.NonEmptySymbol :
+            circleSymbol ? AutomataCharacters.CircleSymbol : symbol;
 
         super.addTransition(symbol, source, target, payload);
 
@@ -47,9 +52,8 @@ export default class TuringMachine extends Automata {
         Vue.set(this.data, id, {
             data: {
                 ...this.data[id].data,
-                writeTapeSymbol, direction,
-                readTapeSymbol: nonEmptySymbol ? AutomataCharacters.NonEmptySymbol : symbol,
-                label: (nonEmptySymbol ? AutomataCharacters.NonEmptySymbol : symbol) + " ; " + writeTapeSymbol + " , " + direction
+                writeTapeSymbol, direction, readTapeSymbol,
+                label: readTapeSymbol + ' ; ' + writeTapeSymbol + ' , ' + direction,
             },
         });
     }
@@ -78,9 +82,11 @@ export default class TuringMachine extends Automata {
      */
     protected applyTransition(srcConfig: TuringMachineConfig, edgeID: number, epsilonMove: boolean): TuringMachineConfig | null {
         const nonEmptySymbol: boolean = this.data[edgeID].data.readTapeSymbol === AutomataCharacters.NonEmptySymbol;
+        const circledSymbol: boolean = this.data[edgeID].data.readTapeSymbol === AutomataCharacters.CircleSymbol;
 
         // Quit if...
         if ((nonEmptySymbol && srcConfig.getInputSymbol() === AutomataCharacters.EmptySymbol) || // We're looking for non-empty symbol and we find empty symbol
+            (circledSymbol && !Circle.isCircled(srcConfig.getInputSymbol())) || // We're looking for circled symbols and we find an uncircled symbol
             (srcConfig.getInputSymbol() !== this.data[edgeID].data.readTapeSymbol && !epsilonMove)) // Selected tape symbol is not the transition symbol (as long as it's not an epsilon move)
             return null;
 

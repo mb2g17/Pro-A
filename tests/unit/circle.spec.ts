@@ -96,4 +96,47 @@ describe('Circle.ts', () => {
         assert.equal(Circle.uncircle('o'), 'o');
         assert.equal(Circle.uncircle('z'), 'z');
     });
+
+    it('can check if characters are circled or not', () => {
+        // Numbers
+        assert.isTrue(Circle.isCircled('①'));
+        assert.isTrue(Circle.isCircled('④'));
+        assert.isTrue(Circle.isCircled('⑨'));
+        assert.isFalse(Circle.isCircled('3'));
+        assert.isFalse(Circle.isCircled('5'));
+        assert.isFalse(Circle.isCircled('8'));
+
+        // Upper-case
+        assert.isTrue(Circle.isCircled('Ⓐ'));
+        assert.isTrue(Circle.isCircled('Ⓓ'));
+        assert.isTrue(Circle.isCircled('Ⓙ'));
+        assert.isTrue(Circle.isCircled('Ⓣ'));
+        assert.isTrue(Circle.isCircled('Ⓩ'));
+        assert.isFalse(Circle.isCircled('A'));
+        assert.isFalse(Circle.isCircled('E'));
+        assert.isFalse(Circle.isCircled('R'));
+        assert.isFalse(Circle.isCircled('Q'));
+        assert.isFalse(Circle.isCircled('Z'));
+
+        // Lower-case
+        assert.isTrue(Circle.isCircled('ⓐ'));
+        assert.isTrue(Circle.isCircled('ⓑ'));
+        assert.isTrue(Circle.isCircled('ⓕ'));
+        assert.isTrue(Circle.isCircled('ⓟ'));
+        assert.isTrue(Circle.isCircled('ⓩ'));
+        assert.isFalse(Circle.isCircled('a'));
+        assert.isFalse(Circle.isCircled('c'));
+        assert.isFalse(Circle.isCircled('h'));
+        assert.isFalse(Circle.isCircled('o'));
+        assert.isFalse(Circle.isCircled('z'));
+
+        // Obscure characters
+        assert.isFalse(Circle.isCircled(AutomataCharacters.Epsilon));
+        assert.isFalse(Circle.isCircled(AutomataCharacters.EmptyStackSymbol));
+        assert.isFalse(Circle.isCircled(AutomataCharacters.EmptySymbol));
+        assert.isFalse(Circle.isCircled(AutomataCharacters.NonEmptySymbol));
+        assert.isFalse(Circle.isCircled(AutomataCharacters.WriteNothingSymbol));
+        assert.isFalse(Circle.isCircled(AutomataCharacters.CircleSymbol));
+        assert.isFalse(Circle.isCircled(AutomataCharacters.UncircleSymbol));
+    });
 });

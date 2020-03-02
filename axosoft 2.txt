@@ -1,6 +1,5 @@
 TODO:
 - add validation to automata operations
-- validate no weird unicode characters in the input (only letters and numbers allowed)
 
 - reorder tabs
 
@@ -29,8 +28,9 @@ TODO:
 
 
 IN PROGRESS:
-- add 'circled' read symbol (⦿)
+- add 'uncircled' read symbol
 - add 'do not move' or 'stay' turing machine direction (S)
+- validate no weird unicode characters in the input (only letters and numbers allowed)
 
 - make automata operations support TM
 - add test cases for TM automata operations
