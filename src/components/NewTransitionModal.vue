@@ -11,7 +11,7 @@
             <!-- Transition symbol -->
             <b-form-group :label="`Transition symbol: ${transitionSymbol}`">
                 <b-form-input v-model="inputtedTransitionSymbol" placeholder="a"
-                              :disabled="isEpsilonMove || tmState.isEmptySymbol || tmState.isNonEmptySymbol || tmState.isCircledSymbol"
+                              :disabled="isEpsilonMove || tmState.isEmptySymbol || tmState.isNonEmptySymbol || tmState.isCircledSymbol || tmState.isUncircledSymbol"
                 ></b-form-input>
             </b-form-group>
 
@@ -21,6 +21,7 @@
                 <b-form-checkbox v-model="tmState.isEmptySymbol" v-if="automataType === 'TM'">Empty symbol</b-form-checkbox>
                 <b-form-checkbox v-model="tmState.isNonEmptySymbol" v-if="automataType === 'TM'">Non-empty symbol</b-form-checkbox>
                 <b-form-checkbox v-model="tmState.isCircledSymbol" v-if="automataType === 'TM'">Circled symbol</b-form-checkbox>
+                <b-form-checkbox v-model="tmState.isUncircledSymbol" v-if="automataType === 'TM'">Uncircled symbol</b-form-checkbox>
             </b-form-group>
 
             <!-- Pushdown automata -->
@@ -162,6 +163,7 @@
             isEmptySymbol: false,
             isNonEmptySymbol: false,
             isCircledSymbol: false,
+            isUncircledSymbol: false,
 
             isWriteEmptySymbol: false,
             isWriteNothing: false,
@@ -208,6 +210,9 @@
 
             if (this.tmState.isCircledSymbol)
                 return AutomataCharacters.CircleSymbol;
+
+            if (this.tmState.isUncircledSymbol)
+                return AutomataCharacters.UncircleSymbol;
 
             // Default value
             if (this.inputtedTransitionSymbol)
@@ -336,6 +341,12 @@
                     this.isEpsilonMove = false;
                 }
 
+                // Because uncircled symbols are technically epsilon moves, we need to deselect flag
+                if (transition.readTapeSymbol === AutomataCharacters.UncircleSymbol) {
+                    this.tmState.isUncircledSymbol = true;
+                    this.isEpsilonMove = false;
+                }
+
                 this.$set(this.tmState, "isWriteEmptySymbol", transition.writeTapeSymbol === AutomataCharacters.EmptySymbol);
                 this.$set(this.tmState, "isWriteNothing", transition.writeTapeSymbol === AutomataCharacters.WriteNothingSymbol);
                 this.$set(this.tmState, "isCircle", transition.writeTapeSymbol === AutomataCharacters.CircleSymbol);
@@ -371,6 +382,7 @@
                 isEmptySymbol: false,
                 isNonEmptySymbol: false,
                 isCircledSymbol: false,
+                isUncircledSymbol: false,
                 isWriteEmptySymbol: false,
                 isWriteNothing: false,
                 isCircle: false,
@@ -418,6 +430,7 @@
                 this.tmState.isEmptySymbol = false;
                 this.tmState.isNonEmptySymbol = false;
                 this.tmState.isCircledSymbol = false;
+                this.tmState.isUncircledSymbol = false;
             }
         }
 
@@ -427,6 +440,7 @@
                 this.isEpsilonMove = false;
                 this.tmState.isNonEmptySymbol = false;
                 this.tmState.isCircledSymbol = false;
+                this.tmState.isUncircledSymbol = false;
             }
         }
 
@@ -436,6 +450,7 @@
                 this.isEpsilonMove = false;
                 this.tmState.isEmptySymbol = false;
                 this.tmState.isCircledSymbol = false;
+                this.tmState.isUncircledSymbol = false;
             }
         }
 
@@ -445,6 +460,17 @@
                 this.isEpsilonMove = false;
                 this.tmState.isEmptySymbol = false;
                 this.tmState.isNonEmptySymbol = false;
+                this.tmState.isUncircledSymbol = false;
+            }
+        }
+
+        @Watch('tmState.isUncircledSymbol')
+        private onIsUncircledSymbolChange(val: any, oldVal: any) {
+            if (val) {
+                this.isEpsilonMove = false;
+                this.tmState.isEmptySymbol = false;
+                this.tmState.isNonEmptySymbol = false;
+                this.tmState.isCircledSymbol = false;
             }
         }
 

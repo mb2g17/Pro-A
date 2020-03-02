@@ -75,4 +75,14 @@ export class Circle {
     public static isCircled(char: string): boolean {
         return char.charCodeAt(0) >= 9312 && char.charCodeAt(0) <= 9450;
     }
+
+    /**
+     * Checks if a character is uncircled
+     * @param char - the character to check if its uncircled
+     * @returns true if char is uncircled, false if not
+     */
+    public static isUncircled(char: string): boolean {
+        return (!!+char) || // Numeric
+                !!char.match(/[a-z]/i); // Letter
+    }
 }

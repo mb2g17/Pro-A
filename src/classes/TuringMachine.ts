@@ -29,12 +29,14 @@ export default class TuringMachine extends Automata {
     addTransition(symbol: string, source: string, target: string, payload: any): void {
         const nonEmptySymbol: boolean = symbol === AutomataCharacters.NonEmptySymbol;
         const circleSymbol: boolean = symbol === AutomataCharacters.CircleSymbol;
+        const uncircleSymbol: boolean = symbol === AutomataCharacters.UncircleSymbol;
         // If transition looks for non-empty symbol or circle symbol, disguise it as an epsilon move
-        if (nonEmptySymbol || circleSymbol) {
+        if (nonEmptySymbol || circleSymbol || uncircleSymbol) {
             symbol = AutomataCharacters.Epsilon;
         }
 
         const readTapeSymbol = nonEmptySymbol ? AutomataCharacters.NonEmptySymbol :
+            uncircleSymbol ? AutomataCharacters.UncircleSymbol :
             circleSymbol ? AutomataCharacters.CircleSymbol : symbol;
 
         super.addTransition(symbol, source, target, payload);
@@ -83,10 +85,12 @@ export default class TuringMachine extends Automata {
     protected applyTransition(srcConfig: TuringMachineConfig, edgeID: number, epsilonMove: boolean): TuringMachineConfig | null {
         const nonEmptySymbol: boolean = this.data[edgeID].data.readTapeSymbol === AutomataCharacters.NonEmptySymbol;
         const circledSymbol: boolean = this.data[edgeID].data.readTapeSymbol === AutomataCharacters.CircleSymbol;
+        const uncircledSymbol: boolean = this.data[edgeID].data.readTapeSymbol === AutomataCharacters.UncircleSymbol;
 
         // Quit if...
         if ((nonEmptySymbol && srcConfig.getInputSymbol() === AutomataCharacters.EmptySymbol) || // We're looking for non-empty symbol and we find empty symbol
             (circledSymbol && !Circle.isCircled(srcConfig.getInputSymbol())) || // We're looking for circled symbols and we find an uncircled symbol
+            (uncircledSymbol && !Circle.isUncircled(srcConfig.getInputSymbol())) || // We're looking for uncircled symbols and we find something that's not un-circled
             (srcConfig.getInputSymbol() !== this.data[edgeID].data.readTapeSymbol && !epsilonMove)) // Selected tape symbol is not the transition symbol (as long as it's not an epsilon move)
             return null;
 
