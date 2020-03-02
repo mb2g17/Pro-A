@@ -8,6 +8,10 @@ export class Circle {
      * @returns the circled character
      */
     public static circle(char: string): string {
+        // If this is already circled, return the same char
+        if (char.charCodeAt(0) >= 9312)
+            return char;
+
         // If it's zero
         if (char === '0')
             return String.fromCharCode(9450);
@@ -37,6 +41,10 @@ export class Circle {
     public static uncircle(char: string): string {
         // Gets char code
         const charCode: number = char.charCodeAt(0);
+
+        // If this is already uncircled, return the same char
+        if (charCode < 9312)
+            return char;
 
         // If it's zero
         if (charCode === 9450)

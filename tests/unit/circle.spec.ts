@@ -54,4 +54,46 @@ describe('Circle.ts', () => {
         assert.equal(Circle.uncircle('ⓞ'), 'o');
         assert.equal(Circle.uncircle('ⓩ'), 'z');
     });
+
+    it('returns the same character if you re-circle circled characters', () => {
+        // Numbers
+        assert.equal(Circle.circle('①'), '①');
+        assert.equal(Circle.circle('④'), '④');
+        assert.equal(Circle.circle('⑨'), '⑨');
+
+        // Upper-case
+        assert.equal(Circle.circle('Ⓐ'), 'Ⓐ');
+        assert.equal(Circle.circle('Ⓓ'), 'Ⓓ');
+        assert.equal(Circle.circle('Ⓙ'), 'Ⓙ');
+        assert.equal(Circle.circle('Ⓣ'), 'Ⓣ');
+        assert.equal(Circle.circle('Ⓩ'), 'Ⓩ');
+
+        // Lower-case
+        assert.equal(Circle.circle('ⓐ'), 'ⓐ');
+        assert.equal(Circle.circle('ⓑ'), 'ⓑ');
+        assert.equal(Circle.circle('ⓕ'), 'ⓕ');
+        assert.equal(Circle.circle('ⓟ'), 'ⓟ');
+        assert.equal(Circle.circle('ⓩ'), 'ⓩ');
+    });
+
+    it('returns the same character if you uncircle normal characters', () => {
+        // Numbers
+        assert.equal(Circle.uncircle('1'), '1');
+        assert.equal(Circle.uncircle('8'), '8');
+        assert.equal(Circle.uncircle('9'), '9');
+
+        // Upper-case
+        assert.equal(Circle.uncircle('A'), 'A');
+        assert.equal(Circle.uncircle('E'), 'E');
+        assert.equal(Circle.uncircle('R'), 'R');
+        assert.equal(Circle.uncircle('Q'), 'Q');
+        assert.equal(Circle.uncircle('Z'), 'Z');
+
+        // Lower-case
+        assert.equal(Circle.uncircle('a'), 'a');
+        assert.equal(Circle.uncircle('c'), 'c');
+        assert.equal(Circle.uncircle('h'), 'h');
+        assert.equal(Circle.uncircle('o'), 'o');
+        assert.equal(Circle.uncircle('z'), 'z');
+    });
 });

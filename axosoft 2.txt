@@ -29,8 +29,7 @@ TODO:
 
 
 IN PROGRESS:
-- add 'circled' turing machine write symbol (⦿)
-- add 'uncircled' turing machine write symbol (⦻)
+- add 'circled' read symbol (⦿)
 - add 'do not move' or 'stay' turing machine direction (S)
 
 - make automata operations support TM

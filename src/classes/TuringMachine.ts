@@ -5,6 +5,7 @@ import TuringMachineConfig from "@/classes/TuringMachineConfig";
 import Vue from "vue";
 import PushdownAutomataConfig from "@/classes/PushdownAutomataConfig";
 import {AutomataCharacters} from '@/classes/AutomataCharacters';
+import {Circle} from '@/classes/Circle';
 
 /**
  * Implementation of a Turing machine
@@ -91,8 +92,14 @@ export default class TuringMachine extends Automata {
 
         // If there isn't a "write nothing" symbol (if we have to write something)
         if (this.data[edgeID].data.writeTapeSymbol !== AutomataCharacters.WriteNothingSymbol) {
+            // If we want to circle
+            if (this.data[edgeID].data.writeTapeSymbol === AutomataCharacters.CircleSymbol)
+                newTape.write(srcTapeIndex, Circle.circle(srcConfig.getInputSymbol()));
+            // If we want to uncircle
+            else if (this.data[edgeID].data.writeTapeSymbol === AutomataCharacters.UncircleSymbol)
+                newTape.write(srcTapeIndex, Circle.uncircle(srcConfig.getInputSymbol()));
             // If write symbol is "empty", erase, otherwise write new symbol
-            if (this.data[edgeID].data.writeTapeSymbol === AutomataCharacters.EmptySymbol)
+            else if (this.data[edgeID].data.writeTapeSymbol === AutomataCharacters.EmptySymbol)
                 newTape.delete(srcTapeIndex);
             else
                 newTape.write(srcTapeIndex, this.data[edgeID].data.writeTapeSymbol);

@@ -74,7 +74,7 @@
                 <!-- Symbol to write -->
                 <b-form-group :label="`Symbol to write: ${payload.writeTapeSymbol}`">
                     <b-form-input v-model="tmState.symbolToWrite" placeholder="a"
-                                  :disabled="tmState.isWriteEmptySymbol || tmState.isWriteNothing"
+                                  :disabled="tmState.isWriteEmptySymbol || tmState.isWriteNothing || tmState.isCircle || tmState.isUncircle"
                     ></b-form-input>
                 </b-form-group>
 
@@ -82,6 +82,8 @@
                 <b-form-group>
                     <b-form-checkbox v-model="tmState.isWriteEmptySymbol">Empty symbol</b-form-checkbox>
                     <b-form-checkbox v-model="tmState.isWriteNothing">Write nothing</b-form-checkbox>
+                    <b-form-checkbox v-model="tmState.isCircle">Circled read symbol</b-form-checkbox>
+                    <b-form-checkbox v-model="tmState.isUncircle">Uncircled read symbol</b-form-checkbox>
                 </b-form-group>
 
                 <!-- Direction -->
@@ -161,6 +163,8 @@
 
             isWriteEmptySymbol: false,
             isWriteNothing: false,
+            isCircle: false,
+            isUncircle: false,
 
             symbolToWrite: '',
             direction: 'L'
@@ -238,6 +242,8 @@
                 return {
                     writeTapeSymbol: this.tmState.isWriteEmptySymbol ? AutomataCharacters.EmptySymbol :
                         this.tmState.isWriteNothing ? AutomataCharacters.WriteNothingSymbol :
+                        this.tmState.isCircle ? AutomataCharacters.CircleSymbol :
+                        this.tmState.isUncircle ? AutomataCharacters.UncircleSymbol :
                         this.tmState.symbolToWrite ? this.tmState.symbolToWrite : 'a',
                     direction: this.tmState.direction
                 };
@@ -321,8 +327,12 @@
 
                 this.$set(this.tmState, "isWriteEmptySymbol", transition.writeTapeSymbol === AutomataCharacters.EmptySymbol);
                 this.$set(this.tmState, "isWriteNothing", transition.writeTapeSymbol === AutomataCharacters.WriteNothingSymbol);
+                this.$set(this.tmState, "isCircle", transition.writeTapeSymbol === AutomataCharacters.CircleSymbol);
+                this.$set(this.tmState, "isUncircle", transition.writeTapeSymbol === AutomataCharacters.UncircleSymbol);
                 if (!this.tmState.isWriteEmptySymbol &&
-                    !this.tmState.isWriteNothing)
+                    !this.tmState.isWriteNothing &&
+                    !this.tmState.isCircle &&
+                    !this.tmState.isUncircle)
                     this.tmState.symbolToWrite = transition.writeTapeSymbol;
                 this.tmState.direction = transition.direction;
             }
@@ -351,6 +361,8 @@
                 isNonEmptySymbol: false,
                 isWriteEmptySymbol: false,
                 isWriteNothing: false,
+                isCircle: false,
+                isUncircle: false,
                 symbolToWrite: '',
                 direction: 'L'
             };
@@ -420,6 +432,8 @@
         private onIsWriteEmptySymbolChange(val: any, oldVal: any) {
             if (val) {
                 this.tmState.isWriteNothing = false;
+                this.tmState.isCircle = false;
+                this.tmState.isUncircle = false;
             }
         }
 
@@ -427,6 +441,26 @@
         private onIsWriteNothingChange(val: any, oldVal: any) {
             if (val) {
                 this.tmState.isWriteEmptySymbol = false;
+                this.tmState.isCircle = false;
+                this.tmState.isUncircle = false;
+            }
+        }
+
+        @Watch('tmState.isCircle')
+        private onIsCircleChange(val: any, oldVal: any) {
+            if (val) {
+                this.tmState.isWriteEmptySymbol = false;
+                this.tmState.isWriteNothing = false;
+                this.tmState.isUncircle = false;
+            }
+        }
+
+        @Watch('tmState.isUncircle')
+        private onIsUncircleChange(val: any, oldVal: any) {
+            if (val) {
+                this.tmState.isWriteEmptySymbol = false;
+                this.tmState.isWriteNothing = false;
+                this.tmState.isCircle = false;
             }
         }
 
