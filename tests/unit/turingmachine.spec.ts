@@ -304,4 +304,58 @@ describe('TuringMachine.ts', () => {
         automata.simulate();
         assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
+
+    it('can circle and read circled symbols', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, false);
+        automata.addState('s3', 10, 10, false, true);
+
+        automata.addTransition(AutomataCharacters.UncircleSymbol, 's1', 's1', {
+            writeTapeSymbol: AutomataCharacters.CircleSymbol,
+            direction: 'R',
+        });
+        automata.addTransition(AutomataCharacters.EmptySymbol, 's1', 's2', {
+            writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+            direction: 'L',
+        });
+        automata.addTransition(AutomataCharacters.CircleSymbol, 's2', 's2', {
+            writeTapeSymbol: AutomataCharacters.UncircleSymbol,
+            direction: 'L',
+        });
+        automata.addTransition(AutomataCharacters.EmptySymbol, 's2', 's3', {
+            writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+            direction: 'R',
+        });
+
+        automata.setInput('123abcABC');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+    });
+
+    it('can uncircle and read uncircled symbols', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, false);
+        automata.addState('s3', 10, 10, false, true);
+
+        automata.addTransition(AutomataCharacters.CircleSymbol, 's1', 's1', {
+            writeTapeSymbol: AutomataCharacters.UncircleSymbol,
+            direction: 'R',
+        });
+        automata.addTransition(AutomataCharacters.EmptySymbol, 's1', 's2', {
+            writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+            direction: 'L',
+        });
+        automata.addTransition(AutomataCharacters.UncircleSymbol, 's2', 's2', {
+            writeTapeSymbol: AutomataCharacters.CircleSymbol,
+            direction: 'L',
+        });
+        automata.addTransition(AutomataCharacters.EmptySymbol, 's2', 's3', {
+            writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+            direction: 'R',
+        });
+
+        automata.setInput('①②③ⒶⒷⒸⓐⓑⓒ');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+    });
 });
