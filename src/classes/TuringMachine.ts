@@ -4,6 +4,7 @@ import TuringMachineTape from "@/classes/TuringMachineTape";
 import TuringMachineConfig from "@/classes/TuringMachineConfig";
 import Vue from "vue";
 import PushdownAutomataConfig from "@/classes/PushdownAutomataConfig";
+import {AutomataCharacters} from '@/classes/AutomataCharacters';
 
 /**
  * Implementation of a Turing machine
@@ -25,10 +26,10 @@ export default class TuringMachine extends Automata {
     }
 
     addTransition(symbol: string, source: string, target: string, payload: any): void {
-        const nonEmptySymbol: boolean = symbol === '■';
+        const nonEmptySymbol: boolean = symbol === AutomataCharacters.NonEmptySymbol;
         // If transition looks for non-empty symbol, disguise it as an epsilon move
         if (nonEmptySymbol)
-            symbol = 'ε';
+            symbol = AutomataCharacters.Epsilon;
 
         super.addTransition(symbol, source, target, payload);
 
@@ -46,8 +47,8 @@ export default class TuringMachine extends Automata {
             data: {
                 ...this.data[id].data,
                 writeTapeSymbol, direction,
-                readTapeSymbol: nonEmptySymbol ? '■' : symbol,
-                label: (nonEmptySymbol ? '■' : symbol) + " ; " + writeTapeSymbol + " , " + direction
+                readTapeSymbol: nonEmptySymbol ? AutomataCharacters.NonEmptySymbol : symbol,
+                label: (nonEmptySymbol ? AutomataCharacters.NonEmptySymbol : symbol) + " ; " + writeTapeSymbol + " , " + direction
             },
         });
     }
@@ -75,10 +76,10 @@ export default class TuringMachine extends Automata {
      * @returns the new config of the TM
      */
     protected applyTransition(srcConfig: TuringMachineConfig, edgeID: number, epsilonMove: boolean): TuringMachineConfig | null {
-        const nonEmptySymbol: boolean = this.data[edgeID].data.readTapeSymbol === '■';
+        const nonEmptySymbol: boolean = this.data[edgeID].data.readTapeSymbol === AutomataCharacters.NonEmptySymbol;
 
         // Quit if...
-        if ((nonEmptySymbol && srcConfig.getInputSymbol() === '□') || // We're looking for non-empty symbol and we find empty symbol
+        if ((nonEmptySymbol && srcConfig.getInputSymbol() === AutomataCharacters.EmptySymbol) || // We're looking for non-empty symbol and we find empty symbol
             (srcConfig.getInputSymbol() !== this.data[edgeID].data.readTapeSymbol && !epsilonMove)) // Selected tape symbol is not the transition symbol (as long as it's not an epsilon move)
             return null;
 
@@ -88,14 +89,17 @@ export default class TuringMachine extends Automata {
         // Creates new tape
         const newTape: TuringMachineTape = new TuringMachineTape(srcTape);
 
-        // If write symbol is "empty", erase, otherwise write new symbol
-        if (this.data[edgeID].data.writeTapeSymbol === "□")
-            newTape.delete(srcTapeIndex);
-        else
-            newTape.write(srcTapeIndex, this.data[edgeID].data.writeTapeSymbol);
+        // If there isn't a "write nothing" symbol (if we have to write something)
+        if (this.data[edgeID].data.writeTapeSymbol !== AutomataCharacters.WriteNothingSymbol) {
+            // If write symbol is "empty", erase, otherwise write new symbol
+            if (this.data[edgeID].data.writeTapeSymbol === AutomataCharacters.EmptySymbol)
+                newTape.delete(srcTapeIndex);
+            else
+                newTape.write(srcTapeIndex, this.data[edgeID].data.writeTapeSymbol);
+        }
 
         // Make tape index go left or right
-        if (this.data[edgeID].data.direction == "L")
+        if (this.data[edgeID].data.direction === 'L')
             srcTapeIndex--;
         else
             srcTapeIndex++;

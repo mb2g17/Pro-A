@@ -4,6 +4,8 @@
 export class AutomataCharacters {
     public static readonly Epsilon = 'ε';
 
+    public static readonly EmptyStackSymbol = '⊥';
+
     public static readonly EmptySymbol = '□';
     public static readonly NonEmptySymbol = '■';
 

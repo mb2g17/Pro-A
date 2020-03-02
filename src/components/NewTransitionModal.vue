@@ -73,12 +73,15 @@
 
                 <!-- Symbol to write -->
                 <b-form-group :label="`Symbol to write: ${payload.writeTapeSymbol}`">
-                    <b-form-input v-model="tmState.symbolToWrite" placeholder="a" :disabled="tmState.isWriteEmptySymbol"></b-form-input>
+                    <b-form-input v-model="tmState.symbolToWrite" placeholder="a"
+                                  :disabled="tmState.isWriteEmptySymbol || tmState.isWriteNothing"
+                    ></b-form-input>
                 </b-form-group>
 
                 <!-- Special write symbols -->
                 <b-form-group>
                     <b-form-checkbox v-model="tmState.isWriteEmptySymbol">Empty symbol</b-form-checkbox>
+                    <b-form-checkbox v-model="tmState.isWriteNothing">Write nothing</b-form-checkbox>
                 </b-form-group>
 
                 <!-- Direction -->
@@ -115,6 +118,7 @@
     import FiniteAutomata from "@/classes/FiniteAutomata";
     import PushdownAutomata from "@/classes/PushdownAutomata";
     import TuringMachine from "@/classes/TuringMachine";
+    import {AutomataCharacters} from '@/classes/AutomataCharacters';
 
     /** The types of modes the modal can be in */
     export enum NewTransitionModalMode {
@@ -154,7 +158,10 @@
         private tmState: any = {
             isEmptySymbol: false,
             isNonEmptySymbol: false,
+
             isWriteEmptySymbol: false,
+            isWriteNothing: false,
+
             symbolToWrite: '',
             direction: 'L'
         };
@@ -229,7 +236,8 @@
                 };
             if (this.automataType === "TM")
                 return {
-                    writeTapeSymbol: this.tmState.isWriteEmptySymbol ? '□' :
+                    writeTapeSymbol: this.tmState.isWriteEmptySymbol ? AutomataCharacters.EmptySymbol :
+                        this.tmState.isWriteNothing ? AutomataCharacters.WriteNothingSymbol :
                         this.tmState.symbolToWrite ? this.tmState.symbolToWrite : 'a',
                     direction: this.tmState.direction
                 };
@@ -294,25 +302,27 @@
             };
 
             // Fills in data
-            this.isEpsilonMove = transition.symbol === "ε";
+            this.isEpsilonMove = transition.symbol === AutomataCharacters.Epsilon;
 
             if (this.automata instanceof PushdownAutomata) {
-                this.pdaState.isEmptyStackSymbol = transition.input === "⊥";
-                this.pdaState.isAnySymbol = transition.input === 'ε';
+                this.pdaState.isEmptyStackSymbol = transition.input === AutomataCharacters.EmptyStackSymbol;
+                this.pdaState.isAnySymbol = transition.input === AutomataCharacters.Epsilon;
                 if (!this.pdaState.isEmptyStackSymbol && !this.pdaState.isAnySymbol)
                     this.pdaState.inputtedInputStackSymbol = transition.input;
                 this.pdaState.inputtedOutputStackSymbols = transition.output;
             } else if (this.automata instanceof TuringMachine) {
-                this.tmState.isEmptySymbol = transition.readTapeSymbol === "□";
+                this.tmState.isEmptySymbol = transition.readTapeSymbol === AutomataCharacters.EmptySymbol;
 
                 // Because non-empty are technically epsilon moves, we need to deselect flag
-                if (transition.readTapeSymbol === "■") {
+                if (transition.readTapeSymbol === AutomataCharacters.NonEmptySymbol) {
                     this.tmState.isNonEmptySymbol = true;
                     this.isEpsilonMove = false;
                 }
 
-                this.$set(this.tmState, "isWriteEmptySymbol", transition.writeTapeSymbol === "□");
-                if (!this.tmState.isWriteEmptySymbol)
+                this.$set(this.tmState, "isWriteEmptySymbol", transition.writeTapeSymbol === AutomataCharacters.EmptySymbol);
+                this.$set(this.tmState, "isWriteNothing", transition.writeTapeSymbol === AutomataCharacters.WriteNothingSymbol);
+                if (!this.tmState.isWriteEmptySymbol &&
+                    !this.tmState.isWriteNothing)
                     this.tmState.symbolToWrite = transition.writeTapeSymbol;
                 this.tmState.direction = transition.direction;
             }
@@ -339,6 +349,8 @@
             this.tmState = {
                 isEmptySymbol: false,
                 isNonEmptySymbol: false,
+                isWriteEmptySymbol: false,
+                isWriteNothing: false,
                 symbolToWrite: '',
                 direction: 'L'
             };
@@ -372,6 +384,10 @@
             this.onAddClick();
         }
 
+        // ----------------
+        // --* Read symbols
+        // ----------------
+
         @Watch('isEpsilonMove')
         private onIsEpsilonMoveChange(val: any, oldVal: any) {
             if (val) {
@@ -395,6 +411,28 @@
                 this.tmState.isEmptySymbol = false;
             }
         }
+
+        // ----------------
+        // --* TM Write tape symbols
+        // ----------------
+
+        @Watch('tmState.isWriteEmptySymbol')
+        private onIsWriteEmptySymbolChange(val: any, oldVal: any) {
+            if (val) {
+                this.tmState.isWriteNothing = false;
+            }
+        }
+
+        @Watch('tmState.isWriteNothing')
+        private onIsWriteNothingChange(val: any, oldVal: any) {
+            if (val) {
+                this.tmState.isWriteEmptySymbol = false;
+            }
+        }
+
+        // ----------------
+        // --* PDA Input stack symbols
+        // ----------------
 
         @Watch('pdaState.isEmptyStackSymbol')
         private onIsEmptyStackSymbolChange(val: any, oldVal: any) {

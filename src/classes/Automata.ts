@@ -5,6 +5,7 @@ import AutomataConfig from '@/classes/AutomataConfig';
 import FiniteAutomata from "@/classes/FiniteAutomata";
 import AutomataMachineCache from "@/classes/AutomataMachineCache";
 import _ from "lodash";
+import {AutomataCharacters} from '@/classes/AutomataCharacters';
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -495,7 +496,7 @@ export default abstract class Automata {
             // Apply this transition for each epsilon target state
             for (const targetState of epsilonTargetStates) {
                 // Gets edge ID
-                const edgeID = this.cacheEdgeID['ε'][config.state][targetState];
+                const edgeID = this.cacheEdgeID[AutomataCharacters.Epsilon][config.state][targetState];
 
                 // Gets new config by applying transition
                 const newConfig = this.applyTransition(config, edgeID, true);

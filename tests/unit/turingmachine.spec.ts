@@ -277,4 +277,31 @@ describe('TuringMachine.ts', () => {
         automata.simulate();
         assert.equal(automata.getOutcome(), Outcome.ACCEPT);
     });
+
+    it('can decide not to write anything if the transition wishes', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, false);
+        automata.addState('s3', 10, 10, false, true);
+
+        automata.addTransition(AutomataCharacters.NonEmptySymbol, 's1', 's1', {
+            writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+            direction: 'R',
+        });
+        automata.addTransition(AutomataCharacters.EmptySymbol, 's1', 's2', {
+            writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+            direction: 'L',
+        });
+        automata.addTransition('a', 's2', 's2', {
+            writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+            direction: 'L',
+        });
+        automata.addTransition(AutomataCharacters.EmptySymbol, 's2', 's3', {
+            writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+            direction: 'R',
+        });
+
+        automata.setInput('aaaa');
+        automata.simulate();
+        assert.equal(automata.getOutcome(), Outcome.ACCEPT);
+    });
 });

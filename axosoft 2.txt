@@ -29,7 +29,6 @@ TODO:
 
 
 IN PROGRESS:
-- add 'write nothing' turing machine write symbol (☒)
 - add 'uppercase' turing machine write symbol (↑)
 - add 'lowercase' turing machine write symbol (↓)
 - add 'do not move' or 'stay' turing machine direction (S)
