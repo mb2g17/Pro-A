@@ -1,5 +1,6 @@
 TODO:
 - add validation to automata operations
+- validate no weird unicode characters in the input (only letters and numbers allowed)
 
 - reorder tabs
 
@@ -25,10 +26,9 @@ TODO:
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 - BUG: edge handles gets saved as their own objects when saving automata (also re-do saved automata)
 - BUG: when moving an edge using the edge editing thing, your selected edges do not update, making state folds error
+- BUG: double check alt+clicking and duplication, as well as deleting state with transitions attached to it
 
 
 IN PROGRESS:
-- validate no weird unicode characters in the input (only letters and numbers allowed)
-
 - make automata operations support TM
 - add test cases for TM automata operations

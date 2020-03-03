@@ -1,5 +1,7 @@
 import Automata from "@/classes/Automata";
 import PushdownAutomata from "@/classes/PushdownAutomata";
+import TuringMachine from "@/classes/TuringMachine";
+import {AutomataCharacters} from "@/classes/AutomataCharacters";
 
 /**
  * Class containing a bunch of automata operations to perform
@@ -42,12 +44,19 @@ export default class AutomataOperations {
         const midY: number = initialStates.reduce((total, currentValue, currentIndex, arr) =>
             automata.getStateById(currentValue).position.y + total, 0) / initialStates.length;
 
-        // If it's a PDA, add a payload
+        // Add a payload
         let payload: any = {};
         if (automata instanceof PushdownAutomata) {
             payload = {
-                input: 'ε',
+                input: AutomataCharacters.Epsilon,
                 output: []
+            };
+        }
+        if (automata instanceof TuringMachine) {
+            payload = {
+                readTapeSymbol: AutomataCharacters.Epsilon,
+                writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
+                direction: 'S'
             };
         }
 
