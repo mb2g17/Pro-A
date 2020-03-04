@@ -33,5 +33,7 @@ TODO:
 
 
 IN PROGRESS:
+- add in concat for TMs
+
 - make automata operations support TM
 - add test cases for TM automata operations

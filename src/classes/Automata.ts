@@ -6,6 +6,7 @@ import FiniteAutomata from "@/classes/FiniteAutomata";
 import AutomataMachineCache from "@/classes/AutomataMachineCache";
 import _ from "lodash";
 import {AutomataCharacters} from '@/classes/AutomataCharacters';
+import {AutomataAlphabetCache} from "@/classes/AutomataAlphabetCache";
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -28,6 +29,9 @@ export default abstract class Automata {
 
     /** Cache storing machines */
     protected cacheMachine: AutomataMachineCache = new AutomataMachineCache(this);
+
+    /** Cache storing alphabet */
+    protected cacheAlphabet: AutomataAlphabetCache = new AutomataAlphabetCache(this);
 
     /** Cytoscape data for all the graph objects */
     protected data: any = {};
@@ -181,8 +185,9 @@ export default abstract class Automata {
                     },
                 });
 
-                // Updates machine cache
+                // Updates cache
                 this.cacheMachine.addTransition(source, target);
+                this.cacheAlphabet.addTransition(source, target, symbol);
             }
         }
     }
@@ -227,8 +232,9 @@ export default abstract class Automata {
             this.cacheEdgeID[currentSymbol][newSourceName] = {};
         this.cacheEdgeID[currentSymbol][newSourceName][currentTargetName] = edgeID;
 
-        // Updates machine cache
+        // Updates cache
         this.cacheMachine.moveTransitionNewSourceState(oldSourceName, newSourceName, currentTargetName);
+        this.cacheAlphabet.changeSourceOfTransition(oldSourceName, newSourceName, currentTargetName, currentSymbol);
     }
 
     /**
@@ -252,6 +258,7 @@ export default abstract class Automata {
 
         // Updates machine cache
         this.cacheMachine.moveTransitionNewTargetState(currentSourceName, oldTargetName, newTargetName);
+        this.cacheAlphabet.changeTargetOfTransition(currentSourceName, oldTargetName, newTargetName, currentSymbol);
     }
 
     /**
@@ -291,8 +298,9 @@ export default abstract class Automata {
             // Deletes data entry
             delete this.data[id];
 
-            // Updates machine cache
+            // Updates cache
             this.cacheMachine.removeState(stateName);
+            this.cacheAlphabet.removeState(stateName);
         }
     }
 
@@ -320,8 +328,9 @@ export default abstract class Automata {
             // Deletes data entry
             delete this.data[id];
 
-            // Updates machine cache
+            // Updates cache
             this.cacheMachine.removeTransition(source, target, true);
+            this.cacheAlphabet.removeTransition(source, target, symbol);
         }
     }
 
@@ -621,6 +630,14 @@ export default abstract class Automata {
      */
     public getReachableFinalStates(initialState: string) : Set<string> {
         return this.cacheMachine.getReachableFinalStates(initialState);
+    }
+
+    /**
+     * Gets the alphabet of the machine belonging to this state
+     * @param state - the state to get the alphabet of
+     */
+    public getAlphabet(state: string) : Set<string> {
+        return this.cacheAlphabet.getAlphabet(state);
     }
 
     /**
