@@ -119,6 +119,13 @@ export default class AutomataPreview extends Vue {
 
             // If alt is held down, select the whole machine
             if (this.isAltDown && !this.isDoingMachineSelect) {
+                // --
+                const neighbourhood = this.cy.getElementById(id).components();
+                neighbourhood.forEach((item: any) => {
+                    console.log(item);
+                });
+                // --
+
                 this.isDoingMachineSelect = true;
                 this.selectedNodes.clear();
                 this.cy.$(`#${id}`).unselect();
@@ -174,8 +181,6 @@ export default class AutomataPreview extends Vue {
                     }
                 }
             }
-
-            // Gets x and y of parent
         });
 
         // When the user moves the mouse

@@ -587,7 +587,7 @@ export default abstract class Automata {
                         autoWidth: item.autoWidth,
                         autoHeight: item.autoHeight,
                         group: item.group,
-                        classes: item.classes
+                        classes: [...item.classes]
                     };
                 }
             }

@@ -11,7 +11,7 @@ import _ from "lodash";
  */
 export default function(serialized: string): Automata {
     // Deserialize
-    const json: any = JSON.parse(serialized);
+    let json: any = JSON.parse(serialized);
 
     // Creates automata
     let automata: Automata;
@@ -33,6 +33,10 @@ export default function(serialized: string): Automata {
     function arrayToSetMap(setObj: any) {
         return _.mapValues(setObj, array => new Set(array));
     }
+
+    // Goes through every item
+    for (const itemID in json.data)
+        json.data[itemID].classes = new Set(json.data[itemID].classes);
 
     // Sets properties
     automata.setName(json.name);

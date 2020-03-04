@@ -20,6 +20,7 @@ export default class TuringMachineTape {
 
     public constructor(initialTape: any) {
         if (typeof initialTape === "string") {
+            this.tape[-1] = '⊢';
             for (let i = 0; i < initialTape.length; i++)
                 this.tape[i] = initialTape[i];
         } else {

@@ -5,7 +5,7 @@ export class Circle {
     /**
      * Circles a letter / number
      * @param char - the character to circle
-     * @returns the circled character
+     * @returns the circled character, or the same char if it can't be circled
      */
     public static circle(char: string): string {
         // If this is already circled, return the same char
@@ -28,15 +28,15 @@ export class Circle {
         else if (char === char.toLowerCase())
             return String.fromCharCode(char.charCodeAt(0) + 9327);
 
-        // It's none of them, so return nothing
+        // It's none of them, so return the same char
         else
-            return "";
+            return char;
     }
 
     /**
      * Uncircles a letter / number
      * @param char - the character to uncircle
-     * @returns the uncircled character
+     * @returns the uncircled character, or the same char if it can't be uncircled
      */
     public static uncircle(char: string): string {
         // Gets char code
@@ -62,9 +62,9 @@ export class Circle {
         else if (charCode >= 9424 && charCode <= 9449)
             return String.fromCharCode(charCode - 9327);
 
-        // If it's none, return nothing
+        // If it's none, return the same char
         else
-            return "";
+            return char;
     }
 
     /**

@@ -11,7 +11,7 @@
             <!-- Transition symbol -->
             <b-form-group :label="`Transition symbol: ${transitionSymbol}`">
                 <b-form-input v-model="inputtedTransitionSymbol" placeholder="a"
-                              :disabled="isEpsilonMove || tmState.isEmptySymbol || tmState.isNonEmptySymbol || tmState.isCircledSymbol || tmState.isUncircledSymbol"
+                              :disabled="isEpsilonMove || tmState.isEmptySymbol || tmState.isNonEmptySymbol || tmState.isCircledSymbol || tmState.isUncircledSymbol || tmState.isStartTapeSymbol"
                 ></b-form-input>
             </b-form-group>
 
@@ -22,6 +22,7 @@
                 <b-form-checkbox v-model="tmState.isNonEmptySymbol" v-if="automataType === 'TM'">Non-empty symbol</b-form-checkbox>
                 <b-form-checkbox v-model="tmState.isCircledSymbol" v-if="automataType === 'TM'">Circled symbol</b-form-checkbox>
                 <b-form-checkbox v-model="tmState.isUncircledSymbol" v-if="automataType === 'TM'">Uncircled symbol</b-form-checkbox>
+                <b-form-checkbox v-model="tmState.isStartTapeSymbol" v-if="automataType === 'TM'">Start of the tape symbol</b-form-checkbox>
             </b-form-group>
 
             <!-- Pushdown automata -->
@@ -164,6 +165,7 @@
             isNonEmptySymbol: false,
             isCircledSymbol: false,
             isUncircledSymbol: false,
+            isStartTapeSymbol: false,
 
             isWriteEmptySymbol: false,
             isWriteNothing: false,
@@ -213,6 +215,9 @@
 
             if (this.tmState.isUncircledSymbol)
                 return AutomataCharacters.UncircleSymbol;
+
+            if (this.tmState.isStartTapeSymbol)
+                return AutomataCharacters.StartTapeSymbol;
 
             // Default value
             if (this.inputtedTransitionSymbol)
@@ -328,6 +333,7 @@
                 this.pdaState.inputtedOutputStackSymbols = transition.output;
             } else if (this.automata instanceof TuringMachine) {
                 this.tmState.isEmptySymbol = transition.readTapeSymbol === AutomataCharacters.EmptySymbol;
+                this.tmState.isStartTapeSymbol = transition.readTapeSymbol === AutomataCharacters.StartTapeSymbol;
 
                 // Because non-empty are technically epsilon moves, we need to deselect flag
                 if (transition.readTapeSymbol === AutomataCharacters.NonEmptySymbol) {
@@ -383,6 +389,7 @@
                 isNonEmptySymbol: false,
                 isCircledSymbol: false,
                 isUncircledSymbol: false,
+                isStartTapeSymbol: false,
                 isWriteEmptySymbol: false,
                 isWriteNothing: false,
                 isCircle: false,
@@ -431,6 +438,7 @@
                 this.tmState.isNonEmptySymbol = false;
                 this.tmState.isCircledSymbol = false;
                 this.tmState.isUncircledSymbol = false;
+                this.tmState.isStartTapeSymbol = false;
             }
         }
 
@@ -441,6 +449,7 @@
                 this.tmState.isNonEmptySymbol = false;
                 this.tmState.isCircledSymbol = false;
                 this.tmState.isUncircledSymbol = false;
+                this.tmState.isStartTapeSymbol = false;
             }
         }
 
@@ -451,6 +460,7 @@
                 this.tmState.isEmptySymbol = false;
                 this.tmState.isCircledSymbol = false;
                 this.tmState.isUncircledSymbol = false;
+                this.tmState.isStartTapeSymbol = false;
             }
         }
 
@@ -461,6 +471,7 @@
                 this.tmState.isEmptySymbol = false;
                 this.tmState.isNonEmptySymbol = false;
                 this.tmState.isUncircledSymbol = false;
+                this.tmState.isStartTapeSymbol = false;
             }
         }
 
@@ -471,6 +482,18 @@
                 this.tmState.isEmptySymbol = false;
                 this.tmState.isNonEmptySymbol = false;
                 this.tmState.isCircledSymbol = false;
+                this.tmState.isStartTapeSymbol = false;
+            }
+        }
+
+        @Watch('tmState.isStartTapeSymbol')
+        private onIsStartTapeSymbolChange(val: any, oldVal: any) {
+            if (val) {
+                this.isEpsilonMove = false;
+                this.tmState.isEmptySymbol = false;
+                this.tmState.isNonEmptySymbol = false;
+                this.tmState.isCircledSymbol = false;
+                this.tmState.isUncircledSymbol = false;
             }
         }
 

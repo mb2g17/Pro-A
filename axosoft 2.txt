@@ -22,11 +22,14 @@ TODO:
 
 - add "comments" to automata screen
 
+- If two configurations are the same, it should only appear once
+
 - BUG: event handlers are still activated even when automata tab is closed
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 - BUG: edge handles gets saved as their own objects when saving automata (also re-do saved automata)
 - BUG: when moving an edge using the edge editing thing, your selected edges do not update, making state folds error
 - BUG: double check alt+clicking and duplication, as well as deleting state with transitions attached to it
+- BUG: can rename state folds (might want to adapt this later for labelling state folds)
 
 
 IN PROGRESS:
