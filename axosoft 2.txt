@@ -1,27 +1,30 @@
-TODO:
+--* TODO:
+
+VALIDATION:
 - add validation to automata operations
 - validate no weird unicode characters in the input (only letters and numbers allowed)
-
-- reorder tabs
-
 - add validation to stop duplicate transitions (e.g. trying to do (a,A,B) twice)
-- transitions should be made by pressing "enter", like with new automata
 
+CONFIG TABLE:
 - change config table to allow stack trace
-- make nodes light up in animation
 - colour code the configurations
+- add a button to "delete" a configuration
+- add a button to "prune" or "exclude" a configuration (delete all except that one)
 
+ANIMATION:
+- make nodes light up in animation
+
+UI:
 - make filled buttons and outline buttons consistent in the menus
-
-- add controls to change the size of loop transitions
-
+- transitions should be made by pressing "enter", like with new automata
+- reorder tabs
 - add ability to add labels to state folds
 
+OTHER / UNCATEGORISED:
+- add controls to change the size of loop transitions
 - make 'delete' delete all objects in your selection, not just the one you clicked on
 - make 'alt-click' also select transitions
-
 - add "comments" to automata screen
-
 - If two configurations are the same, it should only appear once
 
 - BUG: event handlers are still activated even when automata tab is closed
@@ -32,8 +35,10 @@ TODO:
 - BUG: can rename state folds (might want to adapt this later for labelling state folds)
 
 
-IN PROGRESS:
+--* IN PROGRESS:
 - add in concat for TMs
+- add in kleene star for TMs
+- add in product for FAs (and maybe PDAs)
 
 - make automata operations support TM
 - add test cases for TM automata operations
