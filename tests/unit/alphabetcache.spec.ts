@@ -95,4 +95,18 @@ describe('Automata Machine Cache', () => {
         assert.isTrue(automata.getAlphabet('s1').has('b'), "'b' is not in the alphabet");
         assert.isTrue(automata.getAlphabet('s1').has('c'), "'c' is not in the alphabet");
     });
+
+    it('can still recognise an alphabet even after serialization', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, true);
+
+        automata.addTransition('a', 's1', 's2');
+        automata.addTransition('b', 's2', 's2');
+
+        const serialized: string = automata.serialize();
+        automata = deserialize(serialized);
+
+        assert.isTrue(automata.getAlphabet('s1').has('a'), "'a' is not in the alphabet");
+        assert.isTrue(automata.getAlphabet('s1').has('b'), "'b' is not in the alphabet");
+    });
 });

@@ -575,6 +575,8 @@ export default abstract class Automata {
             cacheMachine_cacheMachine_cacheMachine: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachine"]),
             cacheMachine_cacheMachine_cacheMachineReverse: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachineReverse"]),
             cacheMachine_cacheMachine_cacheMachineReverseFinal: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachineReverseFinal"]),
+
+            cacheAlphabet: _.mapValues(this.cacheAlphabet["cacheSourceTargetSymbol"], (x) => setToArrayMap(x)),
         };
 
         // Goes through items, checking if they're good

@@ -368,4 +368,35 @@ describe('Automata Machine Cache', () => {
         const reachableFinalStates = automata.getReachableFinalStates('s1');
         assert.isTrue(reachableFinalStates.has('s4'), "Final state s4 is not recognised as a reachable final state");
     });
+
+    // ---------------------------------------------
+    // --* SERIALIZATION
+    // ---------------------------------------------
+    it('can identify a machine of one straight line automata even after serialization', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, false);
+        automata.addState('s3', 10, 10, false, false);
+        automata.addState('s4', 10, 10, false, true);
+
+        automata.addTransition('a', 's1', 's2');
+        automata.addTransition('a', 's2', 's3');
+        automata.addTransition('a', 's3', 's4');
+
+        const serialized: string = automata.serialize();
+        automata = deserialize(serialized);
+
+        assert.isTrue(automata.getMachine('s1').has('s1'), "s1 is not in the machine 's1'");
+        assert.isTrue(automata.getMachine('s2').has('s1'), "s2 is not in the machine 's1'");
+        assert.isTrue(automata.getMachine('s3').has('s1'), "s3 is not in the machine 's1'");
+        assert.isTrue(automata.getMachine('s4').has('s1'), "s4 is not in the machine 's1'");
+
+        const reachableStates = automata.getReachableStates('s1');
+        assert.isTrue(reachableStates.has('s1'), "s1 is not reachable from 's1'");
+        assert.isTrue(reachableStates.has('s2'), "s2 is not reachable from 's1'");
+        assert.isTrue(reachableStates.has('s3'), "s3 is not reachable from 's1'");
+        assert.isTrue(reachableStates.has('s4'), "s4 is not reachable from 's1'");
+
+        const reachableFinalStates = automata.getReachableFinalStates('s1');
+        assert.isTrue(reachableFinalStates.has('s4'), "Final state s4 is not reachable from 's1'");
+    });
 });

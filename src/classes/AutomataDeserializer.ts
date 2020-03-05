@@ -53,6 +53,8 @@ export default function(serialized: string): Automata {
     automata["cacheMachine"]["cacheMachine"]["cacheMachineReverse"] = arrayToSetMap(json.cacheMachine_cacheMachine_cacheMachineReverse);
     automata["cacheMachine"]["cacheMachine"]["cacheMachineReverseFinal"] = arrayToSetMap(json.cacheMachine_cacheMachine_cacheMachineReverseFinal);
 
+    automata["cacheAlphabet"]["cacheSourceTargetSymbol"] = _.mapValues(json.cacheAlphabet, (x) => arrayToSetMap(x));
+
     // Return automata
     return automata;
 }

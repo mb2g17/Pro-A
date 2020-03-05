@@ -33,7 +33,6 @@ TODO:
 
 
 IN PROGRESS:
-- add serialisation to alphabet cache
 - add in concat for TMs
 
 - make automata operations support TM
