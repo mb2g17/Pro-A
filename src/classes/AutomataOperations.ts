@@ -250,4 +250,8 @@ export default class AutomataOperations {
 
         return duplicatedObjects;
     }
+
+    public static product(automata: Automata, group1: Set<string>, group2: Set<string>) {
+
+    }
 }

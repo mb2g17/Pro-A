@@ -6,7 +6,7 @@ import FiniteAutomata from "@/classes/FiniteAutomata";
 import AutomataMachineCache from "@/classes/AutomataMachineCache";
 import _ from "lodash";
 import {AutomataCharacters} from '@/classes/AutomataCharacters';
-import {AutomataAlphabetCache} from "@/classes/AutomataAlphabetCache";
+import {AutomataTransitionCache} from "@/classes/AutomataTransitionCache";
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -30,8 +30,8 @@ export default abstract class Automata {
     /** Cache storing machines */
     protected cacheMachine: AutomataMachineCache = new AutomataMachineCache(this);
 
-    /** Cache storing alphabet */
-    protected cacheAlphabet: AutomataAlphabetCache = new AutomataAlphabetCache(this);
+    /** Cache storing transition convenience */
+    protected cacheTransition: AutomataTransitionCache = new AutomataTransitionCache(this);
 
     /** Cytoscape data for all the graph objects */
     protected data: any = {};
@@ -187,7 +187,7 @@ export default abstract class Automata {
 
                 // Updates cache
                 this.cacheMachine.addTransition(source, target);
-                this.cacheAlphabet.addTransition(source, target, symbol);
+                this.cacheTransition.addTransition(source, target, symbol);
             }
         }
     }
@@ -234,7 +234,7 @@ export default abstract class Automata {
 
         // Updates cache
         this.cacheMachine.moveTransitionNewSourceState(oldSourceName, newSourceName, currentTargetName);
-        this.cacheAlphabet.changeSourceOfTransition(oldSourceName, newSourceName, currentTargetName, currentSymbol);
+        this.cacheTransition.changeSourceOfTransition(oldSourceName, newSourceName, currentTargetName, currentSymbol);
     }
 
     /**
@@ -258,7 +258,7 @@ export default abstract class Automata {
 
         // Updates machine cache
         this.cacheMachine.moveTransitionNewTargetState(currentSourceName, oldTargetName, newTargetName);
-        this.cacheAlphabet.changeTargetOfTransition(currentSourceName, oldTargetName, newTargetName, currentSymbol);
+        this.cacheTransition.changeTargetOfTransition(currentSourceName, oldTargetName, newTargetName, currentSymbol);
     }
 
     /**
@@ -300,7 +300,7 @@ export default abstract class Automata {
 
             // Updates cache
             this.cacheMachine.removeState(stateName);
-            this.cacheAlphabet.removeState(stateName);
+            this.cacheTransition.removeState(stateName);
         }
     }
 
@@ -330,7 +330,7 @@ export default abstract class Automata {
 
             // Updates cache
             this.cacheMachine.removeTransition(source, target, true);
-            this.cacheAlphabet.removeTransition(source, target, symbol);
+            this.cacheTransition.removeTransition(source, target, symbol);
         }
     }
 
@@ -576,7 +576,7 @@ export default abstract class Automata {
             cacheMachine_cacheMachine_cacheMachineReverse: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachineReverse"]),
             cacheMachine_cacheMachine_cacheMachineReverseFinal: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachineReverseFinal"]),
 
-            cacheAlphabet: _.mapValues(this.cacheAlphabet["cacheSourceTargetSymbol"], (x) => setToArrayMap(x)),
+            cacheTransition: _.mapValues(this.cacheTransition["cacheSourceTargetSymbol"], (x) => setToArrayMap(x)),
         };
 
         // Goes through items, checking if they're good
@@ -617,6 +617,43 @@ export default abstract class Automata {
     }
 
     /**
+     * Gets the machines that have this state, with transitions
+     * @param state - the state to get the machines of
+     * @returns a set of IDs of all the objects within the machines
+     */
+    public getMachineWithTransitions(state: string) : Set<string> {
+        // Gets the initial states from this state
+        const initialStates: Set<string> = this.getMachine(state);
+
+        // Gets all the states in these machines
+        let states: Set<string> = new Set();
+        for (const initialState of initialStates) {
+            const reachableStates = this.getReachableStates(initialState);
+            reachableStates.forEach((x) => states.add(x));
+        }
+
+        // Converts state names to IDs
+        states = new Set([...states].map((state) => this.getState(state).data.id));
+
+        // Gets all transitions from these states
+        const items: Set<string> = new Set(states);
+        for (const sourceStateID of states) {
+            // Gets state name
+            const sourceState = this.getStateById(sourceStateID).data.name;
+
+            const mapping = this.cacheTransition.getTargetMappings(sourceState);
+            Object.keys(mapping).forEach((targetState) => {
+                mapping[targetState].forEach((symbol: any) => {
+                    // Gets transition and adds to set
+                    const transition = this.getTransition(symbol, sourceState, targetState);
+                    items.add(transition.data.id);
+                });
+            });
+        }
+        return items;
+    }
+
+    /**
      * Gets the states reachable by an initial state
      * @param initialState - the initial state name
      * @returns a set of states reachable by the specified initial state
@@ -639,7 +676,45 @@ export default abstract class Automata {
      * @param state - the state to get the alphabet of
      */
     public getAlphabet(state: string) : Set<string> {
-        return this.cacheAlphabet.getAlphabet(state);
+        // Stores states we need to look through; initially add initial states from this state
+        const openStates: string[] = [...this.getMachine(state)];
+
+        // Stores states we've already looked through
+        const closedStates: Set<string> = new Set();
+
+        // Stores alphabet to return
+        const alphabet: Set<string> = new Set();
+
+        // Goes through state fringe
+        while (openStates.length > 0) {
+            // Pops the next state
+            const sourceState: string | undefined = openStates.pop();
+
+            // If we've run out, then stop
+            if (!sourceState)
+                break;
+
+            // We've now "looked" at this one
+            closedStates.add(sourceState);
+
+            // If we have no transitions with this, move on
+            if (!this.cacheTransition.getTargetMappings(sourceState))
+                continue;
+
+            // For every target state
+            for (const targetState of Object.keys(this.cacheTransition.getTargetMappings(sourceState))) {
+                // If it's not closed, add to open states
+                if (!closedStates.has(targetState))
+                    openStates.push(targetState);
+
+                // Gets the symbols we can use from src to target and add them to the set
+                const symbols: Set<string> = this.cacheTransition.getTransitions(sourceState, targetState);
+                symbols.forEach((s) => alphabet.add(s));
+            }
+        }
+
+        // Return alphabet
+        return alphabet;
     }
 
     /**

@@ -17,6 +17,7 @@
                         <b-button :variant="operationState.operationName !== 'union' ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
                         <b-button :variant="operationState.operationName !== 'concatenation' ? 'primary' : 'success'" @click="onConcatenationClick">Concatenation</b-button>
                         <b-button :variant="operationState.operationName !== 'kleene-star' ? 'primary' : 'success'" @click="onKleeneStarClick">Kleene Star</b-button>
+                        <b-button variant="primary" @click="onKleeneStarClick">Product</b-button>
                         <b-button v-if="operationState.operationName" variant="danger" @click="clearOperationState">Cancel</b-button>
                     </div>
 

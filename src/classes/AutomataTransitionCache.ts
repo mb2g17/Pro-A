@@ -1,9 +1,9 @@
 import Automata from "@/classes/Automata";
 
 /**
- * Stores alphabet of machines
+ * Stores transition cache for quick access
  */
-export class AutomataAlphabetCache {
+export class AutomataTransitionCache {
     /** Instance of automata */
     private automata: Automata;
 
@@ -14,46 +14,28 @@ export class AutomataAlphabetCache {
         this.automata = automata;
     }
 
-    public getAlphabet(state: string) {
-        // Stores states we need to look through; initially add initial states from this state
-        const openStates: string[] = [...this.automata.getMachine(state)];
-
-        // Stores states we've already looked through
-        const closedStates: Set<string> = new Set();
-
-        // Stores alphabet to return
-        const alphabet: Set<string> = new Set();
-
-        // Goes through state fringe
-        while (openStates.length > 0) {
-            // Pops the next state
-            const sourceState: string | undefined = openStates.pop();
-
-            // If we've run out, then stop
-            if (!sourceState)
-                break;
-
-            // We've now "looked" at this one
-            closedStates.add(sourceState);
-
-            // If we have no transitions with this, move on
-            if (!this.cacheSourceTargetSymbol[sourceState])
-                continue;
-
-            // For every target state
-            for (const targetState of Object.keys(this.cacheSourceTargetSymbol[sourceState])) {
-                // If it's not closed, add to open states
-                if (!closedStates.has(targetState))
-                    openStates.push(targetState);
-
-                // Gets the symbols we can use from src to target and add them to the set
-                const symbols: Set<string> = this.cacheSourceTargetSymbol[sourceState][targetState];
-                symbols.forEach(s => alphabet.add(s));
+    /**
+     * Gets transitions based on source and target
+     * @param source - the source state of the transition
+     * @param target - the target state of the transition
+     * @return a set of transitions that go between these states
+     */
+    public getTransitions(source: string, target: string): Set<string> {
+        if (this.cacheSourceTargetSymbol[source]) {
+            if (this.cacheSourceTargetSymbol[source][target]) {
+                return this.cacheSourceTargetSymbol[source][target];
             }
         }
+        return new Set();
+    }
 
-        // Return alphabet
-        return alphabet;
+    /**
+     * Gets possible transitions with source state with target mapping
+     * @param source - the source target
+     * @return mapping from target --> set of symbols
+     */
+    public getTargetMappings(source: string) {
+        return this.cacheSourceTargetSymbol[source] ? this.cacheSourceTargetSymbol[source] : {};
     }
 
     public removeState(state: string) {

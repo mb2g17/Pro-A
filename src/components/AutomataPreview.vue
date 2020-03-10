@@ -120,28 +120,22 @@ export default class AutomataPreview extends Vue {
             // If alt is held down, select the whole machine
             if (this.isAltDown && !this.isDoingMachineSelect) {
                 // --
-                const neighbourhood = this.cy.getElementById(id).components();
-                neighbourhood.forEach((item: any) => {
-                    console.log(item);
-                });
+                const items = this.automata.getMachineWithTransitions(this.automata.getStateById(id).data.name);
+                items.forEach((item: any) => console.log(item));
                 // --
 
                 this.isDoingMachineSelect = true;
                 this.selectedNodes.clear();
                 this.cy.$(`#${id}`).unselect();
 
-                // Gets initial states of this machine
+                // Gets relevant items of this machine
                 const selectedState: any = this.automata.getStateById(id);
-                const initialStates: Set<string> = this.automata.getMachine(selectedState.data.name);
-
-                // Gets all the states of this machine
-                const machineStates: string[] = _.flatMap([...initialStates], i => [...this.automata.getReachableStates(i)]);
+                const machineItems: Set<string> = this.automata.getMachineWithTransitions(selectedState.data.name);
 
                 // Selects all the states of the machine
-                for (const machineState of machineStates) {
-                    const machineStateID = this.automata.getState(machineState).data.id;
-                    this.cy.$(`#${machineStateID}`).select();
-                    this.selectedNodes.add(machineStateID);
+                for (const machineItemID of machineItems) {
+                    this.cy.$(`#${machineItemID}`).select();
+                    this.selectedNodes.add(machineItemID);
                 }
 
                 // Sets flag to false

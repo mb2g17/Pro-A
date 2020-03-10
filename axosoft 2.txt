@@ -23,7 +23,6 @@ UI:
 OTHER / UNCATEGORISED:
 - add controls to change the size of loop transitions
 - make 'delete' delete all objects in your selection, not just the one you clicked on
-- make 'alt-click' also select transitions
 - add "comments" to automata screen
 - If two configurations are the same, it should only appear once
 
@@ -36,9 +35,4 @@ OTHER / UNCATEGORISED:
 
 
 --* IN PROGRESS:
-- add in concat for TMs
-- add in kleene star for TMs
 - add in product for FAs (and maybe PDAs)
-
-- make automata operations support TM
-- add test cases for TM automata operations
