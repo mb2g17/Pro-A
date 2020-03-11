@@ -31,7 +31,7 @@ export default abstract class Automata {
     protected cacheMachine: AutomataMachineCache = new AutomataMachineCache(this);
 
     /** Cache storing transition convenience */
-    protected cacheTransition: AutomataTransitionCache = new AutomataTransitionCache(this);
+    public cacheTransition: AutomataTransitionCache = new AutomataTransitionCache(this);
 
     /** Cytoscape data for all the graph objects */
     protected data: any = {};

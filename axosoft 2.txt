@@ -1,7 +1,6 @@
 --* TODO:
 
 VALIDATION:
-- add validation to automata operations
 - validate no weird unicode characters in the input (only letters and numbers allowed)
 - add validation to stop duplicate transitions (e.g. trying to do (a,A,B) twice)
 
@@ -32,7 +31,9 @@ OTHER / UNCATEGORISED:
 - BUG: when moving an edge using the edge editing thing, your selected edges do not update, making state folds error
 - BUG: double check alt+clicking and duplication, as well as deleting state with transitions attached to it
 - BUG: can rename state folds (might want to adapt this later for labelling state folds)
+- BUG: on selecting a machine with one transition, edge editing messes up transition selection
 
 
 --* IN PROGRESS:
 - add in product for FAs (and maybe PDAs)
+- add validation to automata operations

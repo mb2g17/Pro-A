@@ -17,7 +17,7 @@
                         <b-button :variant="operationState.operationName !== 'union' ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
                         <b-button :variant="operationState.operationName !== 'concatenation' ? 'primary' : 'success'" @click="onConcatenationClick">Concatenation</b-button>
                         <b-button :variant="operationState.operationName !== 'kleene-star' ? 'primary' : 'success'" @click="onKleeneStarClick">Kleene Star</b-button>
-                        <b-button variant="primary" @click="onKleeneStarClick">Product</b-button>
+                        <b-button :variant="operationState.operationName !== 'product' ? 'primary' : 'success'" @click="onProductClick">Product</b-button>
                         <b-button v-if="operationState.operationName" variant="danger" @click="clearOperationState">Cancel</b-button>
                     </div>
 
@@ -497,13 +497,56 @@
                     const finalStates = AutomataOperations.getFinalStates(this.automata, automataPreview.selectedNodes);
                     const initialStates = AutomataOperations.getInitialStates(this.automata, automataPreview.selectedNodes);
 
-                    // Concatenate
+                    // Kleene star
                     AutomataOperations.kleeneStar(this.automata, finalStates, initialStates, automataPreview.cy);
                     this.$forceUpdate();
 
                     // Tells user to select initial states of the second sub-automata
                     this.$bvToast.toast("Kleene Star successfully computed!", {
                         title: 'Kleene Star',
+                        variant: "success",
+                        autoHideDelay: 5000
+                    });
+
+                    // Clears state
+                    this.clearOperationState();
+                    break;
+            }
+        }
+
+        /**
+         * When the user clicks the "product" button"
+         */
+        public onProductClick() {
+            // Gets automata preview
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // Acts based on automata stage
+            switch (this.operationState.selectStage) {
+                case 0:
+                    // Stores operation type and increments stage
+                    this.operationState.operationName = "product";
+                    this.operationState.selectStage++;
+
+                    // Remember selected nodes
+                    this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
+
+                    // Tells user to select second machine
+                    this.$bvToast.toast("Select the second automata using ALT + click on a state in the automata, and press Product.", {
+                        title: 'Product',
+                        variant: "warning",
+                        autoHideDelay: 5000
+                    });
+                    break;
+
+                case 1:
+                    // Product
+                    AutomataOperations.product(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
+                    this.$forceUpdate();
+
+                    // Tells user to select initial states of the second sub-automata
+                    this.$bvToast.toast("Product successfully computed!", {
+                        title: 'Product',
                         variant: "success",
                         autoHideDelay: 5000
                     });

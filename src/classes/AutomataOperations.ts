@@ -251,7 +251,56 @@ export default class AutomataOperations {
         return duplicatedObjects;
     }
 
-    public static product(automata: Automata, group1: Set<string>, group2: Set<string>) {
+    /**
+     * Performs product on two machines in an automata
+     * @param automata - the automata to perform the operation on
+     * @param group1 - the first machine
+     * @param group2 - the second machine
+     * @param cy - the cytoscape instance
+     */
+    public static product(automata: Automata, group1: Set<string>, group2: Set<string>, cy?: any) {
+        // Gets states from groups
+        const states1: Set<string> = new Set();
+        const states2: Set<string> = new Set();
+        group1.forEach((item: any) => {
+            const state = automata.getStateById(item);
+            if (state.data.type === 'node')
+                states1.add(item);
+        });
+        group2.forEach((item: any) => {
+            const state = automata.getStateById(item);
+            if (state.data.type === 'node')
+                states2.add(item);
+        });
 
+        console.log(states1);
+        console.log(states2);
+
+        // Creates new states
+        states1.forEach(state1ID => {
+            states2.forEach(state2ID => {
+                // Gets states
+                const [state1, state2] = [automata.getStateById(state1ID), automata.getStateById(state2ID)];
+
+                // Creates state name
+                const newStateName = state1.data.name + ',' + state2.data.name;
+                console.log(newStateName);
+
+                // Gets shared transition symbols
+                const sharedSymbols1: Set<string> = new Set();
+                Object.values(automata.cacheTransition.getTargetMappings(state1.data.name)).forEach(
+                    (set: any) => set.forEach(
+                        (symbol: any) => sharedSymbols1.add(symbol)));
+                const sharedSymbols2: Set<string> = new Set();
+                Object.values(automata.cacheTransition.getTargetMappings(state2.data.name)).forEach(
+                    (set: any) => set.forEach(
+                        (symbol: any) => sharedSymbols2.add(symbol)));
+
+                console.log(sharedSymbols1);
+                console.log(sharedSymbols2);
+
+                // TODO: intersect shared symbol sets, create transitions from that intersection
+            });
+        });
     }
 }
