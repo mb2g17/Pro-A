@@ -328,6 +328,31 @@ export default class AutomataOperations {
                     }));
                 });
 
+                // For all epsilon moves, generate transitions
+                [state1, state2].forEach(state => {
+                    // If we have epsilon moves
+                    if (automata["cacheEdgeID"][AutomataCharacters.Epsilon]) {
+                        if (automata["cacheEdgeID"][AutomataCharacters.Epsilon][state.data.name]) {
+                            // Get epsilon move targets
+                            const epsilonMoveTargets = Object.keys(automata["cacheEdgeID"][AutomataCharacters.Epsilon][state.data.name]);
+
+                            // Creates transitions from this
+                            epsilonMoveTargets.forEach(epsilonMoveTarget => {
+                                const targetStateName = state === state1 ? `${epsilonMoveTarget},${state2.data.name}` : `${state1.data.name},${epsilonMoveTarget}`;
+                                transitionsToMake.push({
+                                    source: newStateName,
+                                    target: targetStateName,
+                                    symbol: AutomataCharacters.Epsilon
+                                });
+
+                                // We need these states
+                                statesToMake.add(newStateName);
+                                statesToMake.add(targetStateName);
+                            });
+                        }
+                    }
+                });
+
                 // Adds info about this state
                 statesToMakeInfo[newStateName] = {
                     x: midX + j * 75,
