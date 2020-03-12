@@ -273,18 +273,21 @@ export default class AutomataOperations {
                 states2.add(item);
         });
 
-        console.log(states1);
-        console.log(states2);
+        // Stores all transitions to create {source, target, symbol}
+        const transitionsToMake: any[] = [];
 
         // Creates new states
+        let i: number = 0, j: number = 0;
         states1.forEach(state1ID => {
+            i++;
+            j = 0;
             states2.forEach(state2ID => {
+                j++;
                 // Gets states
                 const [state1, state2] = [automata.getStateById(state1ID), automata.getStateById(state2ID)];
 
                 // Creates state name
                 const newStateName = state1.data.name + ',' + state2.data.name;
-                console.log(newStateName);
 
                 // Gets shared transition symbols
                 const sharedSymbols1: Set<string> = new Set();
@@ -296,11 +299,36 @@ export default class AutomataOperations {
                     (set: any) => set.forEach(
                         (symbol: any) => sharedSymbols2.add(symbol)));
 
-                console.log(sharedSymbols1);
-                console.log(sharedSymbols2);
+                // Intersects transitions between these two states
+                const sharedSymbolsIntersection: Set<string> = new Set([...sharedSymbols1].filter(x => sharedSymbols2.has(x)));
 
-                // TODO: intersect shared symbol sets, create transitions from that intersection
+                // For all shared symbols, generate transitions
+                sharedSymbolsIntersection.forEach(sharedSymbol => {
+                    const targetStates1 = Object.keys(automata["cacheEdgeID"][sharedSymbol][state1.data.name]);
+                    const targetStates2 = Object.keys(automata["cacheEdgeID"][sharedSymbol][state2.data.name]);
+
+                    targetStates1.forEach(targetState1 => targetStates2.forEach(targetState2 => {
+                        transitionsToMake.push({
+                            source: newStateName,
+                            target: `${targetState1},${targetState2}`,
+                            symbol: sharedSymbol
+                        });
+                    }));
+                });
+
+                console.log(newStateName);
+                console.log([i, j]);
+
+                // Creates the state
+                automata.addState(newStateName, j * 75, i * 75,
+                    state1.data.initial && state2.data.initial,
+                    state1.data.final && state2.data.final);
             });
+        });
+
+        // Creates all the transitions
+        transitionsToMake.forEach(transitionTemplate => {
+            automata.addTransition(transitionTemplate.symbol, transitionTemplate.source, transitionTemplate.target);
         });
     }
 }

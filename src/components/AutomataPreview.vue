@@ -121,7 +121,7 @@ export default class AutomataPreview extends Vue {
             if (this.isAltDown && !this.isDoingMachineSelect) {
                 // --
                 const items = this.automata.getMachineWithTransitions(this.automata.getStateById(id).data.name);
-                items.forEach((item: any) => console.log(item));
+                //items.forEach((item: any) => console.log(item));
                 // --
 
                 this.isDoingMachineSelect = true;

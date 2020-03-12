@@ -37,3 +37,4 @@ OTHER / UNCATEGORISED:
 --* IN PROGRESS:
 - add in product for FAs (and maybe PDAs)
 - add validation to automata operations
+- add test cases to transition cache
