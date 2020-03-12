@@ -273,16 +273,24 @@ export default class AutomataOperations {
                 states2.add(item);
         });
 
+        // Gets base position for this new automata
+        const group2InitialStates = this.getInitialStates(automata, group2);
+        const midX: number = [...group2InitialStates].reduce((total, currentValue, currentIndex, arr) =>
+            automata.getStateById(currentValue).position.x + total, 0) / [...group2InitialStates].length;
+        const midY: number = [...group2InitialStates].reduce((total, currentValue, currentIndex, arr) =>
+            automata.getStateById(currentValue).position.y + total, 0) / [...group2InitialStates].length;
+
         // Stores all transitions to create {source, target, symbol}
         const transitionsToMake: any[] = [];
+
+        // Stores all states to create
+        const statesToMake: Set<string> = new Set();
+        const statesToMakeInfo: any = {}; // {x, y, initial, final}
 
         // Creates new states
         let i: number = 0, j: number = 0;
         states1.forEach(state1ID => {
-            i++;
-            j = 0;
             states2.forEach(state2ID => {
-                j++;
                 // Gets states
                 const [state1, state2] = [automata.getStateById(state1ID), automata.getStateById(state2ID)];
 
@@ -313,22 +321,50 @@ export default class AutomataOperations {
                             target: `${targetState1},${targetState2}`,
                             symbol: sharedSymbol
                         });
+
+                        // We need these states
+                        statesToMake.add(newStateName);
+                        statesToMake.add(`${targetState1},${targetState2}`);
                     }));
                 });
 
-                console.log(newStateName);
-                console.log([i, j]);
+                // Adds info about this state
+                statesToMakeInfo[newStateName] = {
+                    x: midX + j * 75,
+                    y: midY + i * 75,
+                    initial: state1.data.initial && state2.data.initial,
+                    final: state1.data.final && state2.data.final
+                };
 
-                // Creates the state
-                automata.addState(newStateName, j * 75, i * 75,
-                    state1.data.initial && state2.data.initial,
-                    state1.data.final && state2.data.final);
+                // Increments positional counter
+                j++;
             });
+            // Increments positional counter
+            i++;
+            j = 0;
         });
+
+        // Creates all the states
+        statesToMake.forEach(stateToMake =>
+            automata.addState(stateToMake,
+                statesToMakeInfo[stateToMake].x,
+                statesToMakeInfo[stateToMake].y,
+                statesToMakeInfo[stateToMake].initial,
+                statesToMakeInfo[stateToMake].final)
+        );
 
         // Creates all the transitions
         transitionsToMake.forEach(transitionTemplate => {
             automata.addTransition(transitionTemplate.symbol, transitionTemplate.source, transitionTemplate.target);
         });
+
+        // Deletes group 1 and group 2
+        [group1, group2].forEach(group => group.forEach(itemID => {
+            const item = automata.getData()[itemID];
+            if (item.data.type === 'node')
+                automata.removeState(item.data.name);
+            else if (item.data.type === 'edge')
+                automata.removeTransitionWithID(itemID);
+        }));
     }
 }
