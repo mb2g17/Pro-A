@@ -46,14 +46,8 @@ export default function(serialized: string): Automata {
     automata["cacheInitialStates"] = new Set(json.cacheInitialStates);
     automata["cacheFinalStates"] = new Set(json.cacheFinalStates);
 
-    automata["cacheMachine"]["cacheEdgeIDNoSymbol"] = json.cacheMachine_cacheEdgeIDNoSymbol;
-    automata["cacheMachine"]["cacheEdgeIDReverseNoSymbol"] = json.cacheMachine_cacheEdgeIDReverseNoSymbol;
-
-    automata["cacheMachine"]["cacheMachine"]["cacheMachine"] = arrayToSetMap(json.cacheMachine_cacheMachine_cacheMachine);
-    automata["cacheMachine"]["cacheMachine"]["cacheMachineReverse"] = arrayToSetMap(json.cacheMachine_cacheMachine_cacheMachineReverse);
-    automata["cacheMachine"]["cacheMachine"]["cacheMachineReverseFinal"] = arrayToSetMap(json.cacheMachine_cacheMachine_cacheMachineReverseFinal);
-
-    automata["cacheTransition"]["cacheSourceTargetSymbol"] = _.mapValues(json.cacheTransition, (x) => arrayToSetMap(x));
+    // Refreshes cache
+    automata.cacheTransition.refresh(automata);
 
     // Return automata
     return automata;

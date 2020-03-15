@@ -296,7 +296,7 @@ describe('TuringMachine.ts', () => {
             writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
             direction: 'L',
         });
-        automata.addTransition(AutomataCharacters.EmptySymbol, 's2', 's3', {
+        automata.addTransition(AutomataCharacters.StartTapeSymbol, 's2', 's3', {
             writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
             direction: 'R',
         });
@@ -323,7 +323,7 @@ describe('TuringMachine.ts', () => {
             writeTapeSymbol: AutomataCharacters.UncircleSymbol,
             direction: 'L',
         });
-        automata.addTransition(AutomataCharacters.EmptySymbol, 's2', 's3', {
+        automata.addTransition(AutomataCharacters.StartTapeSymbol, 's2', 's3', {
             writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
             direction: 'R',
         });
@@ -350,7 +350,7 @@ describe('TuringMachine.ts', () => {
             writeTapeSymbol: AutomataCharacters.CircleSymbol,
             direction: 'L',
         });
-        automata.addTransition(AutomataCharacters.EmptySymbol, 's2', 's3', {
+        automata.addTransition(AutomataCharacters.StartTapeSymbol, 's2', 's3', {
             writeTapeSymbol: AutomataCharacters.WriteNothingSymbol,
             direction: 'R',
         });

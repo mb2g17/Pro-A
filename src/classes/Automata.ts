@@ -27,11 +27,8 @@ export default abstract class Automata {
     /** Set of final state names */
     protected cacheFinalStates: Set<string> = new Set();
 
-    /** Cache storing machines */
-    protected cacheMachine: AutomataMachineCache = new AutomataMachineCache(this);
-
     /** Cache storing transition convenience */
-    public cacheTransition: AutomataTransitionCache = new AutomataTransitionCache(this);
+    public cacheTransition: AutomataTransitionCache = new AutomataTransitionCache();
 
     /** Cytoscape data for all the graph objects */
     protected data: any = {};
@@ -131,9 +128,6 @@ export default abstract class Automata {
                 },
                 position: {x, y},
             });
-
-            // Updates machine cache
-            this.cacheMachine.addState(name);
         }
     }
 
@@ -186,7 +180,6 @@ export default abstract class Automata {
                 });
 
                 // Updates cache
-                this.cacheMachine.addTransition(source, target);
                 this.cacheTransition.addTransition(source, target, symbol);
             }
         }
@@ -233,7 +226,6 @@ export default abstract class Automata {
         this.cacheEdgeID[currentSymbol][newSourceName][currentTargetName] = edgeID;
 
         // Updates cache
-        this.cacheMachine.moveTransitionNewSourceState(oldSourceName, newSourceName, currentTargetName);
         this.cacheTransition.changeSourceOfTransition(oldSourceName, newSourceName, currentTargetName, currentSymbol);
     }
 
@@ -257,7 +249,6 @@ export default abstract class Automata {
         this.cacheEdgeID[currentSymbol][currentSourceName][newTargetName] = edgeID;
 
         // Updates machine cache
-        this.cacheMachine.moveTransitionNewTargetState(currentSourceName, oldTargetName, newTargetName);
         this.cacheTransition.changeTargetOfTransition(currentSourceName, oldTargetName, newTargetName, currentSymbol);
     }
 
@@ -299,7 +290,6 @@ export default abstract class Automata {
             delete this.data[id];
 
             // Updates cache
-            this.cacheMachine.removeState(stateName);
             this.cacheTransition.removeState(stateName);
         }
     }
@@ -329,7 +319,6 @@ export default abstract class Automata {
             delete this.data[id];
 
             // Updates cache
-            this.cacheMachine.removeTransition(source, target, true);
             this.cacheTransition.removeTransition(source, target, symbol);
         }
     }
@@ -428,9 +417,6 @@ export default abstract class Automata {
 
         // Sets initial
         Vue.set(this.data[id].data, 'initial', initial);
-
-        // Updates the machine cache
-        this.cacheMachine.setInitialState(stateName, initial);
     }
 
     /**
@@ -456,9 +442,6 @@ export default abstract class Automata {
 
         // Sets final
         Vue.set(this.data[id].data, 'final', final);
-
-        // Updates the machine cache
-        this.cacheMachine.setFinalState(stateName, final);
     }
 
     /**
@@ -568,15 +551,6 @@ export default abstract class Automata {
             cacheNodeID: this.cacheNodeID,
             cacheInitialStates: [...this.cacheInitialStates],
             cacheFinalStates : [...this.cacheFinalStates],
-
-            cacheMachine_cacheEdgeIDNoSymbol: this.cacheMachine["cacheEdgeIDNoSymbol"],
-            cacheMachine_cacheEdgeIDReverseNoSymbol: this.cacheMachine["cacheEdgeIDReverseNoSymbol"],
-
-            cacheMachine_cacheMachine_cacheMachine: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachine"]),
-            cacheMachine_cacheMachine_cacheMachineReverse: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachineReverse"]),
-            cacheMachine_cacheMachine_cacheMachineReverseFinal: setToArrayMap(this.cacheMachine["cacheMachine"]["cacheMachineReverseFinal"]),
-
-            cacheTransition: _.mapValues(this.cacheTransition["cacheSourceTargetSymbol"], (x) => setToArrayMap(x)),
         };
 
         // Goes through items, checking if they're good
@@ -613,12 +587,39 @@ export default abstract class Automata {
      * @returns a set of initial state names that can reach that state
      */
     public getMachine(state: string) : Set<string> {
-        return this.cacheMachine.getMachine(state);
+        // Stores open and closed states
+        const openStates: Set<string> = new Set([state]), closedStates: Set<string> = new Set();
+
+        // Initial states to return
+        const initialStates: Set<string> = new Set();
+
+        // Searches through open states
+        while (openStates.size > 0) {
+            // Pop an open state
+            const poppedState = [...openStates][0];
+            openStates.delete(poppedState);
+
+            // Put it in closed
+            closedStates.add(poppedState);
+
+            // If popped state is initial, add it
+            if (this.getState(poppedState).data.initial)
+                initialStates.add(poppedState);
+
+            // Gets states that can go to this popped state
+            const sourceMappings = this.cacheTransition.getSourceMappings(poppedState);
+            Object.keys(sourceMappings).forEach((state: any) => {
+                if (!closedStates.has(state))
+                    openStates.add(state);
+            });
+        }
+
+        return initialStates;
     }
 
     /**
      * Gets the machines that have this state, with transitions
-     * @param state - the state to get the machines of
+     * @param state - the state name to get the machines of
      * @returns a set of IDs of all the objects within the machines
      */
     public getMachineWithTransitions(state: string) : Set<string> {
@@ -654,12 +655,32 @@ export default abstract class Automata {
     }
 
     /**
-     * Gets the states reachable by an initial state
-     * @param initialState - the initial state name
-     * @returns a set of states reachable by the specified initial state
+     * Gets the states reachable by a state
+     * @param state - the state name
+     * @returns a set of states reachable by the specified state
      */
-    public getReachableStates(initialState: string) : Set<string> {
-        return this.cacheMachine.getReachableStates(initialState);
+    public getReachableStates(state: string) : Set<string> {
+        // Stores open and closed states
+        const openStates: Set<string> = new Set([state]), closedStates: Set<string> = new Set();
+
+        // Searches through open states
+        while (openStates.size > 0) {
+            // Pop an open state
+            const poppedState = [...openStates][0];
+            openStates.delete(poppedState);
+
+            // Put it in closed
+            closedStates.add(poppedState);
+
+            // Gets next states from this popped state
+            const targetMappings = this.cacheTransition.getTargetMappings(poppedState);
+            Object.keys(targetMappings).forEach((state: any) => {
+                if (!closedStates.has(state))
+                    openStates.add(state);
+            });
+        }
+
+        return closedStates;
     }
 
     /**
@@ -668,7 +689,34 @@ export default abstract class Automata {
      * @returns a set of final states reachable by the specified initial state
      */
     public getReachableFinalStates(initialState: string) : Set<string> {
-        return this.cacheMachine.getReachableFinalStates(initialState);
+        // Stores open and closed states
+        const openStates: Set<string> = new Set([initialState]), closedStates: Set<string> = new Set();
+
+        // Stores final states to return
+        const finalStates: Set<string> = new Set();
+
+        // Searches through open states
+        while (openStates.size > 0) {
+            // Pop an open state
+            const poppedState = [...openStates][0];
+            openStates.delete(poppedState);
+
+            // Put it in closed
+            closedStates.add(poppedState);
+
+            // If it's final, add to set
+            if (this.getState(poppedState).data.final)
+                finalStates.add(poppedState);
+
+            // Gets next states from this popped state
+            const targetMappings = this.cacheTransition.getTargetMappings(poppedState);
+            Object.keys(targetMappings).forEach((state: any) => {
+                if (!closedStates.has(state))
+                    openStates.add(state);
+            });
+        }
+
+        return finalStates;
     }
 
     /**

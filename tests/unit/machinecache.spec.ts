@@ -304,10 +304,10 @@ describe('Automata Machine Cache', () => {
         assert.isFalse(automata.getMachine('s4').has('s1'), "s4 is still in the machine 's1'");
 
         const reachableStates = automata.getReachableStates('s1');
-        assert.isFalse(reachableStates.has('s1'), "s1 is still in the machine 's1'");
-        assert.isFalse(reachableStates.has('s2'), "s2 is still in the machine 's1'");
-        assert.isFalse(reachableStates.has('s3'), "s3 is still in the machine 's1'");
-        assert.isFalse(reachableStates.has('s4'), "s4 is still in the machine 's1'");
+        assert.isTrue(reachableStates.has('s1'), "s1 is not reachable from 's1'");
+        assert.isTrue(reachableStates.has('s2'), "s2 is not reachable from 's1'");
+        assert.isTrue(reachableStates.has('s3'), "s3 is not reachable from 's1'");
+        assert.isTrue(reachableStates.has('s4'), "s4 is not reachable from 's1'");
     });
 
     it('can identify the machine if the starting state has been set to initial', () => {

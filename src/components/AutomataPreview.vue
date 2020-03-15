@@ -120,8 +120,7 @@ export default class AutomataPreview extends Vue {
             // If alt is held down, select the whole machine
             if (this.isAltDown && !this.isDoingMachineSelect) {
                 // --
-                const items = this.automata.getMachineWithTransitions(this.automata.getStateById(id).data.name);
-                //items.forEach((item: any) => console.log(item));
+                console.log(this.automata.getMachine(this.automata.getStateById(id).data.name));
                 // --
 
                 this.isDoingMachineSelect = true;
