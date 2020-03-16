@@ -16,6 +16,30 @@ describe('Automata Machine Cache', () => {
     });
 
     // ---------------------------------------------
+    // --* IDENTIFYING STATES AND TRANSITIONS
+    // ---------------------------------------------
+    it('can identify the states and transitions of a machine', () => {
+        automata.addState('s1', 10, 10, true, false);
+        automata.addState('s2', 10, 10, false, false);
+        automata.addState('s3', 10, 10, false, false);
+        automata.addState('s4', 10, 10, false, true);
+
+        automata.addTransition('a', 's1', 's2');
+        automata.addTransition('a', 's2', 's3');
+        automata.addTransition('a', 's3', 's4');
+
+        const machineIDs: Set<string> = automata.getMachineWithTransitions('s1');
+
+        assert.isTrue(machineIDs.has(automata.getState('s1').data.id), "s1 is not in the machine 's1'");
+        assert.isTrue(machineIDs.has(automata.getState('s2').data.id), "s1 is not in the machine 's1'");
+        assert.isTrue(machineIDs.has(automata.getState('s3').data.id), "s1 is not in the machine 's1'");
+        assert.isTrue(machineIDs.has(automata.getState('s4').data.id), "s1 is not in the machine 's1'");
+        assert.isTrue(machineIDs.has(automata.getTransition('a', 's1', 's2').data.id), "a,s1,s2 is not in the machine 's1'");
+        assert.isTrue(machineIDs.has(automata.getTransition('a', 's2', 's3').data.id), "a,s2,s3 is not in the machine 's1'");
+        assert.isTrue(machineIDs.has(automata.getTransition('a', 's3', 's4').data.id), "a,s3,s4 is not in the machine 's1'");
+    });
+
+    // ---------------------------------------------
     // --* ADDING STATES & TRANSITIONS
     // ---------------------------------------------
     it('can identify a machine of one straight line automata', () => {

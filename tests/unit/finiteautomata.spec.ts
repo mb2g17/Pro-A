@@ -308,6 +308,31 @@ describe('FiniteAutomata.ts', () => {
         });
     });
 
+    it('can cross product (intersect) an automata', () => {
+        automata.addState("s1", 10, 10, true, false);
+        automata.addState("s2", 10, 10, false, true);
+        automata.addState("s3", 10, 10, true, false);
+        automata.addState("s4", 10, 10, false, true);
+        automata.addTransition('a', 's1', 's2');
+        automata.addTransition('b', 's1', 's2');
+        automata.addTransition('a', 's3', 's4');
+        automata.addTransition('c', 's3', 's4');
+
+        // Product
+        AutomataOperations.product(automata, automata.getMachineWithTransitions('s1'), automata.getMachineWithTransitions('s3'));
+
+        // Tests automata
+        [
+            ['b', Outcome.REJECT],
+            ['c', Outcome.REJECT],
+            ['a', Outcome.ACCEPT],
+        ].forEach(testCase => {
+            automata.setInput(testCase[0]);
+            automata.simulate();
+            assert.equal(automata.getOutcome(), testCase[1]);
+        });
+    });
+
     it('can simulate a deserialized automata', () => {
         automata.addState("s1", 10, 10, true, false);
         automata.addState("s2", 10, 10, false, true);

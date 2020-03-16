@@ -289,6 +289,10 @@ export default abstract class Automata {
             // Deletes data entry
             delete this.data[id];
 
+            // Removes from initial / final state cache
+            this.cacheInitialStates.delete(stateName);
+            this.cacheFinalStates.delete(stateName);
+
             // Updates cache
             this.cacheTransition.removeState(stateName);
         }
