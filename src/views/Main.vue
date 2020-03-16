@@ -79,14 +79,10 @@ import { Base64 } from 'js-base64';
     },
 })
 export default class Main extends Vue {
-    /**
-     * The list of automatas that are in the program
-     */
+    /** The list of automatas that are in the program */
     private automatas: Automata[] = [];
 
-    /**
-     * Stores the tab the user is currently selected
-     */
+    /** Stores the tab the user is currently selected */
     private automataTab: number = 0;
 
     /**

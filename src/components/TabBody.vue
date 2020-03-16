@@ -81,6 +81,10 @@
                     </div>
                     <b-button variant="danger" class="mb-3" @click="onCancelClick">Cancel</b-button>
 
+                    <p>Number of states: {{ Object.keys(automata["cacheNodeID"]).length }}</p>
+                    <p>Number of transitions: {{ automata["cacheTransition"]["cacheNoOfTransitions"] }}</p>
+                    <p>Number of objects: {{ Object.keys(automata["cacheNodeID"]).length + automata["cacheTransition"]["cacheNoOfTransitions"] }}</p>
+
                     <!-- Decision -->
                     <h2 id="decision" v-if="isSimulating">{{ outcome }}</h2>
 

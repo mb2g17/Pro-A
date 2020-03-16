@@ -10,6 +10,9 @@ export class AutomataTransitionCache {
     /** Like cacheSourceTargetSymbol, but reverse, target --> source --> set of symbols */
     private cacheSourceTargetSymbolReverse: any = {};
 
+    /** The number of transitions */
+    private cacheNoOfTransitions = 0;
+
     /**
      * Refreshes the cache, used for serialisation
      */
@@ -97,6 +100,7 @@ export class AutomataTransitionCache {
         // Add this transition
         this.cacheSourceTargetSymbol[sourceState][targetState].add(symbol);
         this.cacheSourceTargetSymbolReverse[targetState][sourceState].add(symbol);
+        this.cacheNoOfTransitions++;
     }
 
     public removeTransition(sourceState: string, targetState: string, symbol: string) {
@@ -104,6 +108,7 @@ export class AutomataTransitionCache {
             if (this.cacheSourceTargetSymbol[sourceState][targetState]) {
                 // Deletes symbol
                 this.cacheSourceTargetSymbol[sourceState][targetState].delete(symbol);
+                this.cacheNoOfTransitions--;
 
                 // If there's no more transitions, delete this mapping
                 if (this.cacheSourceTargetSymbol[sourceState][targetState].size === 0)

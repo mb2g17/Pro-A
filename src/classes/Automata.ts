@@ -111,7 +111,7 @@ export default abstract class Automata {
             const ID = uuidv1();
 
             // Sets node name -> id mapping
-            this.cacheNodeID[name] = ID;
+            Vue.set(this.cacheNodeID, name, ID);
 
             // Sets data
             Vue.set(this.data, ID, {
@@ -147,10 +147,10 @@ export default abstract class Automata {
         if (this.cacheNodeID[source] && this.cacheNodeID[target]) {
             // Creates the parent branches of edgeID
             if (!this.cacheEdgeID[symbol]) {
-                this.cacheEdgeID[symbol] = {};
+                Vue.set(this.cacheEdgeID, symbol, {});
             }
             if (!this.cacheEdgeID[symbol][source]) {
-                this.cacheEdgeID[symbol][source] = {};
+                Vue.set(this.cacheEdgeID[symbol], source, {});
             }
 
             // If the transition doesn't already exist
@@ -159,7 +159,7 @@ export default abstract class Automata {
                 const ID = uuidv1();
 
                 // Create edge name -> id mapping
-                this.cacheEdgeID[symbol][source][target] = ID;
+                Vue.set(this.cacheEdgeID[symbol][source], target, ID);
 
                 // Gets IDs of the states
                 const sourceID = this.cacheNodeID[source];
@@ -245,8 +245,8 @@ export default abstract class Automata {
         this.data[edgeID].data.targetName = newTargetName;
 
         // Edits edge ID lookup
-        delete this.cacheEdgeID[currentSymbol][currentSourceName][oldTargetName];
-        this.cacheEdgeID[currentSymbol][currentSourceName][newTargetName] = edgeID;
+        Vue.delete(this.cacheEdgeID[currentSymbol][currentSourceName], oldTargetName);
+        Vue.set(this.cacheEdgeID[currentSymbol][currentSourceName], newTargetName, edgeID);
 
         // Updates machine cache
         this.cacheTransition.changeTargetOfTransition(currentSourceName, oldTargetName, newTargetName, currentSymbol);
@@ -284,7 +284,7 @@ export default abstract class Automata {
             const id = this.cacheNodeID[stateName];
 
             // Delets nodeID entry
-            delete this.cacheNodeID[stateName];
+            Vue.delete(this.cacheNodeID, stateName);
 
             // Deletes data entry
             delete this.data[id];
@@ -317,7 +317,7 @@ export default abstract class Automata {
             const id = this.cacheEdgeID[symbol][source][target];
 
             // Delete edgeID entry
-            delete this.cacheEdgeID[symbol][source][target];
+            Vue.delete(this.cacheEdgeID[symbol][source], target);
 
             // Deletes data entry
             delete this.data[id];
