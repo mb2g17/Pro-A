@@ -5,6 +5,7 @@ const myConfig: object = {
             style: {
                 'background-color': '#666',
                 'content': 'data(displayName)',
+                'min-zoomed-font-size': '9px'
             },
         },
         { // Selected state
@@ -85,6 +86,8 @@ const myConfig: object = {
                 'loop-direction': '-45deg',
                 'loop-sweep': '90deg',
 
+                'min-zoomed-font-size': '9px'
+
                 //'control-point-step-size': '70px',
             },
         },
@@ -118,6 +121,9 @@ const myConfig: object = {
     wheelSensitivity: 0.15,
     minZoom: 0.1,
     maxZoom: 10,
+    pixelRatio: 1,
+    hideEdgesOnViewport: true,
+    textureOnViewport: true,
 };
 
 export default myConfig;

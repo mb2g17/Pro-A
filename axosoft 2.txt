@@ -25,6 +25,8 @@ OTHER / UNCATEGORISED:
 - add "comments" to automata screen
 - If two configurations are the same, it should only appear once
 
+- use a server to store automata tabs that aren't open
+
 - BUG: event handlers are still activated even when automata tab is closed
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 - BUG: edge handles gets saved as their own objects when saving automata (also re-do saved automata)
@@ -33,6 +35,7 @@ OTHER / UNCATEGORISED:
 - BUG: can rename state folds (might want to adapt this later for labelling state folds)
 - BUG: on selecting a machine with one transition, edge editing messes up transition selection
 - BUG: config table should use alias names, not true names
+- BUG: you can't duplicate state folds
 
 
 --* IN PROGRESS:
