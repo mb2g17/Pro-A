@@ -36,7 +36,8 @@
                     </div>
 
                     <!-- Search -->
-                    <b-form-input type="text" placeholder="State search" class="mt-3"/>
+                    <b-form-input type="text" placeholder="State search" class="mt-3" @keyup.enter="onSearch"/>
+                    <SearchTable :automata="automata" :ref="`searchTable${index}`" @itemClick="onSearchItemClick"></SearchTable>
                 </b-col>
 
                 <!-- CYTOSCAPE -->
@@ -111,12 +112,13 @@
     import uuidv1 from "uuid/v1";
     import AutomataOperations from "@/classes/AutomataOperations";
     import NewTransitionModal from "@/components/NewTransitionModal.vue";
+    import SearchTable from "@/components/SearchTable.vue";
     import AutomataConfig from "@/classes/AutomataConfig";
 
     @Component({
         components: {
             // Custom components
-            ConfigTable, AutomataPreview, NewTransitionModal,
+            ConfigTable, AutomataPreview, NewTransitionModal, SearchTable,
 
             // Bootstrap components
             BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea, BFormCheckbox,
@@ -556,6 +558,26 @@
                     this.clearOperationState();
                     break;
             }
+        }
+
+        /**
+         * When the user wants to search for a state
+         */
+        public onSearch(event: any) {
+            const query: string = event.target.value;
+            this.$refs[`searchTable${this.index}`].setTable(query, this.automata.findStates(query));
+        }
+
+        /**
+         * When the user clicked on an item in the search table
+         */
+        public onSearchItemClick(id: string) {
+            console.log(`Snapping to ${id}`);
+            // Gets automata preview and deselects everything
+            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // Get position of node and pans there
+            automataPreview.cy.center(automataPreview.cy.getElementById(id));
         }
 
         /**

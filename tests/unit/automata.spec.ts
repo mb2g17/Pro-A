@@ -179,4 +179,21 @@ describe('Automata.ts', () => {
         assert.isNotNull(newAutomata.getState("s2"));
         assert.isNotNull(newAutomata.getTransition("a", "s1", "s2"));
     });
+
+    it('can search for states', () => {
+        automata.addState("s1", 10, 10, true, false);
+        automata.addState("s2", 10, 10, false, false);
+        automata.addState("s3", 10, 10, false, false);
+        automata.addState("s34", 10, 10, false, false);
+        automata.addState("s4", 10, 10, false, false);
+
+        // Finds state
+        const foundStates: Set<string> = automata.findStates("s3");
+
+        assert.isFalse(foundStates.has(automata.getState("s1").data.id), "s1 is in the search results for 's3'");
+        assert.isFalse(foundStates.has(automata.getState("s2").data.id), "s2 is in the search results for 's3'");
+        assert.isTrue(foundStates.has(automata.getState("s3").data.id), "s3 is not in the search results for 's3'");
+        assert.isTrue(foundStates.has(automata.getState("s34").data.id), "s34 is not in the search results for 's3'");
+        assert.isFalse(foundStates.has(automata.getState("s4").data.id), "s4 is in the search results for 's3'");
+    });
 });

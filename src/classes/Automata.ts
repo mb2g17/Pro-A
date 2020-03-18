@@ -467,6 +467,24 @@ export default abstract class Automata {
     }
 
     /**
+     * Finds states by name
+     * @param name - the name to search for
+     * @returns a set of IDs that match the name
+     */
+    public findStates(name: string): Set<string> {
+        const foundStates: Set<string> = new Set();
+        Object.keys(this.cacheNodeID).forEach(stateName => {
+            // Get ID and display name
+            const ID = this.cacheNodeID[stateName];
+            const displayName = this.data[ID].data.displayName;
+
+            if (displayName.includes(name))
+                foundStates.add(this.cacheNodeID[stateName]);
+        });
+        return foundStates;
+    }
+
+    /**
      * Reads the next input symbol and travels to the next state
      */
     public step(): void {
