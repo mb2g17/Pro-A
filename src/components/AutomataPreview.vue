@@ -49,7 +49,7 @@ export default class AutomataPreview extends Vue {
     /** The cytoscape instance in this preview component */
     public cy: any;
 
-    /** Set of selected nodes */
+    /** ID of selected items */
     public selectedNodes: Set<any> = new Set();
 
     /** The x position of the mouse on the automata canvas, updated by mousemove */

@@ -27,21 +27,10 @@
 
                         </b-tab>
 
-                        <b-tab title="Visualisation" active>
+                        <b-tab title="Visualisation">
 
                             <!-- Multi-level exploration -->
-                            <div id="multilevel-exploration">
-                                <b-form-checkbox
-                                        class="mt-2"
-                                        v-model="isMultilevelExplorationEnabled"
-                                        :value="true"
-                                        :unchecked-value="false"
-                                >
-                                    Multi-level exploration
-                                </b-form-checkbox>
-                                <b-form-input :disabled="!isMultilevelExplorationEnabled" type="number"
-                                              placeholder="Abstraction level"/>
-                            </div>
+                            <MultiLevelSelect @multiLevelExplore="onMultiLevelExplore"></MultiLevelSelect>
 
                             <!-- Search -->
                             <b-form-input type="text" placeholder="State search" class="mt-3" @keyup.enter="onSearch"/>
@@ -125,11 +114,12 @@
     import NewTransitionModal from "@/components/NewTransitionModal.vue";
     import SearchTable from "@/components/SearchTable.vue";
     import AutomataConfig from "@/classes/AutomataConfig";
+    import MultiLevelSelect from "@/components/MultiLevelSelect.vue";
 
     @Component({
         components: {
             // Custom components
-            ConfigTable, AutomataPreview, NewTransitionModal, SearchTable,
+            ConfigTable, AutomataPreview, NewTransitionModal, SearchTable, MultiLevelSelect,
 
             // Bootstrap components
             BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea, BFormCheckbox,
@@ -148,9 +138,6 @@
         /** The set of current configurations of this automata (to be displayed) */
         private currentConfigs: Set<AutomataConfig> = new Set();
 
-        /** If true, user wants to perform multi-level exploration */
-        private isMultilevelExplorationEnabled: boolean = false;
-
         /** If true, we are simulating. If false, we aren't */
         private isSimulating: boolean = false;
 
@@ -167,7 +154,7 @@
          */
         public zoom(direction: string) {
             // Gets automata preview reference
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
             // Gets new zoom level
             let zoomLevel = automataPreview.cy.zoom();
@@ -198,7 +185,7 @@
          */
         private onCreateTransition(args: any) {
             // Gets automata preview
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
             // Destructures arguments
             const {event, sourceNode, targetNode, addedEles} = args;
@@ -302,7 +289,7 @@
          */
         public onStateFoldClick() {
             // Gets automata preview
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
             // Creates parent node
             let parentID = uuidv1();
@@ -345,7 +332,7 @@
          */
         public async onDuplicateClick() {
             // Gets automata preview
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
             // If there are selected nodes
             if (automataPreview.selectedNodes.size > 0) {
@@ -380,7 +367,7 @@
          */
         public onUnionClick() {
             // Gets automata preview
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
             switch (this.operationState.selectStage) {
                 case 0:
@@ -433,7 +420,7 @@
          */
         public onConcatenationClick() {
             // Gets automata preview
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
             // Acts based on automata stage
             switch (this.operationState.selectStage) {
@@ -489,7 +476,7 @@
          */
         public onKleeneStarClick() {
             // Gets automata preview
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
             if (automataPreview.selectedNodes.size > 0) {
                 // Gets final states and initial states of the automata
@@ -524,7 +511,7 @@
          */
         public onProductClick() {
             // Gets automata preview
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
             // Acts based on automata stage
             switch (this.operationState.selectStage) {
@@ -575,20 +562,80 @@
          * When the user wants to search for a state
          */
         public onSearch(event: any) {
+            // Gets query string
             const query: string = event.target.value;
-            this.$refs[`searchTable${this.index}`].setTable(query, this.automata.findStates(query));
+
+            // Gets search table reference
+            const searchTable: any = (this.$refs[`searchTable${this.index}`] as any);
+
+            // Sets table contents via query
+            searchTable.setTable(query, this.automata.findStates(query));
         }
 
         /**
          * When the user clicked on an item in the search table
          */
         public onSearchItemClick(id: string) {
-            console.log(`Snapping to ${id}`);
             // Gets automata preview and deselects everything
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
 
             // Get position of node and pans there
             automataPreview.cy.center(automataPreview.cy.getElementById(id));
+        }
+
+        /**
+         * When the user wants to see multi-levels
+         */
+        private onMultiLevelExplore(level: number) {
+            // Gets automata preview and deselects everything
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
+
+            // Clear all selected nodes
+            automataPreview.selectedNodes.forEach((selectedNode: any) => automataPreview.cy.getElementById(selectedNode).unselect());
+
+            // If the level is -1, don't select anything
+            if (level === -1)
+                return;
+
+            // Stores names of open and closed nodes
+            const openNodes: [string, number][] = [];
+            const closedNodes: Set<string> = new Set();
+
+            // Fills open nodes with initial states
+            this.automata.getInitialStates().forEach((initialState: any) => openNodes.push([initialState, 0]));
+
+            // Goes through all open nodes
+            while (openNodes.length > 0) {
+                // Pops next node
+                const currentNodePopped = openNodes.pop();
+                if (currentNodePopped) {
+                    const [currentNode, currentLevel]: [string, number] = currentNodePopped;
+
+                    // If this node is closed, don't bother
+                    if (closedNodes.has(currentNode))
+                        continue;
+
+                    // Select this node
+                    console.log(currentNode);
+                    const currentNodeID = this.automata.getState(currentNode).data.id;
+                    automataPreview.cy.getElementById(currentNodeID).select();
+
+                    // Close this node
+                    closedNodes.add(currentNode);
+
+                    // If there are still levels to go up by
+                    if (currentLevel < level) {
+                        // Get the next nodes we can go to and add to open nodes
+                        const targetNodeNames = Object.keys(this.automata.cacheTransition.getTargetMappings(currentNode));
+                        targetNodeNames.forEach((targetNodeName: any) => openNodes.push([
+                            targetNodeName,
+                            currentLevel + 1
+                        ]));
+                    }
+                } else {
+                    break;
+                }
+            }
         }
 
         /**
@@ -597,7 +644,7 @@
          */
         private onNewTransitionModalHide() {
             // Gets automata preview and deselects everything
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
+            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
             for (const selectedID of automataPreview.selectedNodes)
                 automataPreview.cy.getElementById(selectedID).unselect();
             automataPreview.selectedNodes.clear();
