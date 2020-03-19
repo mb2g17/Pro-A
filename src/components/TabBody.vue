@@ -10,34 +10,45 @@
                     <!-- Automata type display -->
                     <h2>{{ automata.getModelName() }}</h2>
 
-                    <!-- Operations -->
-                    <div id="operations">
-                        <b-button variant="warning" @click="onStateFoldClick">State fold</b-button>
-                        <b-button variant="primary" @click="onDuplicateClick">Duplicate</b-button>
-                        <b-button :variant="operationState.operationName !== 'union' ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
-                        <b-button :variant="operationState.operationName !== 'concatenation' ? 'primary' : 'success'" @click="onConcatenationClick">Concatenation</b-button>
-                        <b-button :variant="operationState.operationName !== 'kleene-star' ? 'primary' : 'success'" @click="onKleeneStarClick">Kleene Star</b-button>
-                        <b-button :variant="operationState.operationName !== 'product' ? 'primary' : 'success'" @click="onProductClick">Product</b-button>
-                        <b-button v-if="operationState.operationName" variant="danger" @click="clearOperationState">Cancel</b-button>
-                    </div>
+                    <!-- Tabbed functionalities -->
+                    <b-tabs>
+                        <b-tab title="Operations" active>
 
-                    <!-- Multi-level exploration -->
-                    <div id="multilevel-exploration">
-                        <b-form-checkbox
-                                class="mt-2"
-                                v-model="isMultilevelExplorationEnabled"
-                                :value="true"
-                                :unchecked-value="false"
-                        >
-                            Multi-level exploration
-                        </b-form-checkbox>
-                        <b-form-input :disabled="!isMultilevelExplorationEnabled" type="number"
-                                      placeholder="Abstraction level"/>
-                    </div>
+                            <!-- Operations -->
+                            <div id="operations">
+                                <b-button variant="warning" @click="onStateFoldClick">State fold</b-button>
+                                <b-button variant="primary" @click="onDuplicateClick">Duplicate</b-button>
+                                <b-button :variant="operationState.operationName !== 'union' ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
+                                <b-button :variant="operationState.operationName !== 'concatenation' ? 'primary' : 'success'" @click="onConcatenationClick">Concatenation</b-button>
+                                <b-button :variant="operationState.operationName !== 'kleene-star' ? 'primary' : 'success'" @click="onKleeneStarClick">Kleene Star</b-button>
+                                <b-button :variant="operationState.operationName !== 'product' ? 'primary' : 'success'" @click="onProductClick">Product</b-button>
+                                <b-button v-if="operationState.operationName" variant="danger" @click="clearOperationState">Cancel</b-button>
+                            </div>
 
-                    <!-- Search -->
-                    <b-form-input type="text" placeholder="State search" class="mt-3" @keyup.enter="onSearch"/>
-                    <SearchTable :automata="automata" :ref="`searchTable${index}`" @itemClick="onSearchItemClick"></SearchTable>
+                        </b-tab>
+
+                        <b-tab title="Visualisation" active>
+
+                            <!-- Multi-level exploration -->
+                            <div id="multilevel-exploration">
+                                <b-form-checkbox
+                                        class="mt-2"
+                                        v-model="isMultilevelExplorationEnabled"
+                                        :value="true"
+                                        :unchecked-value="false"
+                                >
+                                    Multi-level exploration
+                                </b-form-checkbox>
+                                <b-form-input :disabled="!isMultilevelExplorationEnabled" type="number"
+                                              placeholder="Abstraction level"/>
+                            </div>
+
+                            <!-- Search -->
+                            <b-form-input type="text" placeholder="State search" class="mt-3" @keyup.enter="onSearch"/>
+                            <SearchTable :automata="automata" :ref="`searchTable${index}`" @itemClick="onSearchItemClick"></SearchTable>
+
+                        </b-tab>
+                    </b-tabs>
                 </b-col>
 
                 <!-- CYTOSCAPE -->
@@ -83,7 +94,7 @@
                     <b-button variant="danger" class="mb-3" @click="onCancelClick">Cancel</b-button>
 
                     <p>Number of states: {{ Object.keys(automata["cacheNodeID"]).length }}</p>
-                    <p>Number of transitions: {{ automata["cacheTransition"]["cacheNoOfTransitions"] }}</p>
+                    <p>Number of transitions: {{ automata["cacheTransition"].getNumberOfTransitions() }}</p>
                     <p>Number of objects: {{ Object.keys(automata["cacheNodeID"]).length + automata["cacheTransition"]["cacheNoOfTransitions"] }}</p>
 
                     <!-- Decision -->

@@ -28,6 +28,14 @@ export class AutomataTransitionCache {
     }
 
     /**
+     * Gets the number of transitions
+     * @returns number of transitions that exist
+     */
+    public getNumberOfTransitions(): number {
+        return this.cacheNoOfTransitions;
+    }
+
+    /**
      * Gets transitions based on source and target
      * @param source - the name of the source state of the transition
      * @param target - the name of the target state of the transition

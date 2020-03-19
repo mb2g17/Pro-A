@@ -1,15 +1,18 @@
 <template>
-    <div>
-        <template v-if="dirty">
-            <b-table :items="items" :fields="fields" v-if="items.length > 0">
+    <!-- Scrollable pane -->
+    <div id="scrollablePane" v-if="dirty">
 
-                <template v-slot:cell(state_name)="data">
-                    <p class="item" @click="onItemClick(data.item.id)">{{ data.item.state_name }}</p>
-                </template>
+        <!-- Table -->
+        <b-table :items="items" :fields="fields" v-if="items.length > 0">
 
-            </b-table>
-            <p v-else>No results for '{{ query }}'.</p>
-        </template>
+            <!-- Items -->
+            <template v-slot:cell(state_name)="data">
+                <p class="item" @click="onItemClick(data.item.id)">{{ data.item.state_name }}</p>
+            </template>
+
+        </b-table>
+        <p v-else>No results for '{{ query }}'.</p>
+
     </div>
 </template>
 
@@ -91,5 +94,10 @@
     .item:hover {
         cursor:pointer;
         background-color: palegreen;
+    }
+
+    #scrollablePane {
+        overflow-y: scroll;
+        height: 400px;
     }
 </style>

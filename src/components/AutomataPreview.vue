@@ -546,5 +546,9 @@ export default class AutomataPreview extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
+    /* Sets the hight of cytoscape div to min-height */
+    #cytoscape-div {
+        height: 1px;
+    }
 </style>
