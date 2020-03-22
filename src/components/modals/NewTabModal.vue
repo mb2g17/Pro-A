@@ -66,6 +66,9 @@
         /** If true, modal is visible. If false, it is not */
         private isModalVisible: boolean = false;
 
+        /** Callback function to run when new automata has been "created" */
+        private callback!: (type: string, name: string) => void;
+
         mounted() {
             // Hacky jQuery event that creates automata upon 'enter' keypress
             $(document).on('keypress', e => {
@@ -76,15 +79,18 @@
         }
 
         /**
-         * Toggles the modal
+         * Shows the modal
          */
-        public toggle() {
+        public show(callback: (type: string, name: string) => void) {
             // Clears data
             this.type = "FA";
             this.name = "";
 
-            // Toggles the modal
-            (this.$refs['newTabModal'] as any).toggle("newTabModal");
+            // Sets callback
+            this.callback = callback;
+
+            // Shows the modal
+            (this.$refs['newTabModal'] as any).show();
         }
 
         /**
@@ -115,14 +121,11 @@
          * When the user clicks on 'add'
          */
         private onAddClick() {
-            // Emits event
-            this.$emit('add', {
-                type: this.type,
-                name: this.name ? this.name : "Automata"
-            });
+            // Runs callback
+            this.callback(this.type, this.name ? this.name : "Automata");
 
             // Hides modal
-            (this.$refs['newTabModal'] as any).hide("newTabModal");
+            (this.$refs['newTabModal'] as any).hide();
         }
 
         /**
@@ -130,7 +133,7 @@
          */
         private onCancelClick() {
             // Hides the modal
-            (this.$refs['newTabModal'] as any).hide("newTabModal");
+            (this.$refs['newTabModal'] as any).hide();
         }
     }
 </script>

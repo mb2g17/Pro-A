@@ -135,10 +135,6 @@
 
     @Component
     export default class NewTransitionModal extends Vue {
-
-        /** The automata being modelled */
-        @Prop() public readonly automata!: Automata;
-
         /** The mode the modal is in right now */
         private mode: NewTransitionModalMode = NewTransitionModalMode.ADD;
 
@@ -150,6 +146,9 @@
 
         /** The inputted (raw) transition symbol */
         private inputtedTransitionSymbol: string = "";
+
+        /** The type of the automata we're editing */
+        private automataType: "FA" | "PDA" | "TM" = "FA";
 
         /** State of inputs if it's a PDA */
         private pdaState: any = {
@@ -179,27 +178,21 @@
         /** If true, this is an epsilon move. False if not */
         private isEpsilonMove: boolean = false;
 
-        /** Stores source node of this new transition (if add mode) */
-        private sourceNode: any;
+        /** Callback function after adding/editing a transition */
+        private callback!: (symbol: string, payload: any) => void;
 
-        /** Stores target node of this new transition (if add mode) */
-        private targetNode: any;
-
-        /** Stores the transition ID we are editing (if edit mode) */
-        private transitionID: string = "";
-
-        mounted() {
+        private mounted() {
             this.modalID = uuid(); // Sets random modal ID
         }
 
-        get NewTransitionModalMode() {
+        private get NewTransitionModalMode() {
             return NewTransitionModalMode;
         }
 
         /**
          * The real transition symbol
          */
-        get transitionSymbol() {
+        private get transitionSymbol() {
             // Epsilon move
             if (this.isEpsilonMove)
                 return AutomataCharacters.Epsilon;
@@ -229,7 +222,7 @@
         /**
          * The real inputted stack symbol (PDA only)
          */
-        get inputStackSymbol() {
+        private get inputStackSymbol() {
             if (this.pdaState.isEmptyStackSymbol)
                 return AutomataCharacters.EmptyStackSymbol;
             if (this.pdaState.isAnySymbol)
@@ -240,14 +233,14 @@
         /**
          * The real output stack symbols (PDA only)
          */
-        get outputStackSymbols() {
+        private get outputStackSymbols() {
             return this.pdaState.inputtedOutputStackSymbols.map((symbol: any) => symbol ? symbol : 'A');
         }
 
         /**
          * The payload needed to pass into the automata method
          */
-        get payload() {
+        private get payload() {
             if (this.automataType === "PDA")
                 return {
                     input: this.inputStackSymbol,
@@ -266,32 +259,22 @@
         }
 
         /**
-         * Gets the type of automata we're doing a transition for
-         * @returns 'FA', 'PDA' or 'TM'. undefined if it's something else entirely
-         */
-        get automataType(): "FA" | "PDA" | "TM" | undefined {
-            if (this.automata instanceof FiniteAutomata)
-                return "FA";
-            if (this.automata instanceof PushdownAutomata)
-                return "PDA";
-            if (this.automata instanceof TuringMachine)
-                return "TM";
-            return undefined;
-        }
-
-        /**
          * Shows the modal, "add" mode
+         * @param automataType - the type of automata to make a transition for
+         * @param callback - the callback function when a transition has been made
          */
-        public show(sourceNode: any, targetNode: any) {
+        public show(automataType: "FA" | "PDA" | "TM", callback: (symbol: string, payload: any) => void) {
             // Sets mode
             this.mode = NewTransitionModalMode.ADD;
 
-            // Stores data
-            this.sourceNode = sourceNode;
-            this.targetNode = targetNode;
+            // Stores automata type
+            this.automataType = automataType;
 
             // Clears data
             this.clearData();
+
+            // Stores callback
+            this.callback = callback;
 
             // Shows the modal
             this.$bvModal.show(this.modalID);
@@ -299,39 +282,33 @@
 
         /**
          * Shows the modal, "edit" mode
+         * @param automataType - the type of automata to edit a transition for
+         * @param transition - the transition data
+         * @param callback - the callback function when the transition has been edited
          */
-        public showEdit(transitionID: string) {
+        public showEdit(automataType: "FA" | "PDA" | "TM", transition: any, callback: (symbol: string, payload: any) => void) {
             // Sets mode
             this.mode = NewTransitionModalMode.EDIT;
 
-            // Remembers transition ID
-            this.transitionID = transitionID;
+            // Stores automata type
+            this.automataType = automataType;
 
             // Clears data
             this.clearData();
 
-            // Gets transition
-            const transition = this.automata.getData()[transitionID].data;
-
-            // Gets source and target states
-            const [source, target] = [this.automata.getData()[transition.source], this.automata.getData()[transition.target]];
-            this.sourceNode = {
-                "_private": source
-            };
-            this.targetNode = {
-                "_private": target
-            };
+            // Stores callback
+            this.callback = callback;
 
             // Fills in data
             this.isEpsilonMove = transition.symbol === AutomataCharacters.Epsilon;
 
-            if (this.automata instanceof PushdownAutomata) {
+            if (this.automataType === "PDA") {
                 this.pdaState.isEmptyStackSymbol = transition.input === AutomataCharacters.EmptyStackSymbol;
                 this.pdaState.isAnySymbol = transition.input === AutomataCharacters.Epsilon;
                 if (!this.pdaState.isEmptyStackSymbol && !this.pdaState.isAnySymbol)
                     this.pdaState.inputtedInputStackSymbol = transition.input;
                 this.pdaState.inputtedOutputStackSymbols = transition.output;
-            } else if (this.automata instanceof TuringMachine) {
+            } else if (this.automataType === "TM") {
                 this.tmState.isEmptySymbol = transition.readTapeSymbol === AutomataCharacters.EmptySymbol;
                 this.tmState.isStartTapeSymbol = transition.readTapeSymbol === AutomataCharacters.StartTapeSymbol;
 
@@ -411,8 +388,8 @@
          * When the user clicks add
          */
         private onAddClick() {
-            // Adds transition
-            this.automata.addTransition(this.transitionSymbol, this.sourceNode._private.data.name, this.targetNode._private.data.name, this.payload);
+            // Runs callback
+            this.callback(this.transitionSymbol, this.payload);
 
             // Hides the modal
             this.$bvModal.hide(this.modalID);
@@ -422,8 +399,7 @@
          * When the user clicks edit
          */
         private onEditClick() {
-            // Removes existing transition, then add the new one (updates cache too)
-            this.automata.removeTransitionWithID(this.transitionID);
+            // Just do the same as adding
             this.onAddClick();
         }
 

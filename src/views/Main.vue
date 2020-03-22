@@ -30,11 +30,12 @@
 
             <!-- New Automata Button (Using tabs-end slot) -->
             <template v-slot:tabs-end>
-                <b-nav-item @click.prevent="$refs['newTabModal'].toggle()" href="#"><b>+</b></b-nav-item>
+                <b-nav-item @click.prevent="onNewAutomataClick" href="#"><b>+</b></b-nav-item>
             </template>
         </b-tabs>
 
-        <NewTabModal ref="newTabModal" @add="createAutomata($event.type, $event.name)" />
+        <!-- Modals -->
+        <Modals></Modals>
 
     </div>
 </template>
@@ -68,9 +69,12 @@ import {FileSaverOptions, saveAs} from 'file-saver';
 import {readFileAsync} from "@/misc/filereader";
 import AutomataDeserializer from "../classes/AutomataDeserializer";
 import { Base64 } from 'js-base64';
+import ModalsEventHandler from "@/events/ModalsEventHandler";
+import Modals from "@/components/Modals.vue";
 
 @Component({
     components: {
+        Modals,
         ConfigTable,
         AutomataPreview,
         NewTabModal,
@@ -146,6 +150,15 @@ export default class Main extends Vue {
 
         // Pushes to array
         this.automatas.push(newAutomata);
+    }
+
+    /**
+     * When the user wants to make a new automata
+     */
+    private onNewAutomataClick() {
+        ModalsEventHandler.$emit("onNewAutomata", (type: string, name: string) => {
+            this.createAutomata(type, name);
+        });
     }
 
     /**

@@ -44,9 +44,6 @@
             </b-row>
         </b-container>
 
-        <!-- New transition modal -->
-        <NewTransitionModal :ref="`newTransitionModal${index}`" :automata="automata" @hide="onNewTransitionModalHide" />
-
     </div>
 
 </template>
@@ -66,6 +63,10 @@
     import MiddlePane from "@/components/middlepane/MiddlePane.vue";
     import RightPane from "@/components/rightpane/RightPane.vue";
     import LeftPane from "@/components/leftpane/LeftPane.vue";
+    import ModalsEventHandler from "@/events/ModalsEventHandler";
+    import FiniteAutomata from "@/classes/FiniteAutomata";
+    import PushdownAutomata from "@/classes/PushdownAutomata";
+    import TuringMachine from "@/classes/TuringMachine";
 
     @Component({
         components: {
@@ -110,8 +111,27 @@
             // Removes automatically created element
             this.automataPreview.cy.remove(addedEles);
 
-            // Shows modal
-            (this.$refs[`newTransitionModal${this.index}`] as any).show(sourceNode, targetNode);
+            // Gets automata type
+            let automataType: string = "";
+            if (this.automata instanceof FiniteAutomata)
+                automataType = "FA";
+            if (this.automata instanceof PushdownAutomata)
+                automataType = "PDA";
+            if (this.automata instanceof TuringMachine)
+                automataType = "TM";
+
+            // Uses modal for transition creation
+            ModalsEventHandler.$emit("onNewTransition", {
+                automataType,
+                callback: (symbol: string, payload: any) => {
+                    this.automata.addTransition(
+                        symbol,
+                        sourceNode.json().data.name,
+                        targetNode.json().data.name,
+                        payload
+                    );
+                }
+            });
         }
 
         /**
@@ -119,8 +139,36 @@
          * @param transitionID - the ID of the transition to edit
          */
         private onEditTransition(transitionID: string) {
-            // Shows modal
-            (this.$refs[`newTransitionModal${this.index}`] as any).showEdit(transitionID);
+            // Gets automata type
+            let automataType: string = "";
+            if (this.automata instanceof FiniteAutomata)
+                automataType = "FA";
+            if (this.automata instanceof PushdownAutomata)
+                automataType = "PDA";
+            if (this.automata instanceof TuringMachine)
+                automataType = "TM";
+
+            // Gets source and target nodes in advance
+            const [sourceNode, targetNode] = [
+                this.automata.getData()[transitionID].data.sourceName,
+                this.automata.getData()[transitionID].data.targetName
+            ];
+
+            // Uses modal for transition editing
+            ModalsEventHandler.$emit("onEditTransition", {
+                automataType,
+                transition: this.automata.getData()[transitionID].data,
+                callback: (symbol: string, payload: any) => {
+                    // Remove old transition, add new one
+                    this.automata.removeTransitionWithID(transitionID);
+                    this.automata.addTransition(
+                        symbol,
+                        sourceNode,
+                        targetNode,
+                        payload
+                    );
+                }
+            });
         }
 
         /**
