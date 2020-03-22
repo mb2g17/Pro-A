@@ -5,92 +5,40 @@
         <b-container fluid>
             <b-row>
 
-                <!-- FOLDING, AUTOMATA OPERATIONS, EXPLORATION AND SEARCH -->
+                <!-- LEFT PANE (FOLDING, AUTOMATA OPERATIONS, EXPLORATION AND SEARCH) -->
                 <b-col>
-                    <!-- Automata type display -->
-                    <h2>{{ automata.getModelName() }}</h2>
+                    <LeftPane :automata="automata"
+                              ref="leftPane"
+                              @onOperationButtonClick="onOperationButtonClick"
+                              @onStateFoldCompute="onStateFoldCompute"
+                              @onDuplicateCompute="onDuplicateCompute"
+                              @onUnionCompute="onUnionCompute"
+                              @onConcatenationCompute="onConcatenationCompute"
+                              @onKleeneStarCompute="onKleeneStarCompute"
+                              @onProductCompute="onProductCompute"
 
-                    <!-- Tabbed functionalities -->
-                    <b-tabs>
-                        <b-tab title="Operations" active>
-
-                            <!-- Operations -->
-                            <div id="operations">
-                                <b-button variant="warning" @click="onStateFoldClick">State fold</b-button>
-                                <b-button variant="primary" @click="onDuplicateClick">Duplicate</b-button>
-                                <b-button :variant="operationState.operationName !== 'union' ? 'primary' : 'success'" @click="onUnionClick">Union</b-button>
-                                <b-button :variant="operationState.operationName !== 'concatenation' ? 'primary' : 'success'" @click="onConcatenationClick">Concatenation</b-button>
-                                <b-button :variant="operationState.operationName !== 'kleene-star' ? 'primary' : 'success'" @click="onKleeneStarClick">Kleene Star</b-button>
-                                <b-button :variant="operationState.operationName !== 'product' ? 'primary' : 'success'" @click="onProductClick">Product</b-button>
-                                <b-button v-if="operationState.operationName" variant="danger" @click="clearOperationState">Cancel</b-button>
-                            </div>
-
-                        </b-tab>
-
-                        <b-tab title="Visualisation">
-
-                            <!-- Multi-level exploration -->
-                            <MultiLevelSelect @multiLevelExplore="onMultiLevelExplore"></MultiLevelSelect>
-
-                            <!-- Search -->
-                            <b-form-input type="text" placeholder="State search" class="mt-3" @keyup.enter="onSearch"/>
-                            <SearchTable :automata="automata" :ref="`searchTable${index}`" @itemClick="onSearchItemClick"></SearchTable>
-
-                        </b-tab>
-                    </b-tabs>
+                              @onMultiLevelExplore="onMultiLevelExplore"
+                              @onSearchItemClick="onSearchItemClick"
+                    ></LeftPane>
                 </b-col>
 
-                <!-- CYTOSCAPE -->
+                <!-- MIDDLE PANE (CYTOSCAPE) -->
                 <b-col cols="6">
-
-                    <!-- Zoom and styles -->
-                    <div id="zoom-and-styles">
-                        <div id="zoom">
-                            <b-button variant="warning" @click="zoom('in')">
-                                <font-awesome-icon :icon="['fas', 'search-plus']" />
-                            </b-button>
-                            <b-button variant="warning" @click="zoom('out')">
-                                <font-awesome-icon :icon="['fas', 'search-minus']" />
-                            </b-button>
-                        </div>
-                        <b-button variant="success">Styles</b-button>
-                    </div>
-
-                    <!-- AUTOMATA PREVIEW -->
-                    <AutomataPreview
-                            :automata="automata"
-                            :ref="`automata${index}`"
-                            @createTransition="onCreateTransition"
-                            @editTransition="onEditTransition"
-                            @editState="onEditState"
-                    />
-
+                    <MiddlePane :automata="automata"
+                                ref="middlePane"
+                                @onCreateTransition="onCreateTransition"
+                                @onEditTransition="onEditTransition"
+                                @onEditState="onEditState"
+                    ></MiddlePane>
                 </b-col>
 
-                <!-- INPUTS -->
+                <!-- RIGHT PANE (INPUTS) -->
                 <b-col>
-                    <b-form-textarea
-                            class="mb-3"
-                            v-model="inputString"
-                            placeholder="Input string"
-                            rows="3"
-                            max-rows="6"
-                    />
-                    <div class="d-flex justify-content-center mb-2">
-                        <b-button variant="primary" @click="onPassInputClick" class="mr-2">Compute immediately</b-button>
-                        <b-button variant="primary" @click="onStepClick">Step</b-button>
-                    </div>
-                    <b-button variant="danger" class="mb-3" @click="onCancelClick">Cancel</b-button>
-
-                    <p>Number of states: {{ Object.keys(automata["cacheNodeID"]).length }}</p>
-                    <p>Number of transitions: {{ automata["cacheTransition"].getNumberOfTransitions() }}</p>
-                    <p>Number of objects: {{ Object.keys(automata["cacheNodeID"]).length + automata["cacheTransition"]["cacheNoOfTransitions"] }}</p>
-
-                    <!-- Decision -->
-                    <h2 id="decision" v-if="isSimulating">{{ outcome }}</h2>
-
-                    <!-- Config -->
-                    <ConfigTable :configs="currentConfigs" />
+                    <RightPane  :automata="automata"
+                                ref="rightPane"
+                                @onPassInputClick="onPassInputClick"
+                                @onStepClick="onStepClick"
+                    ></RightPane>
                 </b-col>
 
             </b-row>
@@ -106,19 +54,23 @@
 <script lang="ts">
     import {Vue, Component, Prop} from 'vue-property-decorator';
     import { BButton, BContainer, BRow, BCol, BTabs, BTab, BFormTextarea, BFormCheckbox } from 'bootstrap-vue';
-    import AutomataPreview from '@/components/AutomataPreview.vue';
-    import ConfigTable from '@/components/ConfigTable.vue';
+    import AutomataPreview from '@/components/middlepane/AutomataPreview.vue';
+    import ConfigTable from '@/components/rightpane/animation/ConfigTable.vue';
     import Automata from "../classes/Automata";
     import uuidv1 from "uuid/v1";
     import AutomataOperations from "@/classes/AutomataOperations";
-    import NewTransitionModal from "@/components/NewTransitionModal.vue";
-    import SearchTable from "@/components/SearchTable.vue";
-    import AutomataConfig from "@/classes/AutomataConfig";
-    import MultiLevelSelect from "@/components/MultiLevelSelect.vue";
+    import NewTransitionModal from "@/components/modals/NewTransitionModal.vue";
+    import SearchTable from "@/components/leftpane/visualisation/SearchTable.vue";
+    import MultiLevelSelect from "@/components/leftpane/visualisation/MultiLevelSelect.vue";
+
+    import MiddlePane from "@/components/middlepane/MiddlePane.vue";
+    import RightPane from "@/components/rightpane/RightPane.vue";
+    import LeftPane from "@/components/leftpane/LeftPane.vue";
 
     @Component({
         components: {
             // Custom components
+            MiddlePane, RightPane, LeftPane,
             ConfigTable, AutomataPreview, NewTransitionModal, SearchTable, MultiLevelSelect,
 
             // Bootstrap components
@@ -129,69 +81,34 @@
         @Prop() public readonly automata!: Automata;
         @Prop() public readonly index!: number;
 
-        /** The input string inputted by the user */
-        private inputString: string = '';
+        /** Automata preview reference */
+        private automataPreview: any;
 
-        /** The outcome of an animation */
-        private outcome: string = "UNDECIDED";
+        /** Right pane reference */
+        private rightPane: any;
 
-        /** The set of current configurations of this automata (to be displayed) */
-        private currentConfigs: Set<AutomataConfig> = new Set();
+        /** Left pane reference */
+        private leftPane: any;
 
-        /** If true, we are simulating. If false, we aren't */
-        private isSimulating: boolean = false;
+        /** Middle pane reference */
+        private middlePane: any;
 
-        /** The state of an automata operation */
-        private operationState: any = {
-            operationName: '', // The name of the operation we're doing
-            selectStage: 0, // Stages of selecting nodes; used for automata operations
-            selectedStates: new Set() // The selected states for this stage
-        };
-
-        /**
-         * Zooms the canvas in a direction
-         * @param direction either the string 'in' or 'out' for zooming in and out; everything else will be ignored
-         */
-        public zoom(direction: string) {
-            // Gets automata preview reference
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
-
-            // Gets new zoom level
-            let zoomLevel = automataPreview.cy.zoom();
-            if (direction === "in")
-                zoomLevel += 0.15;
-            else if (direction === "out")
-                zoomLevel -= 0.15;
-
-            // Sets new zoom level from the centre of the viewport
-            automataPreview.cy.zoom({
-                level: zoomLevel,
-                renderedPosition: {x: automataPreview.cy.width() / 2, y: automataPreview.cy.height() / 2}
-            });
-        }
-
-        /**
-         * Clears the automata operation state
-         */
-        public clearOperationState() {
-            this.$set(this, "operationState", {});
-            this.$set(this.operationState, "operationName", '');
-            this.$set(this.operationState, "selectStage", 0);
-            this.$set(this.operationState, "selectedStates", new Set());
+        private mounted() {
+            this.automataPreview = (this.$refs["middlePane"] as any).getAutomataPreviewReference();
+            this.rightPane = (this.$refs["rightPane"] as any);
+            this.leftPane = (this.$refs["leftPane"] as any);
+            this.middlePane = (this.$refs["middlePane"] as any);
         }
 
         /**
          * When user wants to create a transition
          */
         private onCreateTransition(args: any) {
-            // Gets automata preview
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
-
             // Destructures arguments
             const {event, sourceNode, targetNode, addedEles} = args;
 
             // Removes automatically created element
-            automataPreview.cy.remove(addedEles);
+            this.automataPreview.cy.remove(addedEles);
 
             // Shows modal
             (this.$refs[`newTransitionModal${this.index}`] as any).show(sourceNode, targetNode);
@@ -202,9 +119,6 @@
          * @param transitionID - the ID of the transition to edit
          */
         private onEditTransition(transitionID: string) {
-            // Gets automata preview
-            const automataPreview: AutomataPreview = (this.$refs[`automata${this.index}`] as AutomataPreview);
-
             // Shows modal
             (this.$refs[`newTransitionModal${this.index}`] as any).showEdit(transitionID);
         }
@@ -231,21 +145,20 @@
         /**
          * When the user clicks on "Pass input" button
          */
-        public onPassInputClick() {
+        private onPassInputClick() {
             // We are now simulating
-            this.isSimulating = true;
+            this.rightPane.AnimationPane.isSimulating = true;
 
             // Clears automata
             this.automata.reset();
 
             // Sets the input string
-            this.automata.setInput(this.inputString);
-            this.inputString = '';
+            this.automata.setInput(this.rightPane.AnimationPane.inputString);
+            this.rightPane.AnimationPane.inputString = '';
             this.automata.simulate();
 
-            // Gets outcome and current configuration
-            this.$set(this, "outcome", this.automata.getOutcome().toLocaleString());
-            this.$set(this, "currentConfigs", this.automata.getCurrentConfigs());
+            // Updates outcome and current configuration
+            this.rightPane.AnimationPane.updateOutcomeAndCurrentConfigs();
 
             // Updates vue
             this.$forceUpdate();
@@ -254,46 +167,45 @@
         /**
          * When the user clicks on "Step" button
          */
-        public onStepClick() {
+        private onStepClick() {
             // We are now simulating
-            this.isSimulating = true;
+            this.rightPane.AnimationPane.isSimulating = true;
 
             // Set new input
-            this.automata.setInput(this.inputString);
+            this.automata.setInput(this.rightPane.AnimationPane.inputString);
 
             // Steps the automata
             this.automata.step();
 
-            // Gets outcome and current configurations
-            this.$set(this, "outcome", this.automata.getOutcome().toLocaleString());
-            this.$set(this, "currentConfigs", this.automata.getCurrentConfigs());
+            // Updates outcome and current configurations
+            this.rightPane.AnimationPane.updateOutcomeAndCurrentConfigs();
 
             // Updates vue
             this.$forceUpdate();
         }
 
         /**
-         * When the user clicks on "Cancel" button
+         * When the user clicks on an operation button
          */
-        public onCancelClick() {
-            this.isSimulating = false; // We are no longer simulating
-            this.$set(this, "currentConfigs", new Set());
-            this.automata.reset(); // Reset automata configurations and input
+        private onOperationButtonClick(callback: any) {
+            // Creates callback argument (set of selected nodes)
+            const callbackArg = new Set(this.automataPreview.selectedNodes);
 
-            // Updates vue
-            this.$forceUpdate();
+            // Deselect all nodes
+            for (const selectedID of this.automataPreview.selectedNodes)
+                this.automataPreview.cy.getElementById(selectedID).unselect();
+
+            // Calls back this event with the currently selected nodes
+            callback(callbackArg);
         }
 
         /**
-         * When the user clicks the "State fold" button
+         * When the user wants to perform "State fold"
          */
-        public onStateFoldClick() {
-            // Gets automata preview
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
-
+        private onStateFoldCompute(selectedNodes: Set<string>[]) {
             // Creates parent node
             let parentID = uuidv1();
-            const parentNode = automataPreview.cy.add([
+            const parentNode = this.automataPreview.cy.add([
                 {
                     group: 'nodes',
                     data: { id: parentID, name: "" },
@@ -304,9 +216,9 @@
 
             // Sets parent of all selected nodes
             let grandParent: any = null;
-            for (const node of automataPreview.selectedNodes) {
-                grandParent = automataPreview.cy.getElementById(node)[0]._private.data.parent;
-                automataPreview.cy.getElementById(node).move({
+            for (const node of selectedNodes[0]) {
+                grandParent = this.automataPreview.cy.getElementById(node)[0]._private.data.parent;
+                this.automataPreview.cy.getElementById(node).move({
                     parent: parentID
                 });
 
@@ -317,281 +229,95 @@
             }
 
             // Sets grandparent (parent of parent)
-            automataPreview.cy.getElementById(parentID).move({
+            this.automataPreview.cy.getElementById(parentID).move({
                 parent: grandParent
             });
 
             // Add this node to automata class
             let newData: any = this.automata.getData();
-            newData[parentID] = automataPreview.cy.nodes("#" + parentID)[0]._private;
+            newData[parentID] = this.automataPreview.cy.nodes("#" + parentID)[0]._private;
             this.automata.setData(newData);
         }
 
         /**
-         * When the user clicks the "Duplicate" button
+         * When the user wants to perform "Duplicate"
          */
-        public async onDuplicateClick() {
-            // Gets automata preview
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
+        private async onDuplicateCompute(selectedNodes: Set<string>[]) {
+            // Duplicates
+            const newDuplicatedObjects: Set<string> = AutomataOperations.duplicate(this.automata, selectedNodes[0]);
 
-            // If there are selected nodes
-            if (automataPreview.selectedNodes.size > 0) {
-                // Duplicates
-                const newDuplicatedObjects: Set<string> = AutomataOperations.duplicate(this.automata, automataPreview.selectedNodes);
+            // Waits for one tick
+            await this.$nextTick();
 
-                // Waits for one
-                await this.$nextTick();
+            // De-selects the currently selected nodes
+            for (const selectedObj of this.automataPreview.selectedNodes)
+                this.automataPreview.cy.getElementById(selectedObj).unselect();
 
-                // De-selects the currently selected nodes
-                for (const selectedObj of automataPreview.selectedNodes)
-                    automataPreview.cy.getElementById(selectedObj).unselect();
+            // Clears selected nodes
+            this.automataPreview.selectedNodes.clear();
 
-                // Clears selected nodes
-                automataPreview.selectedNodes.clear();
-
-                // Selects all the duplicates
-                for (const newDuplicatedObject of newDuplicatedObjects)
-                    automataPreview.cy.getElementById(newDuplicatedObject).select();
-            } else {
-                // Tell user to select nodes
-                this.$bvToast.toast("Select a group of states/transitions, then click 'Duplicate' to copy them.", {
-                    title: 'Select a group first',
-                    variant: "warning",
-                    autoHideDelay: 5000
-                });
-            }
+            // Selects all the duplicates
+            for (const newDuplicatedObject of newDuplicatedObjects)
+                this.automataPreview.cy.getElementById(newDuplicatedObject).select();
         }
 
         /**
-         * When the user clicks the "Union" button
+         * When the user wants to perform "Union"
          */
-        public onUnionClick() {
-            // Gets automata preview
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
-
-            switch (this.operationState.selectStage) {
-                case 0:
-                    // If there are selected nodes
-                    if (automataPreview.selectedNodes.size > 0) {
-                        this.operationState.selectStage = 1;
-
-                        // Stores operation type
-                        this.operationState.operationName = "union";
-
-                        // Remember selected nodes
-                        this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
-
-                        // Tell user to input another group
-                        this.$bvToast.toast("Select the second automata and press Union.", {
-                            title: 'Select the second automata',
-                            variant: "warning",
-                            autoHideDelay: 5000
-                        });
-                    } else {
-                        // Tell user to input another group
-                        this.$bvToast.toast("Select the first automata using ALT + click on a state in the automata, and press Union.", {
-                            title: 'Select the first automata',
-                            variant: "warning",
-                            autoHideDelay: 5000
-                        });
-                    }
-                    break;
-                case 1:
-                    this.operationState.selectStage = 0;
-
-                    // Performs union
-                    AutomataOperations.union(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
-
-                    // Tell user that union is finished
-                    this.$bvToast.toast("Union successfully computed!", {
-                        title: 'Success!',
-                        variant: "success",
-                        autoHideDelay: 5000
-                    });
-
-                    // Updates operation state to be empty
-                    this.clearOperationState();
-                    break;
-            }
+        private onUnionCompute(selectedNodes: Set<string>[]) {
+            // Performs union
+            AutomataOperations.union(this.automata, selectedNodes[0], selectedNodes[1], this.automataPreview.cy);
         }
 
         /**
-         * When the user clicks the "Concatenation" button
+         * When the user wants to perform "Concatenation"
          */
-        public onConcatenationClick() {
-            // Gets automata preview
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
+        private onConcatenationCompute(selectedNodes: Set<string>[]) {
+            // Gets final states of automata 1 and initial states of automata 2
+            const finalStateAutomata1 = AutomataOperations.getFinalStates(this.automata, selectedNodes[0]);
+            const initialStateAutomata2 = AutomataOperations.getInitialStates(this.automata, selectedNodes[1]);
 
-            // Acts based on automata stage
-            switch (this.operationState.selectStage) {
-                case 0:
-                    if (automataPreview.selectedNodes.size > 0) {
-                        // Stores operation type and increments stage
-                        this.operationState.operationName = "concatenation";
-                        this.operationState.selectStage = 1;
-
-                        // Remembers the final states of 1st sub-automata
-                        this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
-
-                        // Tells user to select initial states of the second sub-automata
-                        this.$bvToast.toast("Select the second automata and press Concatenation.", {
-                            title: 'Concatenation',
-                            variant: "warning",
-                            autoHideDelay: 5000
-                        });
-                    } else {
-                        // Tells user to select final states of the first sub-automata
-                        this.$bvToast.toast("Select the first automata using ALT + click on a state in the automata, and press Concatenation.", {
-                            title: 'Concatenation',
-                            variant: "warning",
-                            autoHideDelay: 5000
-                        });
-                    }
-                    break;
-
-                case 1:
-                    // Gets final states of automata 1 and initial states of automata 2
-                    const finalStateAutomata1 = AutomataOperations.getFinalStates(this.automata, this.operationState.selectedStates);
-                    const initialStateAutomata2 = AutomataOperations.getInitialStates(this.automata, automataPreview.selectedNodes);
-
-                    // Concatenate
-                    AutomataOperations.concatenation(this.automata, finalStateAutomata1, initialStateAutomata2, automataPreview.cy);
-                    this.$forceUpdate();
-
-                    // Tells user to select initial states of the second sub-automata
-                    this.$bvToast.toast("Concatenation successfully computed!", {
-                        title: 'Concatenation',
-                        variant: "success",
-                        autoHideDelay: 5000
-                    });
-
-                    // Clears state
-                    this.clearOperationState();
-                    break;
-            }
+            // Concatenate
+            AutomataOperations.concatenation(this.automata, finalStateAutomata1, initialStateAutomata2, this.automataPreview.cy);
+            this.$forceUpdate();
         }
 
         /**
-         * When the user clicks the "Kleene star" button
+         * When the user wants to perform "Kleene star"
          */
-        public onKleeneStarClick() {
-            // Gets automata preview
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
+        private onKleeneStarCompute(selectedNodes: Set<string>[]) {
+            // Gets final states and initial states of the automata
+            const finalStates = AutomataOperations.getFinalStates(this.automata, selectedNodes[0]);
+            const initialStates = AutomataOperations.getInitialStates(this.automata, selectedNodes[0]);
 
-            if (automataPreview.selectedNodes.size > 0) {
-                // Gets final states and initial states of the automata
-                const finalStates = AutomataOperations.getFinalStates(this.automata, automataPreview.selectedNodes);
-                const initialStates = AutomataOperations.getInitialStates(this.automata, automataPreview.selectedNodes);
-
-                // Kleene star
-                AutomataOperations.kleeneStar(this.automata, finalStates, initialStates, automataPreview.cy);
-                this.$forceUpdate();
-
-                // Tells user to select initial states of the second sub-automata
-                this.$bvToast.toast("Kleene Star successfully computed!", {
-                    title: 'Kleene Star',
-                    variant: "success",
-                    autoHideDelay: 5000
-                });
-
-                // Clears state
-                this.clearOperationState();
-            } else {
-                // Tells user to select final states of the first sub-automata
-                this.$bvToast.toast("Select the automata using ALT + click on a state in the automata, and press Kleene Star.", {
-                    title: 'Kleene Star',
-                    variant: "warning",
-                    autoHideDelay: 5000
-                });
-            }
+            // Kleene star
+            AutomataOperations.kleeneStar(this.automata, finalStates, initialStates, this.automataPreview.cy);
+            this.$forceUpdate();
         }
 
         /**
-         * When the user clicks the "product" button"
+         * When the user wants to perform "Product"
          */
-        public onProductClick() {
-            // Gets automata preview
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
-
-            // Acts based on automata stage
-            switch (this.operationState.selectStage) {
-                case 0:
-                    if (automataPreview.selectedNodes.size > 0) {
-                        // Stores operation type and increments stage
-                        this.operationState.operationName = "product";
-                        this.operationState.selectStage++;
-
-                        // Remember selected nodes
-                        this.operationState.selectedStates = new Set(automataPreview.selectedNodes);
-
-                        // Tells user to select second machine
-                        this.$bvToast.toast("Select the second automata using ALT + click on a state in the automata, and press Product.", {
-                            title: 'Product',
-                            variant: "warning",
-                            autoHideDelay: 5000
-                        });
-                    } else {
-                        // Tells user to select first machine
-                        this.$bvToast.toast("Select the first automata using ALT + click on a state in the automata, and press Product.", {
-                            title: 'Product',
-                            variant: "warning",
-                            autoHideDelay: 5000
-                        });
-                    }
-                    break;
-
-                case 1:
-                    // Product
-                    AutomataOperations.product(this.automata, this.operationState.selectedStates, automataPreview.selectedNodes, automataPreview.cy);
-                    this.$forceUpdate();
-
-                    // Tells user to select initial states of the second sub-automata
-                    this.$bvToast.toast("Product successfully computed!", {
-                        title: 'Product',
-                        variant: "success",
-                        autoHideDelay: 5000
-                    });
-
-                    // Clears state
-                    this.clearOperationState();
-                    break;
-            }
-        }
-
-        /**
-         * When the user wants to search for a state
-         */
-        public onSearch(event: any) {
-            // Gets query string
-            const query: string = event.target.value;
-
-            // Gets search table reference
-            const searchTable: any = (this.$refs[`searchTable${this.index}`] as any);
-
-            // Sets table contents via query
-            searchTable.setTable(query, this.automata.findStates(query));
+        private onProductCompute(selectedNodes: Set<string>[]) {
+            // Product
+            AutomataOperations.product(this.automata, selectedNodes[0], selectedNodes[1], this.automataPreview.cy);
+            this.$forceUpdate();
         }
 
         /**
          * When the user clicked on an item in the search table
          */
-        public onSearchItemClick(id: string) {
-            // Gets automata preview and deselects everything
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
-
+        private onSearchItemClick(id: string) {
             // Get position of node and pans there
-            automataPreview.cy.center(automataPreview.cy.getElementById(id));
+            this.automataPreview.cy.center(this.automataPreview.cy.getElementById(id));
         }
 
         /**
          * When the user wants to see multi-levels
          */
         private onMultiLevelExplore(level: number) {
-            // Gets automata preview and deselects everything
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
-
             // Clear all selected nodes
-            automataPreview.selectedNodes.forEach((selectedNode: any) => automataPreview.cy.getElementById(selectedNode).unselect());
+            this.automataPreview.selectedNodes.forEach((selectedNode: any) => this.automataPreview.cy.getElementById(selectedNode).unselect());
 
             // If the level is -1, don't select anything
             if (level === -1)
@@ -616,9 +342,8 @@
                         continue;
 
                     // Select this node
-                    console.log(currentNode);
                     const currentNodeID = this.automata.getState(currentNode).data.id;
-                    automataPreview.cy.getElementById(currentNodeID).select();
+                    this.automataPreview.cy.getElementById(currentNodeID).select();
 
                     // Close this node
                     closedNodes.add(currentNode);
@@ -644,35 +369,14 @@
          */
         private onNewTransitionModalHide() {
             // Gets automata preview and deselects everything
-            const automataPreview: any = (this.$refs[`automata${this.index}`] as AutomataPreview);
-            for (const selectedID of automataPreview.selectedNodes)
-                automataPreview.cy.getElementById(selectedID).unselect();
-            automataPreview.selectedNodes.clear();
+            for (const selectedID of this.automataPreview.selectedNodes)
+                this.automataPreview.cy.getElementById(selectedID).unselect();
+            this.automataPreview.selectedNodes.clear();
         }
     }
 </script>
 
 <style lang="scss" scoped>
-    #zoom-and-styles {
-        display:flex;
-        justify-content: space-between;
-
-        padding: 5px 10px;
-    }
-    #zoom > * {
-        margin-right: 10px;
-    }
-    #operations {
-        display:flex;
-        flex-direction: column;
-        > * {
-            height: 50px;
-            text-align:left;
-            margin-bottom: 10px;
-            padding-left: 30px;
-            font-weight: bold;
-        }
-    }
     #decision {
         margin: 30px 0;
         font-weight: bold;

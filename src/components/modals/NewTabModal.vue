@@ -34,8 +34,8 @@
 <script lang="ts">
     import Vue from 'vue';
     import {Component} from 'vue-property-decorator';
-    import ConfigTable from '@/components/ConfigTable.vue';
-    import AutomataPreview from '@/components/AutomataPreview.vue';
+    import ConfigTable from '@/components/rightpane/animation/ConfigTable.vue';
+    import AutomataPreview from '@/components/middlepane/AutomataPreview.vue';
     import {
         BButton, BButtonGroup,
         BCol,

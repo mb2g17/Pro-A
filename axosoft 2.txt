@@ -39,3 +39,5 @@ OTHER / UNCATEGORISED:
 
 
 --* IN PROGRESS:
+- Generalise the modals
+- Remove indexes from reference names

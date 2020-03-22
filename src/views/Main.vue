@@ -53,16 +53,16 @@ import {
     BButtonGroup,
     BFormInput, BForm
 } from 'bootstrap-vue';
-import AutomataPreview from '@/components/AutomataPreview.vue';
+import AutomataPreview from '@/components/middlepane/AutomataPreview.vue';
 import Automata from '@/classes/Automata';
 import FiniteAutomata from '@/classes/FiniteAutomata';
 import uuidv1 from 'uuid/v1';
 import {Outcome} from "@/classes/Outcome";
 import PushdownAutomata from "@/classes/PushdownAutomata";
 import TuringMachine from "@/classes/TuringMachine";
-import ConfigTable from '@/components/ConfigTable.vue';
+import ConfigTable from '@/components/rightpane/animation/ConfigTable.vue';
 import TabBody from "@/components/TabBody.vue";
-import NewTabModal from '@/components/NewTabModal.vue';
+import NewTabModal from '@/components/modals/NewTabModal.vue';
 import deserialize from '../classes/AutomataDeserializer';
 import {FileSaverOptions, saveAs} from 'file-saver';
 import {readFileAsync} from "@/misc/filereader";

@@ -25,7 +25,7 @@ import edgeEditing from 'cytoscape-edge-editing';
 import dblclick from 'cytoscape-dblclick';
 
 // Automata config
-import config from './config';
+import config from '../../config/cytoscape-config';
 
 // CSS for cytoscape-context-menus
 import 'cytoscape-context-menus/cytoscape-context-menus.css';
