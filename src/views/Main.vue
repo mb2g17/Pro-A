@@ -106,11 +106,11 @@ export default class Main extends Vue {
         // Removes the cytoscape elements
         for (const dataObjKey of Object.keys(this.automatas[index].getData())) {
             // Gets cytoscape element
-            const elem = (this.$refs["automata" + index] as any);
+            const elem = (this.$refs[`tab${index}`] as any);
 
             // If it exists
             if (elem)
-                elem[0].cy.remove(`#${dataObjKey}`);
+                elem[0]["automataPreview"].cy.remove(`#${dataObjKey}`);
         }
 
         // Destroys the Automata reference
@@ -183,7 +183,7 @@ export default class Main extends Vue {
 
             // Gets cytoscape element
             const elem = (this.$refs[`tab${automataTabIndex}`] as any);
-            const cy = elem[0].$refs[`automata${automataTabIndex}`].cy;
+            const cy = elem[0]["automataPreview"].cy;
 
             // Updates json of cytoscape
             cy.json(jsonContents.cy);
@@ -197,7 +197,7 @@ export default class Main extends Vue {
     private onSaveAutomataClick(index: any) {
         // Gets cytoscape element
         const elem = (this.$refs["tab" + index] as any);
-        const cy = elem[0].$refs[`automata${index}`].cy;
+        const cy = elem[0]["automataPreview"].cy;
 
         // Gets cytoscape json
         const cytoscapeJSON = cy.json();
