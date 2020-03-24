@@ -70,7 +70,7 @@ import {readFileAsync} from "@/misc/filereader";
 import AutomataDeserializer from "../classes/AutomataDeserializer";
 import { Base64 } from 'js-base64';
 import ModalsEventHandler from "@/events/ModalsEventHandler";
-import Modals from "@/components/Modals.vue";
+import Modals from "@/components/modals/Modals.vue";
 import ordinal from "ordinal";
 
 @Component({

@@ -46,15 +46,15 @@
             // When the user wants to create a new transition
             ModalsEventHandler.$on("onNewTransition", (args: any) => {
                 // Deconstructs arguments and runs modal
-                const {automataType, callback} = args;
-                this.newTransitionModal.show(automataType, callback);
+                const {automataType, existingSymbols, callback} = args;
+                this.newTransitionModal.show(automataType, existingSymbols, callback);
             });
 
             // When the user wants to edit a transition
             ModalsEventHandler.$on("onEditTransition", (args: any) => {
                 // Deconstructs arguments and runs modal
-                const {automataType, transition, callback} = args;
-                this.newTransitionModal.showEdit(automataType, transition, callback);
+                const {automataType, existingSymbols, transition, callback} = args;
+                this.newTransitionModal.showEdit(automataType, existingSymbols, transition, callback);
             });
         }
     }

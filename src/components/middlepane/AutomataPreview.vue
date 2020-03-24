@@ -229,39 +229,6 @@ export default class AutomataPreview extends Vue {
         // On edge creation
         this.cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEles: any) => {
             this.$emit('createTransition', {event, sourceNode, targetNode, addedEles});
-
-            /*this.cy.remove(addedEles);
-            const symbol = prompt('Please enter transition symbol (__epsilon for epsilon move. If TM, use __empty for empty tape symbol):', 'a');
-            if (symbol === null)
-                return;
-
-            // If it's not finite, we need a payload
-            let payload = {};
-
-            // Pushdown automata
-            if (this.automata instanceof PushdownAutomata) {
-                const input = prompt('Please enter stack symbol (use __empty for empty stack symbol and null for epsilon):', 'A');
-                let output: string | string[] | null = prompt('Please enter output stack symbols, separated by commas (use null for epsilon):', 'A,B');
-                if (input && output) {
-                    output = output.split(',');
-                    payload = {
-                        input, output
-                    };
-                }
-            }
-
-            // Turing machine
-            if (this.automata instanceof TuringMachine) {
-                const writeTapeSymbol = prompt('Please enter symbol to write on the tape', 'a');
-                let direction = prompt('Please enter direction (L or R):', 'R');
-                if (writeTapeSymbol && direction) {
-                    payload = {
-                        writeTapeSymbol, direction
-                    };
-                }
-            }
-
-            this.automata.addTransition(symbol, sourceNode._private.data.name, targetNode._private.data.name, payload);*/
         });
     }
 

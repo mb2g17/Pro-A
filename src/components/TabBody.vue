@@ -131,9 +131,14 @@
             if (this.automata instanceof TuringMachine)
                 automataType = "TM";
 
+            // Gets existing symbols
+            const existingSymbols = this.automata.cacheTransition.getTransitions(
+                sourceNode.json().data.name,
+                targetNode.json().data.name);
+
             // Uses modal for transition creation
             ModalsEventHandler.$emit("onNewTransition", {
-                automataType,
+                automataType, existingSymbols,
                 callback: (symbol: string, payload: any) => {
                     this.automata.addTransition(
                         symbol,
@@ -165,9 +170,13 @@
                 this.automata.getData()[transitionID].data.targetName
             ];
 
+            // Gets existing symbols
+            const existingSymbols = this.automata.cacheTransition.getTransitions(sourceNode, targetNode);
+            existingSymbols.delete(this.automata.getData()[transitionID].data.symbol);
+
             // Uses modal for transition editing
             ModalsEventHandler.$emit("onEditTransition", {
-                automataType,
+                automataType, existingSymbols,
                 transition: this.automata.getData()[transitionID].data,
                 callback: (symbol: string, payload: any) => {
                     // Remove old transition, add new one

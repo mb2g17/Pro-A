@@ -39,7 +39,7 @@ export class AutomataTransitionCache {
      * Gets transitions based on source and target
      * @param source - the name of the source state of the transition
      * @param target - the name of the target state of the transition
-     * @return a set of transitions that go between these states
+     * @return a set of symbols that go between these states
      */
     public getTransitions(source: string, target: string): Set<string> {
         if (this.cacheSourceTargetSymbol[source]) {

@@ -148,6 +148,9 @@
         /** The type of the automata we're editing */
         private automataType: "FA" | "PDA" | "TM" = "FA";
 
+        /** The existing symbols between these two states that we cannot overwrite */
+        private existingSymbols: Set<String> = new Set();
+
         /** State of inputs if it's a PDA */
         private pdaState: any = {
             inputtedInputStackSymbol: "",
@@ -268,11 +271,15 @@
         /**
          * Shows the modal, "add" mode
          * @param automataType - the type of automata to make a transition for
+         * @param existingSymbols - the symbols that already exist as a transition
          * @param callback - the callback function when a transition has been made
          */
-        public show(automataType: "FA" | "PDA" | "TM", callback: (symbol: string, payload: any) => void) {
+        public show(automataType: "FA" | "PDA" | "TM", existingSymbols: Set<string>, callback: (symbol: string, payload: any) => void) {
             // Sets mode
             this.mode = NewTransitionModalMode.ADD;
+
+            // Sets existing symbols
+            this.existingSymbols = existingSymbols;
 
             // Stores automata type
             this.automataType = automataType;
@@ -290,12 +297,16 @@
         /**
          * Shows the modal, "edit" mode
          * @param automataType - the type of automata to edit a transition for
+         * @param existingSymbols - the symbols that already exist as a transition
          * @param transition - the transition data
          * @param callback - the callback function when the transition has been edited
          */
-        public showEdit(automataType: "FA" | "PDA" | "TM", transition: any, callback: (symbol: string, payload: any) => void) {
+        public showEdit(automataType: "FA" | "PDA" | "TM", existingSymbols: Set<string>, transition: any, callback: (symbol: string, payload: any) => void) {
             // Sets mode
             this.mode = NewTransitionModalMode.EDIT;
+
+            // Sets existing symbols
+            this.existingSymbols = existingSymbols;
 
             // Stores automata type
             this.automataType = automataType;
@@ -395,6 +406,17 @@
          * When the user clicks add
          */
         private onAddClick() {
+            // If symbol is in existing symbols set
+            if (this.existingSymbols.has(this.transitionSymbol)) {
+                // Tell the user this transition exists
+                this.$bvToast.toast(`A transition with this input symbol already exists.`, {
+                    title: `Cannot overwrite transition!`,
+                    variant: "danger",
+                    autoHideDelay: 5000
+                });
+                return;
+            }
+
             // Runs callback
             this.callback(this.transitionSymbol, this.payload);
 

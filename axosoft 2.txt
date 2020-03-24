@@ -30,7 +30,7 @@ OTHER / UNCATEGORISED:
 - BUG: can rename state folds (might want to adapt this later for labelling state folds)
 - BUG: on selecting a machine with one transition, edge editing messes up transition selection
 - BUG: you can't duplicate state folds
+- BUG: with TMs, since some transitions are technically epsilon moves, there is a problem with duplicate transitions
 
 
 --* IN PROGRESS:
-- add validation to stop duplicate transitions (e.g. trying to do (a,A,B) twice)
