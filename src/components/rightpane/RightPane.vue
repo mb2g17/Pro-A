@@ -6,8 +6,7 @@
         <b-tab title="Animation" class="pt-2" active>
             <AnimationPane ref="animationPane"
                            :automata="automata"
-                           @onPassInputClick="$emit('onPassInputClick')"
-                           @onStepClick="$emit('onStepClick')"
+                           @changeHighlightedNodes="$emit('changeHighlightedNodes', $event)"
             ></AnimationPane>
         </b-tab>
 
@@ -45,11 +44,6 @@
         /** Information pane reference */
         private informationPane: any;
 
-        private mounted() {
-            this.animationPane = (this.$refs["animationPane"] as any);
-            this.informationPane = (this.$refs["informationPane"] as any);
-        }
-
         /** Accessor for animation pane reference */
         get AnimationPane() {
             return this.animationPane;
@@ -58,6 +52,11 @@
         /** Accessor for information pane reference */
         get InformationPane() {
             return this.informationPane;
+        }
+
+        private mounted() {
+            this.animationPane = (this.$refs["animationPane"] as any);
+            this.informationPane = (this.$refs["informationPane"] as any);
         }
     }
 </script>

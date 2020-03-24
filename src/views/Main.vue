@@ -71,6 +71,7 @@ import AutomataDeserializer from "../classes/AutomataDeserializer";
 import { Base64 } from 'js-base64';
 import ModalsEventHandler from "@/events/ModalsEventHandler";
 import Modals from "@/components/Modals.vue";
+import ordinal from "ordinal";
 
 @Component({
     components: {
@@ -207,7 +208,7 @@ export default class Main extends Vue {
      * When the user saves an automata
      * @param index - index of the automata which is being saved
      */
-    private onSaveAutomataClick(index: any) {
+    private async onSaveAutomataClick(index: any) {
         // Gets cytoscape element
         const elem = (this.$refs["tab" + index] as any);
         const cy = elem[0]["automataPreview"].cy;
@@ -215,6 +216,17 @@ export default class Main extends Vue {
         // Gets cytoscape json
         const cytoscapeJSON = cy.json();
         delete cytoscapeJSON.style;
+
+        // If we are simulating, do not save
+        if (elem[0].RightPane.AnimationPane.isSimulating) {
+            // Tell the user to stop the animation
+            this.$bvToast.toast(`You must cancel the current animation first before saving.`, {
+                title: `Cannot save while animation is active`,
+                variant: "danger",
+                autoHideDelay: 5000
+            });
+            return;
+        }
 
         // Creates JSON object to save
         const jsonToSave = {

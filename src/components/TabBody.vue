@@ -36,8 +36,7 @@
                 <b-col>
                     <RightPane  :automata="automata"
                                 ref="rightPane"
-                                @onPassInputClick="onPassInputClick"
-                                @onStepClick="onStepClick"
+                                @changeHighlightedNodes="onChangeHighlightedNodes"
                     ></RightPane>
                 </b-col>
 
@@ -93,6 +92,18 @@
 
         /** Middle pane reference */
         private middlePane: any;
+
+        get RightPane(): any {
+            return this.rightPane;
+        }
+
+        get LeftPane(): any {
+            return this.leftPane;
+        }
+
+        get MiddlePane(): any {
+            return this.middlePane;
+        }
 
         private mounted() {
             this.automataPreview = (this.$refs["middlePane"] as any).getAutomataPreviewReference();
@@ -191,45 +202,34 @@
         }
 
         /**
-         * When the user clicks on "Pass input" button
+         * When the user needs to change highlighted nodes
          */
-        private onPassInputClick() {
-            // We are now simulating
-            this.rightPane.AnimationPane.isSimulating = true;
+        private onChangeHighlightedNodes(args: any) {
+            // Destructs the args
+            const {deselect, select} = args;
 
-            // Clears automata
-            this.automata.reset();
+            // Deselects nodes
+            deselect.forEach((deselectNode: any) => {
+                const id = this.automata.getState(deselectNode).data.id;
 
-            // Sets the input string
-            this.automata.setInput(this.rightPane.AnimationPane.inputString);
-            this.rightPane.AnimationPane.inputString = '';
-            this.automata.simulate();
+                // Removes from Automata
+                const classIndex = this.automata.getData()[id].classes.indexOf('highlighted-node');
+                this.automata["data"][id].classes.splice(classIndex, 1);
 
-            // Updates outcome and current configuration
-            this.rightPane.AnimationPane.updateOutcomeAndCurrentConfigs();
+                // Removes from cytoscape
+                this.automataPreview.cy.getElementById(id).removeClass('highlighted-node');
+            });
 
-            // Updates vue
-            this.$forceUpdate();
-        }
+            // Selects nodes
+            select.forEach((selectNode: any) => {
+                const id = this.automata.getState(selectNode).data.id;
 
-        /**
-         * When the user clicks on "Step" button
-         */
-        private onStepClick() {
-            // We are now simulating
-            this.rightPane.AnimationPane.isSimulating = true;
+                // Adds to Automata
+                this.automata["data"][id].classes.push('highlighted-node');
 
-            // Set new input
-            this.automata.setInput(this.rightPane.AnimationPane.inputString);
-
-            // Steps the automata
-            this.automata.step();
-
-            // Updates outcome and current configurations
-            this.rightPane.AnimationPane.updateOutcomeAndCurrentConfigs();
-
-            // Updates vue
-            this.$forceUpdate();
+                // Adds to cytoscape
+                this.automataPreview.cy.getElementById(id).addClass('highlighted-node');
+            });
         }
 
         /**

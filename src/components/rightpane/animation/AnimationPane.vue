@@ -9,8 +9,8 @@
                 max-rows="6"
         />
         <div class="d-flex justify-content-center mb-2">
-            <b-button variant="primary" @click="$emit('onPassInputClick')" class="mr-2">Compute immediately</b-button>
-            <b-button variant="primary" @click="$emit('onStepClick')">Step</b-button>
+            <b-button variant="primary" @click="onPassInputClick" class="mr-2">Compute immediately</b-button>
+            <b-button variant="primary" @click="onStepClick">Step</b-button>
         </div>
         <b-button variant="danger" class="mb-3" @click="onCancelClick">Cancel</b-button>
 
@@ -48,6 +48,9 @@
         /** The set of current configurations of this automata (to be displayed) */
         private currentConfigs: Set<AutomataConfig> = new Set();
 
+        /** The set of highlighted node names during animation */
+        private highlightedNodes: Set<string> = new Set();
+
         /** The outcome of an animation */
         private outcome: string = "UNDECIDED";
 
@@ -60,12 +63,92 @@
         }
 
         /**
+         * When the user clicks on "Step" button
+         */
+        private onStepClick() {
+            // We are now simulating
+            this.isSimulating = true;
+
+            // Set new input
+            this.automata.setInput(this.inputString);
+
+            // Remembers old highlighted nodes and clears the set
+            const oldHighlightedNodes: Set<string> = new Set(this.highlightedNodes);
+            this.highlightedNodes.clear();
+
+            // Steps the automata
+            this.automata.step();
+
+            // Updates outcome and current configurations
+            this.updateOutcomeAndCurrentConfigs();
+
+            // Fill in highlighted nodes
+            this.currentConfigs.forEach((currentConfig: AutomataConfig) => {
+                this.highlightedNodes.add(currentConfig.state);
+            });
+
+            // Emits event that toggles highlightings
+            this.$emit("changeHighlightedNodes", {
+                deselect: oldHighlightedNodes,
+                select: new Set(this.highlightedNodes)
+            });
+
+            // Updates vue
+            this.$forceUpdate();
+        }
+
+        /**
+         * When the user clicks on "Pass input" button
+         */
+        private onPassInputClick() {
+            // We are now simulating
+            this.isSimulating = true;
+
+            // Clears automata
+            this.automata.reset();
+
+            // Remembers old highlighted nodes and clears the set
+            const oldHighlightedNodes: Set<string> = new Set(this.highlightedNodes);
+            this.highlightedNodes.clear();
+
+            // Sets the input string
+            this.automata.setInput(this.inputString);
+            this.inputString = '';
+            this.automata.simulate();
+
+            // Updates outcome and current configuration
+            this.updateOutcomeAndCurrentConfigs();
+
+            // Fill in highlighted nodes
+            this.highlightedNodes.clear();
+            this.currentConfigs.forEach((currentConfig: AutomataConfig) => {
+                this.highlightedNodes.add(currentConfig.state);
+            });
+
+            // Emits event that toggles highlightings
+            this.$emit("changeHighlightedNodes", {
+                deselect: oldHighlightedNodes,
+                select: new Set(this.highlightedNodes)
+            });
+
+            // Updates vue
+            this.$forceUpdate();
+        }
+
+        /**
          * When the user clicks on "Cancel" button
          */
         private onCancelClick() {
             this.isSimulating = false; // We are no longer simulating
             this.$set(this, "currentConfigs", new Set());
             this.automata.reset(); // Reset automata configurations and input
+
+            // Emits event that toggles highlightings
+            this.$emit("changeHighlightedNodes", {
+                deselect: new Set(this.highlightedNodes),
+                select: new Set()
+            });
+            this.highlightedNodes.clear();
 
             // Updates vue
             this.$forceUpdate();

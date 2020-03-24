@@ -11,7 +11,6 @@ CONFIG TABLE:
 - add a button to "prune" or "exclude" a configuration (delete all except that one)
 
 ANIMATION:
-- make nodes light up in animation
 
 UI:
 - make filled buttons and outline buttons consistent in the menus

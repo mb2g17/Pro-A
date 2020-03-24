@@ -29,6 +29,12 @@ const myConfig: object = {
                 'content': 'data(displayName)',
             },
         },
+        { // Highlighted state
+            selector: '.highlighted-node',
+            style: {
+                'background-color': '#ff0',
+            },
+        },
         { // Edge handle
             selector: '.eh-handle',
             style: {

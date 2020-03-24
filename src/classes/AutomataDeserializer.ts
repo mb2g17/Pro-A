@@ -34,10 +34,6 @@ export default function(serialized: string): Automata {
         return _.mapValues(setObj, array => new Set(array));
     }
 
-    // Goes through every item
-    for (const itemID in json.data)
-        json.data[itemID].classes = new Set(json.data[itemID].classes);
-
     // Sets properties
     automata.setName(json.name);
     automata.setData(json.data);
