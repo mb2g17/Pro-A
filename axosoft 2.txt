@@ -15,7 +15,6 @@ ANIMATION:
 
 UI:
 - make filled buttons and outline buttons consistent in the menus
-- transitions should be made by pressing "enter", like with new automata
 - reorder tabs
 - add ability to add labels to state folds
 
@@ -27,7 +26,6 @@ OTHER / UNCATEGORISED:
 
 - use a server to store automata tabs that aren't open
 
-- BUG: event handlers are still activated even when automata tab is closed
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 - BUG: edge handles gets saved as their own objects when saving automata (also re-do saved automata)
 - BUG: when moving an edge using the edge editing thing, your selected edges do not update, making state folds error
@@ -39,4 +37,3 @@ OTHER / UNCATEGORISED:
 
 
 --* IN PROGRESS:
-- Remove indexes from reference names

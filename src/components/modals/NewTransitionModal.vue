@@ -1,7 +1,7 @@
 <template>
 
     <!-- New transition modal -->
-    <b-modal :id="modalID" v-model="isModalVisible" @hide="$emit('hide')">
+    <b-modal id="newTransitionModal" v-model="isModalVisible" @hide="$emit('hide')">
         <template v-slot:modal-title>
             {{ mode === NewTransitionModalMode.ADD ? `New Transition (${automataType})` : `Edit transition (${automataType})` }}
         </template>
@@ -138,9 +138,6 @@
         /** The mode the modal is in right now */
         private mode: NewTransitionModalMode = NewTransitionModalMode.ADD;
 
-        /** ID of this modal (there will be multiple) */
-        private modalID: string = "";
-
         /** True if modal is visible, false if not */
         private isModalVisible: boolean = false;
 
@@ -180,10 +177,6 @@
 
         /** Callback function after adding/editing a transition */
         private callback!: (symbol: string, payload: any) => void;
-
-        private mounted() {
-            this.modalID = uuid(); // Sets random modal ID
-        }
 
         private get NewTransitionModalMode() {
             return NewTransitionModalMode;
@@ -277,7 +270,7 @@
             this.callback = callback;
 
             // Shows the modal
-            this.$bvModal.show(this.modalID);
+            this.$bvModal.show("newTransitionModal");
         }
 
         /**
@@ -346,7 +339,7 @@
                 this.inputtedTransitionSymbol = transition.symbol;
 
             // Shows the modal
-            this.$bvModal.show(this.modalID);
+            this.$bvModal.show("newTransitionModal");
         }
 
         /**
@@ -381,7 +374,7 @@
          */
         private onCancelClick() {
             // Hides the modal
-            this.$bvModal.hide(this.modalID);
+            this.$bvModal.hide("newTransitionModal");
         }
 
         /**
@@ -392,7 +385,7 @@
             this.callback(this.transitionSymbol, this.payload);
 
             // Hides the modal
-            this.$bvModal.hide(this.modalID);
+            this.$bvModal.hide("newTransitionModal");
         }
 
         /**
