@@ -68,6 +68,17 @@
          * When the user clicks on "Step" button
          */
         private onStepClick() {
+            // Checks if input is legit
+            if (!RegExp('^([A-Z]|[a-z]|[1-9])*$').test(this.inputString)) {
+                // Tell the user
+                this.$bvToast.toast(`Only letters and numbers are allowed as input symbols.`, {
+                    title: `Invalid input string!`,
+                    variant: "danger",
+                    autoHideDelay: 5000
+                });
+                return;
+            }
+
             // We are now simulating
             this.isSimulating = true;
 
@@ -103,6 +114,17 @@
          * When the user clicks on "Pass input" button
          */
         private onPassInputClick() {
+            // Checks if input is legit
+            if (!RegExp('^([A-Z]|[a-z]|[1-9])*$').test(this.inputString)) {
+                // Tell the user
+                this.$bvToast.toast(`Only letters and numbers are allowed as input symbols.`, {
+                    title: `Invalid input string!`,
+                    variant: "danger",
+                    autoHideDelay: 5000
+                });
+                return;
+            }
+
             // We are now simulating
             this.isSimulating = true;
 

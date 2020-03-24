@@ -221,7 +221,7 @@ export default class Main extends Vue {
         if (elem[0].RightPane.AnimationPane.isSimulating) {
             // Tell the user to stop the animation
             this.$bvToast.toast(`You must cancel the current animation first before saving.`, {
-                title: `Cannot save while animation is active`,
+                title: `Cannot save while animation is active!`,
                 variant: "danger",
                 autoHideDelay: 5000
             });

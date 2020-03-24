@@ -1,8 +1,6 @@
 --* TODO:
 
 VALIDATION:
-- validate no weird unicode characters in the input (only letters and numbers allowed)
-- add validation to stop duplicate transitions (e.g. trying to do (a,A,B) twice)
 
 CONFIG TABLE:
 - change config table to allow stack trace
@@ -35,3 +33,4 @@ OTHER / UNCATEGORISED:
 
 
 --* IN PROGRESS:
+- add validation to stop duplicate transitions (e.g. trying to do (a,A,B) twice)
