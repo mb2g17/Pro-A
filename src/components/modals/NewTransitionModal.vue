@@ -124,6 +124,7 @@
     import PushdownAutomata from "@/classes/PushdownAutomata";
     import TuringMachine from "@/classes/TuringMachine";
     import {AutomataCharacters} from '@/classes/AutomataCharacters';
+    import $ from "jquery";
 
     /** The types of modes the modal can be in */
     export enum NewTransitionModalMode {
@@ -249,6 +250,19 @@
                     direction: this.tmState.direction
                 };
             return {};
+        }
+
+        private mounted() {
+            // Hacky jQuery event that creates automata upon 'enter' keypress
+            $(document).on('keypress', e => {
+                // If user pressed enter *and* modal is visibile, add automata
+                if (e.key === "Enter" && this.isModalVisible) {
+                    if (this.mode === NewTransitionModalMode.ADD)
+                        this.onAddClick();
+                    else
+                        this.onEditClick();
+                }
+            });
         }
 
         /**
