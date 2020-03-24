@@ -14,9 +14,13 @@
     import AutomataConfig from '@/classes/AutomataConfig';
     import PushdownAutomataConfig from "@/classes/PushdownAutomataConfig";
     import TuringMachineConfig from "@/classes/TuringMachineConfig";
+    import Automata from "@/classes/Automata";
 
     @Component
     export default class ConfigTable extends Vue {
+        /** Automata reference */
+        @Prop() private readonly automata!: Automata;
+
         @Prop() public readonly configs: Set<AutomataConfig> | undefined;
 
         /**
@@ -36,7 +40,7 @@
                     if (config instanceof PushdownAutomataConfig) {
                         const pConfig: PushdownAutomataConfig = (config as PushdownAutomataConfig);
                         items.push({
-                            "state": config.state,
+                            "state": this.automata.getState(config.state).data.displayName,
                             "remaining_input": config.getInputLength() > 0 ? config.getInput() : "Empty",
                             "stack": pConfig.stackAsString()
                         });
@@ -46,7 +50,7 @@
                     else if (config instanceof TuringMachineConfig) {
                         const tConfig: TuringMachineConfig = (config as TuringMachineConfig);
                         items.push({
-                            "state": config.state,
+                            "state": this.automata.getState(config.state).data.displayName,
                             "tape": tConfig.tapeToString(5),
                         });
                     }
@@ -54,7 +58,7 @@
                     // If this is a finite automata
                     else {
                         items.push({
-                            "state": config.state,
+                            "state": this.automata.getState(config.state).data.displayName,
                             "remaining_input": config.getInputLength() > 0 ? config.getInput() : "Empty",
                         });
                     }

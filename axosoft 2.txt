@@ -31,7 +31,6 @@ OTHER / UNCATEGORISED:
 - BUG: double check alt+clicking and duplication, as well as deleting state with transitions attached to it
 - BUG: can rename state folds (might want to adapt this later for labelling state folds)
 - BUG: on selecting a machine with one transition, edge editing messes up transition selection
-- BUG: config table should use alias names, not true names
 - BUG: you can't duplicate state folds
 
 

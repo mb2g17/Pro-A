@@ -18,7 +18,9 @@
         <h2 id="decision" v-if="isSimulating">{{ outcome }}</h2>
 
         <!-- Config -->
-        <ConfigTable :configs="currentConfigs" />
+        <ConfigTable :automata="automata"
+                     :configs="currentConfigs"
+        />
 
     </div>
 </template>
