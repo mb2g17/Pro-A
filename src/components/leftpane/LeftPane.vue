@@ -24,6 +24,8 @@
             <b-tab title="Visualisation" class="pt-2">
                 <VisualisationPane ref="visualisationPane"
                                    :automata="automata"
+                                   @updateOutline="$emit('updateOutline')"
+
                                    @onMultiLevelExplore="$emit('onMultiLevelExplore', $event)"
                                    @onSearchItemClick="$emit('onSearchItemClick', $event)"
                 ></VisualisationPane>

@@ -23,6 +23,7 @@ import contextMenus from 'cytoscape-context-menus';
 import expandCollapse from 'cytoscape-expand-collapse';
 import edgeEditing from 'cytoscape-edge-editing';
 import dblclick from 'cytoscape-dblclick';
+import navigator from 'cytoscape-navigator';
 
 // Automata config
 import config from '../../config/cytoscape-config';
@@ -517,5 +518,45 @@ export default class AutomataPreview extends Vue {
     /* Sets the hight of cytoscape div to min-height */
     #cytoscape-div {
         height: 1px;
+    }
+
+    .cytoscape-navigator{
+        position:relative;
+        border: 1px solid #000;
+        background: #fff;
+        z-index: 99999;
+        width: 400px;
+        height: 400px;
+        bottom: 0;
+        right: 0;
+        overflow: hidden;
+    }
+
+    .cytoscape-navigator > img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 101;
+        width:400px;
+        height: 400px;
+    }
+
+    .cytoscape-navigatorView{
+        position: absolute;
+        top: 0;
+        left: 0;
+        cursor: move;
+        background: #B7E1ED;
+        opacity: 0.5;
+        z-index: 102;
+    }
+
+    .cytoscape-navigatorOverlay{
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 103;
     }
 </style>
