@@ -38,6 +38,7 @@ import TuringMachine from "@/classes/TuringMachine";
 
 // Lodash
 import _ from 'lodash';
+import OutlineUpdateEventHandler from "@/events/OutlineUpdateEventHandler";
 
 @Component
 export default class AutomataPreview extends Vue {
@@ -121,7 +122,7 @@ export default class AutomataPreview extends Vue {
             // If alt is held down, select the whole machine
             if (this.isAltDown && !this.isDoingMachineSelect) {
                 // --
-                console.log(this.automata.getMachine(this.automata.getStateById(id).data.name));
+                // console.log(this.automata.getMachine(this.automata.getStateById(id).data.name));
                 // --
 
                 this.isDoingMachineSelect = true;
@@ -141,12 +142,18 @@ export default class AutomataPreview extends Vue {
                 // Sets flag to false
                 this.isDoingMachineSelect = false;
             }
+
+            // Updates outline pane
+            OutlineUpdateEventHandler.$emit('updateOutline');
         });
 
         // When the user deselects a node
         cy.on('unselect', (event: any) => {
             const id = event.target.id();
             this.selectedNodes.delete(id);
+
+            // Updates outline pane
+            OutlineUpdateEventHandler.$emit('updateOutline');
         });
 
         // When the user taps on the screen
@@ -185,6 +192,9 @@ export default class AutomataPreview extends Vue {
 
         // When the user drags an object and drops
         cy.on('dragfree', (event: any) => {
+            // Updates outline pane
+            OutlineUpdateEventHandler.$emit('updateOutline');
+
             // Gets ID and new position
             const stateID = event.target._private.data.id;
 
@@ -292,6 +302,9 @@ export default class AutomataPreview extends Vue {
                             data[node].parent = parentID;
                             this.automata.setData(data);
                         }
+
+                        // Updates outline pane
+                        OutlineUpdateEventHandler.$emit('updateOutline');
                     }
                 },
                 {
@@ -322,6 +335,9 @@ export default class AutomataPreview extends Vue {
                             data[node].parent = null;
                             this.automata.setData(data);
                         }
+
+                        // Updates outline pane
+                        OutlineUpdateEventHandler.$emit('updateOutline');
                     }
                 },
                 {
@@ -337,6 +353,9 @@ export default class AutomataPreview extends Vue {
                         // Toggles initial state + class
                         this.automata.setInitialState(stateName, !initial);
                         event.target.toggleClass('initial-node');
+
+                        // Updates outline pane
+                        OutlineUpdateEventHandler.$emit('updateOutline');
                     }
                 },
                 {
@@ -352,6 +371,9 @@ export default class AutomataPreview extends Vue {
                         // Toggles initial state
                         this.automata.setFinalState(stateName, !final);
                         event.target.toggleClass('final-node');
+
+                        // Updates outline pane
+                        OutlineUpdateEventHandler.$emit('updateOutline');
                     }
                 },
                 {
@@ -359,7 +381,7 @@ export default class AutomataPreview extends Vue {
                     content: 'Remove',
                     tooltipText: 'remove',
                     selector: 'node, edge',
-                    onClickFunction: (event: any) => {
+                    onClickFunction: async (event: any) => {
                         // Removes object from Cytoscape
                         let target = event.target || event.cyTarget;
                         const removedElements = target.remove();
@@ -388,6 +410,10 @@ export default class AutomataPreview extends Vue {
                             else {
                                 this.automata.removeStateFold(elem._private.data.id);
                             }
+
+                            // Updates outline pane
+                            await this.$nextTick();
+                            OutlineUpdateEventHandler.$emit('updateOutline');
                         }
                     },
                     hasTrailingDivider: true
@@ -409,12 +435,16 @@ export default class AutomataPreview extends Vue {
                     content: 'Add node',
                     tooltipText: 'add node',
                     coreAsWell: true,
-                    onClickFunction: (event: any) => {
+                    onClickFunction: async (event: any) => {
                         // Gets unique name
                         const uniqueName = this.automata.getNewStateName();
 
                         // Creates new state
                         this.automata.addState(uniqueName, event.position.x, event.position.y, false, false);
+
+                        // Updates outline pane
+                        await this.$nextTick();
+                        OutlineUpdateEventHandler.$emit('updateOutline');
                     }
                 },
             ]
@@ -457,7 +487,7 @@ export default class AutomataPreview extends Vue {
         (window as any)['$'] = $; // Globally defines jQuery so that this dumb plugin will work
         let instance = this.cy.edgeEditing({
             bendRemovalSensitivity: 16,
-            handleReconnectEdge: (sourceID: any, targetID: any, edge: any) => {
+            handleReconnectEdge: async (sourceID: any, targetID: any, edge: any) => {
                 // Gets source and target names
                 const sourceName = this.automata.getStateById(sourceID).data.name;
                 const targetName = this.automata.getStateById(targetID).data.name;
@@ -473,6 +503,10 @@ export default class AutomataPreview extends Vue {
                 edgeData.data.target = targetID;
                 edgeData.data.targetName = targetName;
                 this.cy.getElementById(edge.id)[0].json(edgeData);
+
+                // Updates outline pane
+                await this.$nextTick();
+                OutlineUpdateEventHandler.$emit('updateOutline');
             }
         });
         this.cy.style().update();
@@ -484,7 +518,7 @@ export default class AutomataPreview extends Vue {
     private initDoubleClick() {
         this.cy.dblclick();
 
-        this.cy.on('dblclick', (event: any) => {
+        this.cy.on('dblclick', async (event: any) => {
             // If we're double clicking on empty space, create a new state
             if (event.target.constructor.name === "Core") {
                 // Gets unique name
@@ -492,6 +526,10 @@ export default class AutomataPreview extends Vue {
 
                 // Creates new state
                 this.automata.addState(uniqueName, this.mousePositionX, this.mousePositionY, false, false);
+
+                // Updates outline pane
+                await this.$nextTick();
+                OutlineUpdateEventHandler.$emit('updateOutline');
             }
             else {
                 // If we're double clicking on a transition

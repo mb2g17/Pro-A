@@ -17,8 +17,6 @@
                               @onKleeneStarCompute="onKleeneStarCompute"
                               @onProductCompute="onProductCompute"
 
-                              @updateOutline="onUpdateOutline"
-
                               @onMultiLevelExplore="onMultiLevelExplore"
                               @onSearchItemClick="onSearchItemClick"
                     ></LeftPane>
@@ -68,6 +66,7 @@
     import FiniteAutomata from "@/classes/FiniteAutomata";
     import PushdownAutomata from "@/classes/PushdownAutomata";
     import TuringMachine from "@/classes/TuringMachine";
+    import OutlineUpdateEventHandler from "@/events/OutlineUpdateEventHandler";
 
     @Component({
         components: {
@@ -112,6 +111,48 @@
             this.rightPane = (this.$refs["rightPane"] as any);
             this.leftPane = (this.$refs["leftPane"] as any);
             this.middlePane = (this.$refs["middlePane"] as any);
+
+            // Update outline pane if event is captured
+            OutlineUpdateEventHandler.$on('updateOutline', () => {
+                this.updateOutlinePane();
+            })
+        }
+
+        /**
+         * Updates outline pane using Cytoscape instance
+         */
+        private updateOutlinePane() {
+            // If the pane is disabled, don't update
+            if (!this.leftPane.VisualisationPane.OutlinePane.Enabled)
+                return;
+
+            console.log("Updating!");
+
+            // Selects a cytoscape div where the bounding rect isn't 0
+            let cytoscapeDiv: any = undefined;
+            document.querySelectorAll("#cytoscape-div").forEach((div: Element) => {
+                if (div.getBoundingClientRect().width != 0 && div.getBoundingClientRect().height != 0)
+                    cytoscapeDiv = div;
+            });
+
+            // If cytoscape is still undefined, just leave
+            if (!cytoscapeDiv)
+                return;
+
+            // Gets properties
+            const w = cytoscapeDiv.getBoundingClientRect().width;
+            const h = cytoscapeDiv.getBoundingClientRect().height;
+            const bb = this.automataPreview.cy.elements().boundingBox();
+            const zoom = Math.min(w / bb.w, h / bb.h);
+
+            // Gets outline png and updates img with it
+            const png = this.automataPreview.cy.png({
+                full: true,
+                scale: zoom,
+                maxHeight: h,
+                maxWidth: w
+            });
+            this.leftPane.VisualisationPane.OutlinePane.updateOutline(png);
         }
 
         /**
@@ -209,34 +250,11 @@
             // If it wasn't cancelled, rename
             if (response) {
                 this.automata.renameState(stateID, response);
+
+                // Updates outline pane
+                await this.$nextTick();
+                this.updateOutlinePane();
             }
-        }
-
-        /**
-         * When the outline window needs to be updated
-         */
-        private onUpdateOutline() {
-            // Selects a cytoscape div where the bounding rect isn't 0
-            let cytoscapeDiv: any = undefined;
-            document.querySelectorAll("#cytoscape-div").forEach((div: Element) => {
-                if (div.getBoundingClientRect().width != 0 && div.getBoundingClientRect().height != 0)
-                    cytoscapeDiv = div;
-            });
-
-            // Gets properties
-            const w = cytoscapeDiv.getBoundingClientRect().width;
-            const h = cytoscapeDiv.getBoundingClientRect().height;
-            const bb = this.automataPreview.cy.elements().boundingBox();
-            const zoom = Math.min(w / bb.w, h / bb.h);
-
-            // Gets outline png and updates img with it
-            const png = this.automataPreview.cy.png({
-                full: true,
-                scale: zoom,
-                maxHeight: h,
-                maxWidth: w
-            });
-            this.leftPane.VisualisationPane.OutlinePane.updateOutline(png);
         }
 
         /**

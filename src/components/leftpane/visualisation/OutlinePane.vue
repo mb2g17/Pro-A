@@ -1,26 +1,42 @@
 <template>
     <div>
 
+        <b-form-checkbox
+                class="mt-2"
+                v-model="enabled"
+        >
+            Outline pane: {{ enabled ? 'Enabled' : 'Disabled' }}
+        </b-form-checkbox>
+
         <img class="outline-image"
              ref="outlineImage"
              :src="imageSrc"
-             @click="test"
+             v-if="enabled"
+             @click="onPaneClick"
         />
 
     </div>
 </template>
 
 <script lang="ts">
-    import {Component} from "vue-property-decorator";
+    import {Component, Watch} from "vue-property-decorator";
     import Vue from "vue";
+    import OutlineUpdateEventHandler from "@/events/OutlineUpdateEventHandler";
 
     @Component
     export default class OutlinePane extends Vue {
         /** What the image is displaying */
         private imageSrc: string = "";
 
-        private test() {
-            this.$emit("updateOutline");
+        /** If true, outline pane will be visible and updated */
+        private enabled: boolean = false;
+        get Enabled(): boolean {
+            return this.enabled;
+        }
+
+        private mounted() {
+            // Updates outline pane
+            OutlineUpdateEventHandler.$emit('updateOutline');
         }
 
         /**
@@ -29,6 +45,20 @@
          */
         public updateOutline(png: any) {
             Vue.set(this, "imageSrc", png);
+        }
+
+        /**
+         * When the user clicks on the pane, perform a manual update
+         */
+        private onPaneClick() {
+            OutlineUpdateEventHandler.$emit('updateOutline');
+        }
+
+        @Watch("enabled")
+        private onEnabledChange(val: number, oldVal: number) {
+            // If we're enabling, update pane
+            if (val)
+                OutlineUpdateEventHandler.$emit('updateOutline');
         }
     }
 </script>

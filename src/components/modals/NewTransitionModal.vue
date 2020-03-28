@@ -125,6 +125,7 @@
     import TuringMachine from "@/classes/TuringMachine";
     import {AutomataCharacters} from '@/classes/AutomataCharacters';
     import $ from "jquery";
+    import OutlineUpdateEventHandler from "@/events/OutlineUpdateEventHandler";
 
     /** The types of modes the modal can be in */
     export enum NewTransitionModalMode {
@@ -405,7 +406,7 @@
         /**
          * When the user clicks add
          */
-        private onAddClick() {
+        private async onAddClick() {
             // If symbol is in existing symbols set
             if (this.existingSymbols.has(this.transitionSymbol)) {
                 // Tell the user this transition exists
@@ -422,6 +423,10 @@
 
             // Hides the modal
             this.$bvModal.hide("newTransitionModal");
+
+            // Updates outline pane
+            await this.$nextTick();
+            OutlineUpdateEventHandler.$emit('updateOutline');
         }
 
         /**

@@ -2,9 +2,7 @@
     <div id="visualisationPane">
 
         <!-- Outline pane -->
-        <OutlinePane ref="outlinePane"
-                     @updateOutline="$emit('updateOutline')"
-        ></OutlinePane>
+        <OutlinePane ref="outlinePane"></OutlinePane>
 
         <!-- Multi-level exploration -->
         <MultiLevelSelect @multiLevelExplore="$emit('onMultiLevelExplore', $event)"
