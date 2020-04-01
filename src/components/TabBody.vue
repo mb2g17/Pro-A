@@ -29,6 +29,7 @@
                                 @onCreateTransition="onCreateTransition"
                                 @onEditTransition="onEditTransition"
                                 @onEditState="onEditState"
+                                @styleChange="changeStyle"
                     ></MiddlePane>
                 </b-col>
 
@@ -126,8 +127,6 @@
             if (!this.leftPane.VisualisationPane.OutlinePane.Enabled)
                 return;
 
-            console.log("Updating!");
-
             // Selects a cytoscape div where the bounding rect isn't 0
             let cytoscapeDiv: any = undefined;
             document.querySelectorAll("#cytoscape-div").forEach((div: Element) => {
@@ -153,6 +152,14 @@
                 maxWidth: w
             });
             this.leftPane.VisualisationPane.OutlinePane.updateOutline(png);
+        }
+
+        /**
+         * Swaps the stylesheet for another
+         * @param newStyle - the new stylesheet
+         */
+        private changeStyle(newStyle: any) {
+            this.automataPreview.cy.style(newStyle);
         }
 
         /**

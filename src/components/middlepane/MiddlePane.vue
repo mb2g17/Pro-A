@@ -11,7 +11,7 @@
                     <font-awesome-icon :icon="['fas', 'search-minus']" />
                 </b-button>
             </div>
-            <b-button variant="success">Styles</b-button>
+            <b-button variant="success" @click="onStylesClick">Styles</b-button>
         </div>
 
         <!-- AUTOMATA PREVIEW -->
@@ -31,6 +31,7 @@
     import AutomataPreview from "./AutomataPreview.vue";
     import Vue from "vue";
     import Automata from "@/classes/Automata";
+    import ModalsEventHandler from "@/events/ModalsEventHandler";
 
     @Component({
         components: {
@@ -69,6 +70,17 @@
                 level: zoomLevel,
                 renderedPosition: {x: automataPreview.cy.width() / 2, y: automataPreview.cy.height() / 2}
             });
+        }
+
+        /**
+         * When the user wants to change styles
+         */
+        private onStylesClick() {
+            const newStyle = require("../../config/cytoscape-config").default.style;
+            console.log(newStyle);
+            this.$emit("styleChange", newStyle);
+
+            ModalsEventHandler.$emit("onStylesChange");
         }
     }
 </script>

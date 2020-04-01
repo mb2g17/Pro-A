@@ -52,6 +52,7 @@
     "sass-loader": "^8.0.0",
     "typescript": "~3.5.3",
     "uuid": "^3.3.3",
+    "verte": "0.0.12",
     "vue-cytoscape": "^1.0.8",
     "vue-template-compiler": "^2.6.10"
   },

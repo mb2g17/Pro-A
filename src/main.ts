@@ -23,6 +23,11 @@ Vue.use(Dialog, {
 import FontAwesomeIcon from './fontawesome';
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
+// Imports Verte
+import Verte from 'verte';
+import 'verte/dist/verte.css';
+Vue.component(Verte.name, Verte);
+
 Vue.config.productionTip = false;
 
 new Vue({
