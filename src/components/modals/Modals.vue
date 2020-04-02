@@ -19,7 +19,7 @@
     import Vue from "vue";
     import NewTabModal from "@/components/modals/NewTabModal.vue";
     import NewTransitionModal from "@/components/modals/NewTransitionModal.vue";
-    import StylesModal from "@/components/modals/StylesModal.vue";
+    import StylesModal from "@/components/modals/styles/StylesModal.vue";
 
     @Component({
         components: {

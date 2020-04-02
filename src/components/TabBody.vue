@@ -29,7 +29,6 @@
                                 @onCreateTransition="onCreateTransition"
                                 @onEditTransition="onEditTransition"
                                 @onEditState="onEditState"
-                                @styleChange="changeStyle"
                     ></MiddlePane>
                 </b-col>
 
@@ -68,6 +67,7 @@
     import PushdownAutomata from "@/classes/PushdownAutomata";
     import TuringMachine from "@/classes/TuringMachine";
     import OutlineUpdateEventHandler from "@/events/OutlineUpdateEventHandler";
+    import StyleUpdateEventHandler from "@/events/StyleUpdateEventHandler";
 
     @Component({
         components: {
@@ -116,7 +116,35 @@
             // Update outline pane if event is captured
             OutlineUpdateEventHandler.$on('updateOutline', () => {
                 this.updateOutlinePane();
-            })
+            });
+
+            // Update styles if event is captured
+            StyleUpdateEventHandler.$on("styleUpdate", (newStyles: any) => {
+                // Gets default styles
+                const defaultStyles: any[] = require("../config/cytoscape-config").default.style;
+
+                // Goes through every default style
+                defaultStyles.forEach((defaultStyle: any, defaultStyleIndex: number) => {
+                    // Goes through every editable style
+                    Object.keys(newStyles).forEach(editedStyle => {
+                        // If we have a match
+                        if (defaultStyle.selector === newStyles[editedStyle].selector) {
+                            // Updates style
+                            defaultStyles[defaultStyleIndex].style = {
+                                ...defaultStyles[defaultStyleIndex].style,
+                                ...newStyles[editedStyle].style
+                            };
+                        }
+                    });
+                });
+
+                // Update stylesheet
+                this.automataPreview.cy.style(defaultStyles);
+
+                // Waits for a tick and then updates outline
+                this.$nextTick();
+                this.updateOutlinePane();
+            });
         }
 
         /**

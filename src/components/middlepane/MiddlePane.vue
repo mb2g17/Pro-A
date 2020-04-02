@@ -76,10 +76,6 @@
          * When the user wants to change styles
          */
         private onStylesClick() {
-            const newStyle = require("../../config/cytoscape-config").default.style;
-            console.log(newStyle);
-            this.$emit("styleChange", newStyle);
-
             ModalsEventHandler.$emit("onStylesChange");
         }
     }

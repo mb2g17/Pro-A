@@ -25,6 +25,7 @@ const myConfig: object = {
         { // Final state
             selector: '.final-node',
             style: {
+                'background-color': '#666',
                 'border-width': 4,
                 'content': 'data(displayName)',
             },
