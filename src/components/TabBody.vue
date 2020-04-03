@@ -121,20 +121,28 @@
             // Update styles if event is captured
             StyleUpdateEventHandler.$on("styleUpdate", (newStyles: any) => {
                 if (this.automataPreview.selectedNodes.size > 0) {
-                    // Goes through every selected element
-                    this.automataPreview.selectedNodes.forEach((selectedNode: any) => {
-                        // Goes through every editable style
-                        Object.keys(newStyles).forEach(editedStyle => {
-                            // Creates selector
-                            const editableStyleSelector = newStyles[editedStyle].selector;
-                            const selector = "#" + selectedNode + (editableStyleSelector === "node" ? "" : editableStyleSelector);
+                    // Goes through every editable style
+                    Object.keys(newStyles).forEach(editedStyle => {
+                        // Creates selector
+                        const editableStyleSelector = newStyles[editedStyle].selector;
+                        let selector = "";
+                        let selectedNodeIndex = 0;
 
-                            // Updates style
-                            this.automataPreview.cy.style()
-                                .selector(selector)
-                                    .style(newStyles[editedStyle].style)
-                                .update();
+                        // Goes through every selected element
+                        this.automataPreview.selectedNodes.forEach((selectedNode: string) => {
+                            selector += ("#" +
+                                selectedNode +
+                                (editableStyleSelector === 'node' ? '' : editableStyleSelector) +
+                                (selectedNodeIndex === this.automataPreview.selectedNodes.size - 1 ? '' : ',')
+                            );
+                            selectedNodeIndex++;
                         });
+
+                        // Updates style
+                        this.automataPreview.cy.style()
+                            .selector(selector)
+                            .style(newStyles[editedStyle].style)
+                            .update();
                     });
                 } else {
                     // Gets default styles

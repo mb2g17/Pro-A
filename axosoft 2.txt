@@ -20,6 +20,7 @@ OTHER / UNCATEGORISED:
 - make 'delete' delete all objects in your selection, not just the one you clicked on
 - add "comments" to automata screen
 - If two configurations are the same, it should only appear once
+- Add a list of styles to the styles modal and give the option to delete / move
 
 - use a server to store automata tabs that aren't open
 
