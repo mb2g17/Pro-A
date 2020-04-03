@@ -8,7 +8,7 @@
              size="lg"
     >
         <template v-slot:modal-title>
-            Styles (all)
+            Styles {{ isAll ? '(all)' : '(selection)' }}
         </template>
 
         <!-- Body -->
@@ -52,6 +52,9 @@
         /** If true, modal is visible. If false, it is not */
         private isModalVisible: boolean = false;
 
+        /** If true, we're editing all. If false, we're editing a selection */
+        public isAll: boolean = true;
+
         private styles: any = {
             "Default node": {
                 selector: 'node',
@@ -63,6 +66,10 @@
             },
             "Final node": {
                 selector: '.final-node',
+                style: {}
+            },
+            "Initial and final node": {
+                selector: '.initial-node.final-node',
                 style: {}
             },
             "Highlighted node": {

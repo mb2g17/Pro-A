@@ -120,26 +120,46 @@
 
             // Update styles if event is captured
             StyleUpdateEventHandler.$on("styleUpdate", (newStyles: any) => {
-                // Gets default styles
-                const defaultStyles: any[] = require("../config/cytoscape-config").default.style;
+                if (this.automataPreview.selectedNodes.size > 0) {
+                    // Goes through every selected element
+                    this.automataPreview.selectedNodes.forEach((selectedNode: any) => {
+                        // Goes through every editable style
+                        Object.keys(newStyles).forEach(editedStyle => {
+                            // Creates selector
+                            const editableStyleSelector = newStyles[editedStyle].selector;
+                            const selector = "#" + selectedNode + (editableStyleSelector === "node" ? "" : editableStyleSelector);
 
-                // Goes through every default style
-                defaultStyles.forEach((defaultStyle: any, defaultStyleIndex: number) => {
-                    // Goes through every editable style
-                    Object.keys(newStyles).forEach(editedStyle => {
-                        // If we have a match
-                        if (defaultStyle.selector === newStyles[editedStyle].selector) {
                             // Updates style
-                            defaultStyles[defaultStyleIndex].style = {
-                                ...defaultStyles[defaultStyleIndex].style,
-                                ...newStyles[editedStyle].style
-                            };
-                        }
+                            this.automataPreview.cy.style()
+                                .selector(selector)
+                                    .style(newStyles[editedStyle].style)
+                                .update();
+                        });
                     });
-                });
+                } else {
+                    // Gets default styles
+                    const defaultStyles: any[] = require("../config/cytoscape-config").default.style;
 
-                // Update stylesheet
-                this.automataPreview.cy.style(defaultStyles);
+                    // Goes through every default style
+                    defaultStyles.forEach((defaultStyle: any, defaultStyleIndex: number) => {
+                        // Goes through every editable style
+                        Object.keys(newStyles).forEach(editedStyle => {
+                            // If we have a match
+                            if (defaultStyle.selector === newStyles[editedStyle].selector) {
+                                // Updates style
+                                defaultStyles[defaultStyleIndex].style = {
+                                    ...defaultStyles[defaultStyleIndex].style,
+                                    ...newStyles[editedStyle].style
+                                };
+                            }
+                        });
+                    });
+
+                    // Update stylesheet
+                    this.automataPreview.cy.style(defaultStyles);
+                }
+
+                console.log(this.automataPreview.cy.style());
 
                 // Waits for a tick and then updates outline
                 this.$nextTick();

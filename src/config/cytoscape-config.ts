@@ -30,6 +30,14 @@ const myConfig: object = {
                 'content': 'data(displayName)',
             },
         },
+        { // Initial + final state
+            selector: '.initial-node.final-node',
+            style: {
+                'background-color': '#00f',
+                'border-width': 4,
+                'content': 'data(displayName)',
+            },
+        },
         { // Highlighted state
             selector: '.highlighted-node',
             style: {

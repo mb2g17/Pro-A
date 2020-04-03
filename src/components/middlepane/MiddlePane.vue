@@ -76,7 +76,16 @@
          * When the user wants to change styles
          */
         private onStylesClick() {
-            ModalsEventHandler.$emit("onStylesChange");
+            // Gets automata preview reference
+            const automataPreview: any = this.getAutomataPreviewReference();
+
+            // Passes a selected object, if it doesn't exist pass null
+            let selectedObject = null;
+            if (automataPreview.selectedNodes.size > 0)
+                selectedObject = [...automataPreview.selectedNodes][0];
+
+            // Emits event to open up style modal
+            ModalsEventHandler.$emit("onStylesChange", selectedObject);
         }
     }
 </script>
