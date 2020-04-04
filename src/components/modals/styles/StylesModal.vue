@@ -5,23 +5,44 @@
              v-model="isModalVisible"
              no-close-on-backdrop
              :static="true"
-             size="lg"
+             size="xl"
     >
         <template v-slot:modal-title>
-            Styles {{ isAll ? '(all)' : '(selection)' }}
+            Styles
         </template>
 
         <!-- Body -->
         <b-row>
-            <b-col v-for="(style, styleName) in styles" cols="6">
-                <StyleColourPicker
-                        :label="styleName"
-                        :ref="styleName"
-                        @styleChange="onStyleChange"
-                ></StyleColourPicker>
+            <b-col cols="3" class="styleCards">
+                <StyleCard v-for="(card, title) in cards"
+                           :key="title"
+                           :title="title"
+                           :all="card.all"
+                           :states="card.states"
+                           :selected="card.selected"
+                           @onCardClick="selectCard(title)"
+                           @onCloseClick=""
+                           @onMoveUpClick=""
+                           @onMoveDownClick=""
+                ></StyleCard>
+            </b-col>
+
+            <b-col cols="9">
+
+                <b-row>
+                    <b-col v-for="(style, styleName) in styles" cols="4">
+                        <StyleColourPicker
+                                :label="styleName"
+                                :ref="styleName"
+                                @styleChange="onStyleChange"
+                        ></StyleColourPicker>
+                    </b-col>
+                </b-row>
+
             </b-col>
         </b-row>
 
+        <!-- Footer buttons -->
         <template v-slot:modal-footer>
             <div class="w-100">
                 <b-button variant="danger" class="float-left" @click="onCancelClick">Cancel</b-button>
@@ -37,15 +58,16 @@
 <script lang="ts">
     import Vue from "vue";
     import {Component} from "vue-property-decorator";
-    import {BForm, BModal, BRow, BCol} from "bootstrap-vue";
+    import {BForm, BModal, BRow, BCol, BCard, BButton, BCardText, BButtonGroup} from "bootstrap-vue";
     import StyleColourPicker from "@/components/modals/styles/StyleColourPicker.vue";
     import StyleUpdateEventHandler from "@/events/StyleUpdateEventHandler";
+    import StyleCard from "@/components/modals/styles/StyleCard.vue";
 
     @Component({
         components: {
-            BRow, BCol, BModal, BForm,
+            BRow, BCol, BModal, BForm, BCard, BCardText, BButton, BButtonGroup,
 
-            StyleColourPicker
+            StyleColourPicker, StyleCard
         }
     })
     export default class StylesModal extends Vue {
@@ -68,7 +90,7 @@
                 selector: '.final-node',
                 style: {}
             },
-            "Initial and final node": {
+            "Initial + final node": {
                 selector: '.initial-node.final-node',
                 style: {}
             },
@@ -78,8 +100,30 @@
             },
         };
 
+        /**
+         * The style cards, mapping from title -> style card object
+         */
+        private cards: any = {
+            "All": {
+                all: true,
+                states: [],
+                selected: false,
+            },
+            "Style1": {
+                all: false,
+                states: ['s1', 's2', 's3', 's4', 's5', 's6', 's7'],
+                selected: false,
+            },
+            "Style2": {
+                all: false,
+                states: ['s4', 's5'],
+                selected: false,
+            }
+        };
+
         mounted() {
             this.resetToDefault();
+            this.show();
         }
 
         /**
@@ -94,6 +138,28 @@
          */
         public hide() {
             (this.$refs['stylesModal'] as any).hide();
+        }
+
+        /**
+         * Selects a new card
+         * @param title - the new card to select
+         */
+        private selectCard(title: string) {
+            if (this.selectedCard)
+                this.cards[this.selectedCard].selected = false;
+            this.cards[title].selected = true;
+        }
+
+        /**
+         * Gets the currently selected card by sequential search
+         * @return the title of the selected card. Returns empty string if none is selected
+         */
+        private get selectedCard(): string {
+            for (const cardTitle in this.cards) {
+                if (this.cards[cardTitle].selected)
+                    return cardTitle;
+            }
+            return "";
         }
 
         /**
@@ -152,5 +218,8 @@
 </script>
 
 <style scoped>
-
+    .styleCards {
+        overflow-y: scroll;
+        max-height: 450px;
+    }
 </style>
