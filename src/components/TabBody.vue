@@ -119,7 +119,44 @@
             });
 
             // Update styles if event is captured
-            StyleUpdateEventHandler.$on("styleUpdate", (newStyles: any) => {
+            StyleUpdateEventHandler.$on("styleUpdate", (cards: any) => {
+                // Gets styles array and resets cytoscape style to default
+                const defaultStyles: any[] = require("../config/cytoscape-config").default.style;
+                this.automataPreview.cy.style(defaultStyles);
+
+                // For every card
+                Object.keys(cards).forEach(card => {
+                    // For every style
+                    Object.keys(cards[card].styles).forEach(styleName => {
+                        // Gets selector and style
+                        const selector = cards[card].styles[styleName].selector;
+                        const style = cards[card].styles[styleName].style;
+
+                        // Updates selector based on nodes
+                        let newSelector = "";
+                        let selectedNodeIndex = 0;
+
+                        // Goes through every selected state
+                        cards[card].states.forEach((state: string) => {
+                            // If this state exists, append to selector
+                            if (this.automata.getState(state)) {
+                                newSelector +=
+                                    (newSelector ? ',' : '') +
+                                    "#" +
+                                    this.automata.getState(state).data.id +
+                                    (selector === 'node' ? '' : selector);
+                            }
+                            selectedNodeIndex++;
+                        });
+
+                        this.automataPreview.cy.style()
+                            .selector(newSelector)
+                            .style('background-color', style['background-color'])
+                            .style('border-width', style['border-width'])
+                            .update();
+                    })
+                });
+/*
                 if (this.automataPreview.selectedNodes.size > 0) {
                     // Goes through every editable style
                     Object.keys(newStyles).forEach(editedStyle => {
@@ -166,7 +203,7 @@
                     // Update stylesheet
                     this.automataPreview.cy.style(defaultStyles);
                 }
-
+*/
                 console.log(this.automataPreview.cy.style());
 
                 // Waits for a tick and then updates outline

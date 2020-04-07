@@ -16,10 +16,6 @@
 
             <b-col cols="3" class="p-0" v-if="!all">
                 <b-button href="#" variant="danger" @click.stop="onCloseClick">X</b-button>
-                <b-button-group vertical>
-                    <b-button href="#" variant="primary" @click.stop="onMoveUpClick">^</b-button>
-                    <b-button href="#" variant="primary" @click.stop="onMoveDownClick">v</b-button>
-                </b-button-group>
             </b-col>
         </b-row>
     </b-card>
@@ -62,20 +58,6 @@
          */
         private onCloseClick() {
             this.$emit("onCloseClick");
-        }
-
-        /**
-         * When the user clicks the move up button
-         */
-        private onMoveUpClick() {
-            this.$emit("onMoveUpClick");
-        }
-
-        /**
-         * When the user clicks the move down button
-         */
-        private onMoveDownClick() {
-            this.$emit("onMoveDownClick");
         }
     }
 </script>

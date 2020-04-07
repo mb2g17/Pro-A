@@ -35,3 +35,5 @@ OTHER / UNCATEGORISED:
 
 
 --* IN PROGRESS:
+- The ability to add new styles
+- Make it so that styles only apply to one automata at a time
