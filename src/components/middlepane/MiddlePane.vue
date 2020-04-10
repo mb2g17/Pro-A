@@ -26,6 +26,9 @@
                 @editState="$emit('onEditState', $event)"
         />
 
+        <!-- Styles modal -->
+        <StylesModal ref="stylesModal"></StylesModal>
+
     </div>
 </template>
 
@@ -35,15 +38,30 @@
     import Vue from "vue";
     import Automata from "@/classes/Automata";
     import ModalsEventHandler from "@/events/ModalsEventHandler";
+    import StylesModal from "@/components/modals/styles/StylesModal.vue";
 
     @Component({
         components: {
-            AutomataPreview
+            AutomataPreview, StylesModal
         }
     })
     export default class MiddlePane extends Vue {
         /** Automata reference */
         @Prop() private readonly automata!: Automata;
+
+        /** Styles modal reference */
+        private stylesModal: any;
+
+        mounted() {
+            this.stylesModal = this.$refs["stylesModal"];
+
+            // When the user wants to change styles
+            ModalsEventHandler.$on("onStylesChange", (automataID: any) => {
+            });
+
+            ModalsEventHandler.$on("onAddStyle", (args: any) => {
+            });
+        }
 
         public get isThereSelectedNodes(): boolean {
             const automataPreview = this.getAutomataPreviewReference();
@@ -57,6 +75,24 @@
          */
         public getAutomataPreviewReference(): any {
             return this.$refs["automata"];
+        }
+
+        /**
+         * When the user wants to view styles
+         * @param callback - run when the user tries to apply styles
+         */
+        public viewStyles(callback: any) {
+            this.stylesModal.show(callback);
+        }
+
+        /**
+         * When the user wants to add a style
+         * @param callback - run when the user tries to apply styles
+         * @param selectedNodes - the nodes of the new style
+         */
+        public addStyle(callback: any, selectedNodes: string[]) {
+            this.stylesModal.show(callback);
+            this.stylesModal.addCard(selectedNodes);
         }
 
         /**
@@ -86,7 +122,8 @@
          */
         private onStylesClick() {
             // Emits event to open up style modal
-            ModalsEventHandler.$emit("onStylesChange");
+            ModalsEventHandler.$emit("onStylesChange", this.automata.getID());
+            this.viewStyles((cards: any) => this.$emit("onStylesChange", cards));
         }
 
         /**
@@ -100,7 +137,7 @@
             const selectedNodes = [...automataPreview.selectedNodes].map(id => this.automata.getStateById(id).data.name);
 
             // Emits event to open up style modal
-            ModalsEventHandler.$emit("onAddStyle", selectedNodes);
+            this.addStyle((cards: any) => this.$emit("onStylesChange", cards), selectedNodes);
         }
     }
 </script>

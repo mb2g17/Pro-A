@@ -109,13 +109,13 @@
         /** Counts the number of style names that has been generated */
         private styleNameCounter: number = 1;
 
+        /** The callback to run when styles are applied */
+        private callback: any;
+
         mounted() {
             //this.resetToDefault();
             this.addCard([], "All");
             Vue.set(this.cards["All"], 'all', true);
-
-            this.addCard(['s1', 's2', 's3', 's4', 's5', 's6', 's7']);
-            this.addCard(['s4', 's5']);
         }
 
         /**
@@ -153,7 +153,8 @@
         /**
          * Shows this modal
          */
-        public show() {
+        public show(callback: any) {
+            this.callback = callback;
             (this.$refs['stylesModal'] as any).show();
         }
 
@@ -288,7 +289,7 @@
          * When the user wants to apply changes
          */
         private onApplyClick() {
-            StyleUpdateEventHandler.$emit("styleUpdate", this.cards);
+            this.callback(this.cards);
             this.hide();
         }
 

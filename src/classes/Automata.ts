@@ -36,6 +36,13 @@ export default abstract class Automata {
     /** The name of the automata itself */
     private name: string = '';
 
+    /** The ID of the automata */
+    private readonly id: string = '';
+
+    public constructor() {
+        this.id = uuidv1();
+    }
+
     /**
      * Sets the input string stored in the automata
      * @param inputString - the new input string to put into the automata
@@ -50,6 +57,14 @@ export default abstract class Automata {
      */
     public getInput(): string {
         return this.inputString;
+    }
+
+    /**
+     * Gets the ID of the automata itself
+     * @returns the ID of the automata
+     */
+    public getID(): string {
+        return this.id;
     }
 
     /**

@@ -7,9 +7,6 @@
         <!-- New transition modal -->
         <NewTransitionModal ref="newTransitionModal" />
 
-        <!-- Styles modal -->
-        <StylesModal ref="stylesModal"></StylesModal>
-
     </div>
 </template>
 
@@ -33,14 +30,10 @@
         /** New transition modal reference */
         private newTransitionModal: any;
 
-        /** Styles modal reference */
-        private stylesModal: any;
-
         private mounted() {
             // Stores references for convenience
             this.newTabModal = this.$refs["newTabModal"];
             this.newTransitionModal = this.$refs["newTransitionModal"];
-            this.stylesModal = this.$refs["stylesModal"];
 
             // --* EVENTS *--
             // When the user wants to create a new automata
@@ -63,16 +56,6 @@
                 // Deconstructs arguments and runs modal
                 const {automataType, existingSymbols, transition, callback} = args;
                 this.newTransitionModal.showEdit(automataType, existingSymbols, transition, callback);
-            });
-
-            // When the user wants to change styles
-            ModalsEventHandler.$on("onStylesChange", (args: any) => {
-                this.stylesModal.show();
-            });
-
-            ModalsEventHandler.$on("onAddStyle", (selectedNodes: any) => {
-                this.stylesModal.show();
-                this.stylesModal.addCard(selectedNodes);
             });
         }
     }
