@@ -154,57 +154,8 @@
                             .style('background-color', style['background-color'])
                             .style('border-width', style['border-width'])
                             .update();
-                    })
+                    });
                 });
-/*
-                if (this.automataPreview.selectedNodes.size > 0) {
-                    // Goes through every editable style
-                    Object.keys(newStyles).forEach(editedStyle => {
-                        // Creates selector
-                        const editableStyleSelector = newStyles[editedStyle].selector;
-                        let selector = "";
-                        let selectedNodeIndex = 0;
-
-                        // Goes through every selected element
-                        this.automataPreview.selectedNodes.forEach((selectedNode: string) => {
-                            selector += ("#" +
-                                selectedNode +
-                                (editableStyleSelector === 'node' ? '' : editableStyleSelector) +
-                                (selectedNodeIndex === this.automataPreview.selectedNodes.size - 1 ? '' : ',')
-                            );
-                            selectedNodeIndex++;
-                        });
-
-                        // Updates style
-                        this.automataPreview.cy.style()
-                            .selector(selector)
-                            .style(newStyles[editedStyle].style)
-                            .update();
-                    });
-                } else {
-                    // Gets default styles
-                    const defaultStyles: any[] = require("../config/cytoscape-config").default.style;
-
-                    // Goes through every default style
-                    defaultStyles.forEach((defaultStyle: any, defaultStyleIndex: number) => {
-                        // Goes through every editable style
-                        Object.keys(newStyles).forEach(editedStyle => {
-                            // If we have a match
-                            if (defaultStyle.selector === newStyles[editedStyle].selector) {
-                                // Updates style
-                                defaultStyles[defaultStyleIndex].style = {
-                                    ...defaultStyles[defaultStyleIndex].style,
-                                    ...newStyles[editedStyle].style
-                                };
-                            }
-                        });
-                    });
-
-                    // Update stylesheet
-                    this.automataPreview.cy.style(defaultStyles);
-                }
-*/
-                console.log(this.automataPreview.cy.style());
 
                 // Waits for a tick and then updates outline
                 this.$nextTick();

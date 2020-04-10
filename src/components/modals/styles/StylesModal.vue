@@ -6,6 +6,7 @@
              no-close-on-backdrop
              :static="true"
              size="xl"
+             @shown="onModalShown"
     >
         <template v-slot:modal-title>
             Styles
@@ -14,7 +15,7 @@
         <!-- Body -->
         <b-row>
             <!-- Cards -->
-            <b-col cols="3" class="styleCards">
+            <b-col cols="3" id="styleCards">
                 <StyleCard v-for="(card, title) in cards"
                            :key="title"
                            :title="title"
@@ -66,6 +67,7 @@
     import StyleColourPicker from "@/components/modals/styles/StyleColourPicker.vue";
     import StyleUpdateEventHandler from "@/events/StyleUpdateEventHandler";
     import StyleCard from "@/components/modals/styles/StyleCard.vue";
+    import $ from "jquery";
 
     @Component({
         components: {
@@ -77,9 +79,6 @@
     export default class StylesModal extends Vue {
         /** If true, modal is visible. If false, it is not */
         private isModalVisible: boolean = false;
-
-        /** If true, we're editing all. If false, we're editing a selection */
-        public isAll: boolean = true;
 
         /**
          * The different styles to take care of
@@ -107,28 +106,48 @@
          */
         private cards: any = {};
 
+        /** Counts the number of style names that has been generated */
+        private styleNameCounter: number = 1;
+
         mounted() {
             //this.resetToDefault();
-            this.show();
-            this.addCard("All", []);
+            this.addCard([], "All");
             Vue.set(this.cards["All"], 'all', true);
 
-            this.addCard("Style1", ['s1', 's2', 's3', 's4', 's5', 's6', 's7']);
-            this.addCard("Style2", ['s4', 's5']);
+            this.addCard(['s1', 's2', 's3', 's4', 's5', 's6', 's7']);
+            this.addCard(['s4', 's5']);
         }
 
         /**
          * Adds a new card
-         * @param cardName - the name of the card
          * @param states - the states that this card affects
+         * @param cardName - the name of the card, leave it to generate one
+         * @param select - if true, this new card will be selected after being created
          */
-        public addCard(cardName: string, states: string[]) {
+        public addCard(states: string[], cardName?: string, select: boolean = true) {
+            if (!cardName)
+                cardName = this.generateName();
+
             Vue.set(this.cards, cardName, {
                 all: false,
                 states,
                 selected: false,
                 styles: this.getDefaultStyles()
             });
+
+            if (select) {
+                this.selectCard(cardName);
+            }
+        }
+
+        /**
+         * Generates a style name
+         * @returns the generated style name
+         */
+        public generateName(): string {
+            const rv: string = "Style" + this.styleNameCounter;
+            this.styleNameCounter++;
+            return rv;
         }
 
         /**
@@ -284,11 +303,33 @@
             if (this.selectedCard)
                 this.cards[this.selectedCard].styles[name].style = style;
         }
+
+        /**
+         * When the modal has just been shown
+         */
+        private onModalShown() {
+            // Gets selected card
+            const selectedCard = this.selectedCard;
+
+            // If no card is selected, bail out
+            if (!selectedCard)
+                return;
+
+            // Gets index of selected node
+            const selectedCardIndex = Object.keys(this.cards).indexOf(selectedCard);
+
+            // Highlights selected node
+            const container = this.$el.querySelector("#styleCards");
+            if (container != null) {
+                container.scrollTop = 0;
+                container.scrollTop = $(container.children[selectedCardIndex]).position().top;
+            }
+        }
     }
 </script>
 
 <style scoped>
-    .styleCards {
+    #styleCards {
         overflow-y: scroll;
         max-height: 450px;
     }

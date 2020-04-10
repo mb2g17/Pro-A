@@ -67,8 +67,12 @@
 
             // When the user wants to change styles
             ModalsEventHandler.$on("onStylesChange", (args: any) => {
-                this.stylesModal.isAll = !args;
                 this.stylesModal.show();
+            });
+
+            ModalsEventHandler.$on("onAddStyle", (selectedNodes: any) => {
+                this.stylesModal.show();
+                this.stylesModal.addCard(selectedNodes);
             });
         }
     }

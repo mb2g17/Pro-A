@@ -32,8 +32,8 @@ OTHER / UNCATEGORISED:
 - BUG: on selecting a machine with one transition, edge editing messes up transition selection
 - BUG: you can't duplicate state folds
 - BUG: with TMs, since some transitions are technically epsilon moves, there is a problem with duplicate transitions
+- BUG: newEdge.data is not a function when trying to use edge editing
 
 
 --* IN PROGRESS:
-- The ability to add new styles
 - Make it so that styles only apply to one automata at a time

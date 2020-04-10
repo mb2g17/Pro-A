@@ -11,7 +11,10 @@
                     <font-awesome-icon :icon="['fas', 'search-minus']" />
                 </b-button>
             </div>
-            <b-button variant="success" @click="onStylesClick">Styles</b-button>
+            <div>
+                <b-button variant="success" @click="onAddStyleClick">Add style</b-button>
+                <b-button variant="warning" @click="onStylesClick" class="ml-2">View styles</b-button>
+            </div>
         </div>
 
         <!-- AUTOMATA PREVIEW -->
@@ -41,6 +44,12 @@
     export default class MiddlePane extends Vue {
         /** Automata reference */
         @Prop() private readonly automata!: Automata;
+
+        public get isThereSelectedNodes(): boolean {
+            const automataPreview = this.getAutomataPreviewReference();
+            console.log(automataPreview);
+            return automataPreview ? this.getAutomataPreviewReference().selectedNodes.size > 0 : false;
+        }
 
         /**
          * Gets automata preview reference
@@ -76,16 +85,22 @@
          * When the user wants to change styles
          */
         private onStylesClick() {
+            // Emits event to open up style modal
+            ModalsEventHandler.$emit("onStylesChange");
+        }
+
+        /**
+         * When the user wants to add a style
+         */
+        private onAddStyleClick() {
             // Gets automata preview reference
             const automataPreview: any = this.getAutomataPreviewReference();
 
-            // Passes a selected object, if it doesn't exist pass null
-            let selectedObject = null;
-            if (automataPreview.selectedNodes.size > 0)
-                selectedObject = [...automataPreview.selectedNodes][0];
+            // Converts selected node IDs to names
+            const selectedNodes = [...automataPreview.selectedNodes].map(id => this.automata.getStateById(id).data.name);
 
             // Emits event to open up style modal
-            ModalsEventHandler.$emit("onStylesChange", selectedObject);
+            ModalsEventHandler.$emit("onAddStyle", selectedNodes);
         }
     }
 </script>
