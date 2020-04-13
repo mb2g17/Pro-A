@@ -5,8 +5,6 @@ VALIDATION:
 CONFIG TABLE:
 - change config table to allow stack trace
 - colour code the configurations
-- add a button to "delete" a configuration
-- add a button to "prune" or "exclude" a configuration (delete all except that one)
 
 ANIMATION:
 

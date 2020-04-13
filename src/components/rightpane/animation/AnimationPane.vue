@@ -20,6 +20,8 @@
         <!-- Config -->
         <ConfigTable :automata="automata"
                      :configs="currentConfigs"
+                     @onDeleteConfig="onDeleteConfig"
+                     @onPruneConfig="onPruneConfig"
         />
 
     </div>
@@ -176,6 +178,47 @@
 
             // Updates vue
             this.$forceUpdate();
+        }
+
+        /**
+         * When the user wants to delete a configuration
+         * @param config - the configuration to delete
+         */
+        private onDeleteConfig(config: AutomataConfig) {
+            this.automata.deleteConfig(config);
+            this.updateOutcomeAndCurrentConfigs();
+
+            // Check if any other configs have this state too
+            let stateExistsAsConfig: boolean = false;
+            this.automata.getCurrentConfigs().forEach(currentConfig => {
+                if (currentConfig.state === config.state) {
+                    stateExistsAsConfig = true;
+                }
+            });
+
+            // If no other config shares this state, unhighlight it
+            if (!stateExistsAsConfig) {
+                // Emits event that toggles highlightings
+                this.$emit("changeHighlightedNodes", {
+                    deselect: new Set([config.state]),
+                    select: new Set()
+                });
+            }
+        }
+
+        /**
+         * When the user wants to delete all but one config
+         * @param config - the config to leave
+         */
+        private onPruneConfig(config: AutomataConfig) {
+            const deselect = this.automata.pruneConfig(config);
+            this.updateOutcomeAndCurrentConfigs();
+
+            // Deselects states that no longer have configs
+            this.$emit("changeHighlightedNodes", {
+                deselect: deselect,
+                select: new Set()
+            });
         }
     }
 </script>

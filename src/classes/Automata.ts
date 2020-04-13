@@ -808,6 +808,31 @@ export default abstract class Automata {
     public abstract getCurrentConfigs(): Set<AutomataConfig>;
 
     /**
+     * Deletes a config and saves the new set of configs without this config
+     * @param configArg - the config to delete
+     */
+    public deleteConfig(configArg: AutomataConfig) {
+        let configs: Set<AutomataConfig> = this.getCurrentConfigs();
+        configs = new Set([...configs].filter(config => config !== configArg));
+        this.setCurrentConfigs(configs);
+    }
+
+    /**
+     * Deletes all but the argument config and saves the new set of configs with just this config
+     * @param configArg - the config to prune
+     * @returns the set of state names that are no longer selected
+     */
+    public pruneConfig(configArg: AutomataConfig): Set<string> {
+        const configs: Set<AutomataConfig> = this.getCurrentConfigs();
+        const newConfigs = new Set([...configs].filter(config => config === configArg));
+        this.setCurrentConfigs(newConfigs);
+
+        return new Set([...configs]
+            .filter(config => config !== configArg)
+            .map(config => config.state));
+    }
+
+    /**
      * Resets the animation of this automata
      */
     public abstract reset(): void;
