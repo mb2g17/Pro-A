@@ -15,22 +15,20 @@ UI:
 
 OTHER / UNCATEGORISED:
 - add controls to change the size of loop transitions
-- make 'delete' delete all objects in your selection, not just the one you clicked on
 - add "comments" to automata screen
 - If two configurations are the same, it should only appear once
-- make styles save in files too
 
 - use a server to store automata tabs that aren't open
 
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 - BUG: edge handles gets saved as their own objects when saving automata (also re-do saved automata)
-- BUG: when moving an edge using the edge editing thing, your selected edges do not update, making state folds error
-- BUG: double check alt+clicking and duplication, as well as deleting state with transitions attached to it
+- BUG?: double check alt+clicking and duplication, as well as deleting state with transitions attached to it
 - BUG: can rename state folds (might want to adapt this later for labelling state folds)
 - BUG: on selecting a machine with one transition, edge editing messes up transition selection
-- BUG: you can't duplicate state folds
 - BUG: with TMs, since some transitions are technically epsilon moves, there is a problem with duplicate transitions
-- BUG: newEdge.data is not a function when trying to use edge editing
 
 
 --* IN PROGRESS:
+- make styles save in files too
+- BUG: you can't duplicate state folds
+- BUG: when moving an edge using the edge editing thing, your selected edges do not update, making state folds error (newEdge.data is not a function when trying to use edge editing)

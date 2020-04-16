@@ -382,9 +382,17 @@ export default class AutomataPreview extends Vue {
                     tooltipText: 'remove',
                     selector: 'node, edge',
                     onClickFunction: async (event: any) => {
-                        // Removes object from Cytoscape
-                        let target = event.target || event.cyTarget;
-                        const removedElements = target.remove();
+                        // Create selector that gets all selected objects
+                        let selector: string = "";
+                        this.selectedNodes.forEach(selectedNode => {
+                            selector +=
+                                (selector ? ',' : '') +
+                                "#" +
+                                selectedNode;
+                        });
+
+                        // Removes objects from Cytoscape
+                        const removedElements = this.cy.remove(this.cy.elements(selector));
 
                         // Goes through all removed elements
                         for (let i = 0; i < removedElements.length; i++) {
