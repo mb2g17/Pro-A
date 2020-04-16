@@ -166,6 +166,13 @@
         }
 
         /**
+         * Updates style cards
+         */
+        public updateStyleCard(cards: any) {
+            Vue.set(this, "cards", cards);
+        }
+
+        /**
          * Selects a new card
          * @param title - the new card to select
          */

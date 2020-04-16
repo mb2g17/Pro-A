@@ -96,6 +96,9 @@
         /** Middle pane reference */
         private middlePane: any;
 
+        /** A stored copy of currently applied style cards */
+        private cards: any;
+
         get RightPane(): any {
             return this.rightPane;
         }
@@ -108,6 +111,10 @@
             return this.middlePane;
         }
 
+        get StyleCards(): any {
+            return this.cards;
+        }
+
         private mounted() {
             this.automataPreview = (this.$refs["middlePane"] as any).getAutomataPreviewReference();
             this.rightPane = (this.$refs["rightPane"] as any);
@@ -118,6 +125,14 @@
             OutlineUpdateEventHandler.$on('updateOutline', () => {
                 this.updateOutlinePane();
             });
+        }
+
+        /**
+         * Updates style cards
+         */
+        public updateStyleCards(cards: any) {
+            this.onStylesChange(cards);
+            this.middlePane.updateStyleCards(cards);
         }
 
         /**
@@ -167,6 +182,8 @@
          * Executed when styles are updated
          */
         private onStylesChange(cards: any) {
+            this.cards = cards;
+
             // Gets styles array and resets cytoscape style to default
             const defaultStyles: any[] = require("../config/cytoscape-config").default.style;
             this.automataPreview.cy.style(defaultStyles);

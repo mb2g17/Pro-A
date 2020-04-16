@@ -63,6 +63,13 @@
             });
         }
 
+        /**
+         * Updates style cards
+         */
+        public updateStyleCards(cards: any) {
+            this.stylesModal.cards = cards;
+        }
+
         public get isThereSelectedNodes(): boolean {
             const automataPreview = this.getAutomataPreviewReference();
             console.log(automataPreview);

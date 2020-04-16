@@ -184,6 +184,7 @@ export default class Main extends Vue {
             const contents: string = await readFileAsync(file) as string;
             const decryptedBase64: string = Base64.decode(contents);
             let jsonContents: any = JSON.parse(decryptedBase64);
+            console.log(jsonContents);
 
             // Parses new automata
             const newAutomata: Automata = deserialize(jsonContents.automata);
@@ -201,6 +202,10 @@ export default class Main extends Vue {
 
             // Updates json of cytoscape
             cy.json(jsonContents.cy);
+
+            // Updates styles, if it's defined (if undefined, default styles are used)
+            if (jsonContents.style)
+                elem[0].updateStyleCards(jsonContents.style);
         }
     }
 
@@ -231,8 +236,11 @@ export default class Main extends Vue {
         // Creates JSON object to save
         const jsonToSave = {
             cy: cytoscapeJSON,
-            automata: this.automatas[index].serialize()
+            automata: this.automatas[index].serialize(),
+            style: elem[0].StyleCards
         };
+
+        console.log(jsonToSave);
 
         // Creates save blob and encodes into Base64
         let saveBlob: string = JSON.stringify(jsonToSave);
