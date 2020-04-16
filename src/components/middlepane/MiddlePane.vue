@@ -39,6 +39,7 @@
     import Automata from "@/classes/Automata";
     import ModalsEventHandler from "@/events/ModalsEventHandler";
     import StylesModal from "@/components/modals/styles/StylesModal.vue";
+    import ordinal from "ordinal";
 
     @Component({
         components: {
@@ -139,6 +140,17 @@
         private onAddStyleClick() {
             // Gets automata preview reference
             const automataPreview: any = this.getAutomataPreviewReference();
+
+            // If there are no selected nodes, don't do anything
+            if (automataPreview.selectedNodes.size === 0) {
+                // Tell the user to select nodes next time
+                this.$bvToast.toast(`Please select the nodes you wish to customise before adding a style.`, {
+                    title: `No selected nodes to stylise!`,
+                    variant: "danger",
+                    autoHideDelay: 5000
+                });
+                return;
+            }
 
             // Converts selected node IDs to names
             const selectedNodes = [...automataPreview.selectedNodes].map(id => this.automata.getStateById(id).data.name);
