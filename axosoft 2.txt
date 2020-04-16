@@ -26,9 +26,10 @@ OTHER / UNCATEGORISED:
 - BUG: can rename state folds (might want to adapt this later for labelling state folds)
 - BUG: on selecting a machine with one transition, edge editing messes up transition selection
 - BUG: with TMs, since some transitions are technically epsilon moves, there is a problem with duplicate transitions
+- BUG: attempting to nest state folds crashes system (click on a state fold, then click "state fold")
+- BUG: when the last node is removed from a state fold, the state fold persists as a blue node
 
 
 --* IN PROGRESS:
-- BUG: you can't duplicate state folds
 - BUG: when moving an edge using the edge editing thing, your selected edges do not update, making state folds error (newEdge.data is not a function when trying to use edge editing)
 - BUG: Clicking 'add style' with no nodes selected still opens modal

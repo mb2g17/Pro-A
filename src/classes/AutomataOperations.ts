@@ -235,8 +235,16 @@ export default class AutomataOperations {
             duplicatedObjects.add(automata.getTransition(srcSymbol, targetSrc, targetTarget).data.id);
         }
 
+        // Stores group as a stack
+        const groupStack: string[] = [...group];
+
         // Goes through each object
-        for (const srcObjID of group) {
+        while (groupStack.length > 0) {
+            // Gets obj id
+            const srcObjID = groupStack.pop();
+            if (!srcObjID)
+                break;
+
             // Fetch object
             const srcObj = automata.getData()[srcObjID];
 
@@ -244,8 +252,30 @@ export default class AutomataOperations {
             if (srcObj.data.type === "node") {
                 addState(srcObj);
             }
-            else if (srcObj.data.type === "edge")
+            // If it's an edge
+            else if (srcObj.data.type === "edge") {
                 addTransition(srcObj);
+            }
+            // If it's a state fold
+            else if (srcObj.classes.has("parent")) {
+                // Goes through all children
+                srcObj.children.forEach((child: any) => {
+                    // Gets child name and ID
+                    const childID = child._private.data.id, childName = child._private.data.name;
+
+                    // Push child node
+                    groupStack.push(childID);
+
+                    // Gets child transitions
+                    const childTransitions = automata.cacheTransition.getTargetMappings(childName);
+                    Object.keys(childTransitions).forEach(targetNode => {
+                        childTransitions[targetNode].forEach((symbol: any) => {
+                            console.log(childName + ", " + targetNode + ", " + symbol);
+                            groupStack.push(automata.getTransition(symbol, childName, targetNode).data.id);
+                        });
+                    });
+                });
+            }
         }
 
         return duplicatedObjects;
