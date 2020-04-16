@@ -495,7 +495,7 @@ export default class AutomataPreview extends Vue {
         (window as any)['$'] = $; // Globally defines jQuery so that this dumb plugin will work
         let instance = this.cy.edgeEditing({
             bendRemovalSensitivity: 16,
-            handleReconnectEdge: async (sourceID: any, targetID: any, edge: any) => {
+            handleReconnectEdge: (sourceID: any, targetID: any, edge: any) => {
                 // Gets source and target names
                 const sourceName = this.automata.getStateById(sourceID).data.name;
                 const targetName = this.automata.getStateById(targetID).data.name;
@@ -513,7 +513,7 @@ export default class AutomataPreview extends Vue {
                 this.cy.getElementById(edge.id)[0].json(edgeData);
 
                 // Updates outline pane
-                await this.$nextTick();
+                this.$nextTick();
                 OutlineUpdateEventHandler.$emit('updateOutline');
             }
         });

@@ -31,4 +31,3 @@ OTHER / UNCATEGORISED:
 
 
 --* IN PROGRESS:
-- BUG: when moving an edge using the edge editing thing, your selected edges do not update, making state folds error (newEdge.data is not a function when trying to use edge editing)
