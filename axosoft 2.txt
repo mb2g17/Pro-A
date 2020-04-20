@@ -22,7 +22,6 @@ OTHER / UNCATEGORISED:
 
 - BUG: holding alt, defocusing the browser and releasing alt still keeps Pro-A in "holding down alt" mode
 - BUG?: double check alt+clicking and duplication, as well as deleting state with transitions attached to it
-- BUG: can rename state folds (might want to adapt this later for labelling state folds)
 - BUG: on selecting a machine with one transition, edge editing messes up transition selection
 
 
@@ -30,3 +29,4 @@ OTHER / UNCATEGORISED:
 - BUG: attempting to nest state folds crashes system (click on a state fold, then click "state fold")
 - BUG: when the last node is removed from a state fold, the state fold persists as a blue node
 - BUG: edge handles gets saved as their own objects when saving automata (also re-do saved automata)
+- BUG: can rename state folds (might want to adapt this later for labelling state folds)

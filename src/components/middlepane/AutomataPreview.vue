@@ -383,7 +383,7 @@ export default class AutomataPreview extends Vue {
                     selector: 'node, edge',
                     onClickFunction: async (event: any) => {
                         // Create selector that gets all selected objects
-                        let selector: string = "";
+                        let selector: string = "#" + event.target._private.data.id;
                         this.selectedNodes.forEach(selectedNode => {
                             selector +=
                                 (selector ? ',' : '') +
