@@ -27,6 +27,9 @@ export default abstract class Automata {
     /** Set of final state names */
     protected cacheFinalStates: Set<string> = new Set();
 
+    /** Set of states that are in a fold by ID */
+    public cacheFoldedStates: Set<string> = new Set();
+
     /** Cache storing transition convenience */
     public cacheTransition: AutomataTransitionCache = new AutomataTransitionCache();
 
@@ -307,6 +310,7 @@ export default abstract class Automata {
             // Removes from initial / final state cache
             this.cacheInitialStates.delete(stateName);
             this.cacheFinalStates.delete(stateName);
+            this.cacheFoldedStates.delete(id);
 
             // Updates cache
             this.cacheTransition.removeState(stateName);
@@ -595,6 +599,7 @@ export default abstract class Automata {
             cacheNodeID: this.cacheNodeID,
             cacheInitialStates: [...this.cacheInitialStates],
             cacheFinalStates : [...this.cacheFinalStates],
+            cacheFoldedStates: [...this.cacheFoldedStates]
         };
 
         // Goes through items, checking if they're good

@@ -301,6 +301,9 @@ export default class AutomataPreview extends Vue {
                             let data: any = this.automata.getData();
                             data[node].parent = parentID;
                             this.automata.setData(data);
+
+                            // Change cache
+                            this.automata.cacheFoldedStates.add(node);
                         }
 
                         // Updates outline pane
@@ -334,6 +337,9 @@ export default class AutomataPreview extends Vue {
                             let data: any = this.automata.getData();
                             data[node].parent = null;
                             this.automata.setData(data);
+
+                            // Change cache
+                            this.automata.cacheFoldedStates.delete(node);
                         }
 
                         // Updates outline pane
@@ -397,6 +403,9 @@ export default class AutomataPreview extends Vue {
                         // Goes through all removed elements
                         for (let i = 0; i < removedElements.length; i++) {
                             const elem = removedElements[i];
+
+                            // Removes from selected set
+                            this.selectedNodes.delete(elem._private.data.id);
 
                             // If this is a state
                             if (elem._private.data.type === "node") {

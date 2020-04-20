@@ -378,6 +378,21 @@
          * When the user wants to perform "State fold"
          */
         private onStateFoldCompute(selectedNodes: Set<string>[]) {
+            let cancel: boolean = false;
+            // Checks for state folds or states that are already in folds
+            selectedNodes[0].forEach(selectedNode => {
+                // If this is a state fold
+                console.log(this.automataPreview.cy.getElementById(selectedNode));
+                if (this.automataPreview.cy.getElementById(selectedNode)._private.classes.has("parent"))
+                    cancel = true;
+
+                // If this is a state that is in a fold already
+                if (this.automata.cacheFoldedStates.has(selectedNode))
+                    cancel = true;
+            });
+            if (cancel)
+                return;
+
             // Creates parent node
             let parentID = uuidv1();
             const parentNode = this.automataPreview.cy.add([
@@ -412,6 +427,9 @@
             let newData: any = this.automata.getData();
             newData[parentID] = this.automataPreview.cy.nodes("#" + parentID)[0]._private;
             this.automata.setData(newData);
+
+            // Add all nodes to cache
+            selectedNodes[0].forEach(selectedNode => this.automata.cacheFoldedStates.add(selectedNode));
         }
 
         /**
