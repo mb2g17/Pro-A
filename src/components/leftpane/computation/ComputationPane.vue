@@ -25,18 +25,21 @@
 
         <OperationButton name="Concatenation"
                          max-stages=2
+                         v-if="automataTypeEnabled('pushdown')"
                          @onOperationButtonClick="$emit('onOperationButtonClick', $event)"
                          @onOperationCompute="$emit('onConcatenationCompute', $event)"
         ></OperationButton>
 
         <OperationButton name="Kleene star"
                          max-stages=1
+                         v-if="automataTypeEnabled('pushdown')"
                          @onOperationButtonClick="$emit('onOperationButtonClick', $event)"
                          @onOperationCompute="$emit('onKleeneStarCompute', $event)"
         ></OperationButton>
 
         <OperationButton name="Product"
                          max-stages=2
+                         v-if="automataTypeEnabled('finite')"
                          @onOperationButtonClick="$emit('onOperationButtonClick', $event)"
                          @onOperationCompute="$emit('onProductCompute', $event)"
         ></OperationButton>
@@ -49,12 +52,25 @@
     import Vue from "vue";
     import Automata from "@/classes/Automata";
     import OperationButton from "@/components/leftpane/computation/OperationButton.vue";
+    import FiniteAutomata from "@/classes/FiniteAutomata";
+    import PushdownAutomata from "@/classes/PushdownAutomata";
     @Component({
         components: {OperationButton}
     })
     export default class ComputationPane extends Vue {
         /** Automata reference */
         @Prop() private readonly automata!: Automata;
+
+        private automataTypeEnabled(type: string): boolean {
+            if (type === "finite") {
+                return this.automata instanceof FiniteAutomata;
+            }
+            else if (type === "pushdown") {
+                return this.automata instanceof FiniteAutomata ||
+                        this.automata instanceof PushdownAutomata;
+            }
+            return true;
+        }
     }
 </script>
 
