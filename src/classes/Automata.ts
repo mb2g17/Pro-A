@@ -514,27 +514,34 @@ export default abstract class Automata {
 
         // Goes through each config
         for (const config of this.getCurrentConfigs()) {
-            // Gets epsilon move target states
-            let epsilonTargetStates = this.getTargetStates('ε', config.state);
+            // Computes epsilon-like moves
+            [AutomataCharacters.Epsilon,
+                AutomataCharacters.NonEmptySymbol,
+                AutomataCharacters.CircleSymbol,
+                AutomataCharacters.UncircleSymbol].forEach(character => {
 
-            // If there are none, change to empty array
-            if (!epsilonTargetStates) {
-                epsilonTargetStates = [];
-            }
+                // Gets epsilon move target states
+                let epsilonTargetStates = this.getTargetStates(character, config.state);
 
-            // Apply this transition for each epsilon target state
-            for (const targetState of epsilonTargetStates) {
-                // Gets edge ID
-                const edgeID = this.cacheEdgeID[AutomataCharacters.Epsilon][config.state][targetState];
-
-                // Gets new config by applying transition
-                const newConfig = this.applyTransition(config, edgeID, true);
-
-                // If the transition was succesful, add
-                if (newConfig) {
-                    newCurrentConfigs.add(newConfig);
+                // If there are none, change to empty array
+                if (!epsilonTargetStates) {
+                    epsilonTargetStates = [];
                 }
-            }
+
+                // Apply this transition for each epsilon target state
+                for (const targetState of epsilonTargetStates) {
+                    // Gets edge ID
+                    const edgeID = this.cacheEdgeID[character][config.state][targetState];
+
+                    // Gets new config by applying transition
+                    const newConfig = this.applyTransition(config, edgeID, true);
+
+                    // If the transition was succesful, add
+                    if (newConfig) {
+                        newCurrentConfigs.add(newConfig);
+                    }
+                }
+            });
 
             // Gets first input symbol
             const inputSymbol: string = config.getInputSymbol();

@@ -30,13 +30,14 @@ export default class TuringMachine extends Automata {
         const circleSymbol: boolean = symbol === AutomataCharacters.CircleSymbol;
         const uncircleSymbol: boolean = symbol === AutomataCharacters.UncircleSymbol;
         // If transition looks for non-empty symbol or circle symbol, disguise it as an epsilon move
-        if (nonEmptySymbol || circleSymbol || uncircleSymbol) {
+        /*if (nonEmptySymbol || circleSymbol || uncircleSymbol) {
             symbol = AutomataCharacters.Epsilon;
         }
 
         const readTapeSymbol = nonEmptySymbol ? AutomataCharacters.NonEmptySymbol :
             uncircleSymbol ? AutomataCharacters.UncircleSymbol :
-            circleSymbol ? AutomataCharacters.CircleSymbol : symbol;
+            circleSymbol ? AutomataCharacters.CircleSymbol : symbol;*/
+        const readTapeSymbol = symbol;
 
         super.addTransition(symbol, source, target, payload);
 
