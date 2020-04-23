@@ -292,18 +292,21 @@ export default class AutomataPreview extends Vue {
 
                         // Goes through every selected node
                         for (const node of this.selectedNodes) {
-                            // Sets parent of this node to new parent
-                            this.cy.getElementById(node).move({
-                                parent: parentID
-                            });
+                            // Only do this if this is a node
+                            if (this.automata.getStateById(node).data.type === "node") {
+                                // Sets parent of this node to new parent
+                                this.cy.getElementById(node).move({
+                                    parent: parentID
+                                });
 
-                            // Sets parent property in data
-                            let data: any = this.automata.getData();
-                            data[node].parent = parentID;
-                            this.automata.setData(data);
+                                // Sets parent property in data
+                                let data: any = this.automata.getData();
+                                data[node].parent = parentID;
+                                this.automata.setData(data);
 
-                            // Change cache
-                            this.automata.cacheFoldedStates.add(node);
+                                // Change cache
+                                this.automata.cacheFoldedStates.addStateToFold(node, parentID);
+                            }
                         }
 
                         // Updates outline pane
@@ -328,18 +331,21 @@ export default class AutomataPreview extends Vue {
                         }
                         // Goes through every selected node
                         for (const node of this.selectedNodes) {
-                            // Removes parent from this node
-                            this.cy.getElementById(node).move({
-                                parent: null
-                            });
+                            // Only do this if this is a node
+                            if (this.automata.getStateById(node).data.type === "node") {
+                                // Removes parent from this node
+                                this.cy.getElementById(node).move({
+                                    parent: null
+                                });
 
-                            // Sets parent property in data
-                            let data: any = this.automata.getData();
-                            data[node].parent = null;
-                            this.automata.setData(data);
+                                // Sets parent property in data
+                                let data: any = this.automata.getData();
+                                data[node].parent = null;
+                                this.automata.setData(data);
 
-                            // Change cache
-                            this.automata.cacheFoldedStates.delete(node);
+                                // Change cache
+                                this.automata.cacheFoldedStates.removeStateFromFold(node);
+                            }
                         }
 
                         // Updates outline pane
@@ -400,6 +406,9 @@ export default class AutomataPreview extends Vue {
                         // Removes objects from Cytoscape
                         const removedElements = this.cy.remove(this.cy.elements(selector));
 
+                        // Remembers folds the states were in
+                        const folds: Set<string> = new Set();
+
                         // Goes through all removed elements
                         for (let i = 0; i < removedElements.length; i++) {
                             const elem = removedElements[i];
@@ -409,6 +418,12 @@ export default class AutomataPreview extends Vue {
 
                             // If this is a state
                             if (elem._private.data.type === "node") {
+                                // If this is within a fold
+                                if (this.automata.cacheFoldedStates.isStateInFold(elem._private.data.id)) {
+                                    // Remember this fold
+                                    folds.add(this.automata.cacheFoldedStates.getFoldOfState(elem._private.data.id));
+                                }
+
                                 // Removes node from data
                                 const name = elem._private.data.name;
                                 this.automata.removeState(name);
@@ -432,6 +447,16 @@ export default class AutomataPreview extends Vue {
                             await this.$nextTick();
                             OutlineUpdateEventHandler.$emit('updateOutline');
                         }
+
+                        // Goes through all folds
+                        folds.forEach((fold: string) => {
+                            // If this fold is empty
+                            if (this.automata.cacheFoldedStates.getFoldContents(fold).size === 0)
+                            {
+                                this.cy.remove("#" + fold);
+                                this.automata.removeStateFold(fold);
+                            }
+                        });
                     },
                     hasTrailingDivider: true
                 },

@@ -382,12 +382,11 @@
             // Checks for state folds or states that are already in folds
             selectedNodes[0].forEach(selectedNode => {
                 // If this is a state fold
-                console.log(this.automataPreview.cy.getElementById(selectedNode));
                 if (this.automataPreview.cy.getElementById(selectedNode)._private.classes.has("parent"))
                     cancel = true;
 
                 // If this is a state that is in a fold already
-                if (this.automata.cacheFoldedStates.has(selectedNode))
+                if (this.automata.cacheFoldedStates.isStateInFold(selectedNode))
                     cancel = true;
             });
             if (cancel)
@@ -407,15 +406,19 @@
             // Sets parent of all selected nodes
             let grandParent: any = null;
             for (const node of selectedNodes[0]) {
-                grandParent = this.automataPreview.cy.getElementById(node)[0]._private.data.parent;
-                this.automataPreview.cy.getElementById(node).move({
-                    parent: parentID
-                });
+                // Only do this if this is a node
+                if (this.automata.getStateById(node).data.type === "node") {
+                    console.log(node);
+                    grandParent = this.automataPreview.cy.getElementById(node)[0]._private.data.parent;
+                    this.automataPreview.cy.getElementById(node).move({
+                        parent: parentID
+                    });
 
-                // Sets parent property in data
-                let data: any = this.automata.getData();
-                data[node].parent = parentID;
-                this.automata.setData(data);
+                    // Sets parent property in data
+                    let data: any = this.automata.getData();
+                    data[node].parent = parentID;
+                    this.automata.setData(data);
+                }
             }
 
             // Sets grandparent (parent of parent)
@@ -429,7 +432,11 @@
             this.automata.setData(newData);
 
             // Add all nodes to cache
-            selectedNodes[0].forEach(selectedNode => this.automata.cacheFoldedStates.add(selectedNode));
+            selectedNodes[0].forEach(selectedNode => {
+                // Only do this if this is a node
+                if (this.automata.getStateById(selectedNode).data.type === "node")
+                    this.automata.cacheFoldedStates.addStateToFold(selectedNode, parentID);
+            });
         }
 
         /**

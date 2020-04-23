@@ -41,10 +41,10 @@ export default function(serialized: string): Automata {
     automata["cacheNodeID"] = json.cacheNodeID;
     automata["cacheInitialStates"] = new Set(json.cacheInitialStates);
     automata["cacheFinalStates"] = new Set(json.cacheFinalStates);
-    automata["cacheFoldedStates"] = new Set(json.cacheFoldedStates);
 
     // Refreshes cache
     automata.cacheTransition.refresh(automata);
+    automata.cacheFoldedStates.refresh(automata);
 
     // Return automata
     return automata;

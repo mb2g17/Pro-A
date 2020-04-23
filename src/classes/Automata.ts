@@ -7,6 +7,7 @@ import AutomataMachineCache from "@/classes/AutomataMachineCache";
 import _ from "lodash";
 import {AutomataCharacters} from '@/classes/AutomataCharacters';
 import {AutomataTransitionCache} from "@/classes/AutomataTransitionCache";
+import {AutomataFoldedStatesCache} from "@/classes/AutomataFoldedStatesCache";
 
 /**
  * Abstract class of an automata such as FA, PDA or TM
@@ -27,8 +28,8 @@ export default abstract class Automata {
     /** Set of final state names */
     protected cacheFinalStates: Set<string> = new Set();
 
-    /** Set of states that are in a fold by ID */
-    public cacheFoldedStates: Set<string> = new Set();
+    /** State IDs --> State fold ID that this state is in */
+    public cacheFoldedStates: AutomataFoldedStatesCache = new AutomataFoldedStatesCache();
 
     /** Cache storing transition convenience */
     public cacheTransition: AutomataTransitionCache = new AutomataTransitionCache();
@@ -310,10 +311,13 @@ export default abstract class Automata {
             // Removes from initial / final state cache
             this.cacheInitialStates.delete(stateName);
             this.cacheFinalStates.delete(stateName);
-            this.cacheFoldedStates.delete(id);
 
-            // Updates cache
+            // Updates transition cache
             this.cacheTransition.removeState(stateName);
+
+            // Updates state fold cache
+            if (this.cacheFoldedStates.isStateInFold(id))
+                this.cacheFoldedStates.removeStateFromFold(id);
         }
     }
 
@@ -321,6 +325,9 @@ export default abstract class Automata {
         // Deletes data entry
         if (this.data[foldID])
             delete this.data[foldID];
+
+        // Updates cache
+        this.cacheFoldedStates.removeFold(foldID);
     }
 
     /**
@@ -598,8 +605,7 @@ export default abstract class Automata {
             cacheEdgeID: this.cacheEdgeID,
             cacheNodeID: this.cacheNodeID,
             cacheInitialStates: [...this.cacheInitialStates],
-            cacheFinalStates : [...this.cacheFinalStates],
-            cacheFoldedStates: [...this.cacheFoldedStates]
+            cacheFinalStates : [...this.cacheFinalStates]
         };
 
         // Goes through items, checking if they're good
