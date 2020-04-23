@@ -314,12 +314,17 @@
             let state = this.automata.getData()[stateID];
 
             let response = await (this as any).$dialog.prompt({
-                text: `Type new state name here`,
-                title: `Renaming '${state.data.displayName}'`
+                text: `Type new name here`,
+                title: state.data.displayName ? `Renaming '${state.data.displayName}'` : "Naming state fold"
             });
 
             // If it wasn't cancelled, rename
             if (response) {
+                this.automataPreview.cy.getElementById(stateID).json({
+                    data: {
+                        displayName: response
+                    }
+                });
                 this.automata.renameState(stateID, response);
 
                 // Updates outline pane

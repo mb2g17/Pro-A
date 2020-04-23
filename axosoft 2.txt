@@ -27,4 +27,3 @@ OTHER / UNCATEGORISED:
 
 --* IN PROGRESS:
 - BUG: edge handles gets saved as their own objects when saving automata (also re-do saved automata)
-- BUG: can rename state folds (might want to adapt this later for labelling state folds)
