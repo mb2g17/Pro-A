@@ -221,6 +221,9 @@ export default class Main extends Vue {
         const cytoscapeJSON = cy.json();
         delete cytoscapeJSON.style;
 
+        // Filter out edge handle elements
+        cytoscapeJSON.elements.nodes = cytoscapeJSON.elements.nodes.filter((nodeData: any) => nodeData.classes !== "eh-handle");
+
         // If we are simulating, do not save
         if (elem[0].RightPane.AnimationPane.isSimulating) {
             // Tell the user to stop the animation
