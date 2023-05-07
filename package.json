@@ -44,7 +44,7 @@
     "cytoscape-expand-collapse": "^3.2.0",
     "cytoscape-navigator": "^2.0.1",
     "file-saver": "^2.0.2",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "js-base64": "^2.5.2",
     "lodash": "^4.17.15",
     "node-sass": "^4.12.0",
